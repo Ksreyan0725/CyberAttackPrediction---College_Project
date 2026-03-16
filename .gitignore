@@ -4,7 +4,7 @@ venv/
 ENV/
 
 # Softwares
-Soft/
+# Soft/
 
 # Python Cache
 __pycache__/
