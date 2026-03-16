@@ -69,8 +69,8 @@ This project primarily uses the **NSL-KDD** dataset, an industry-standard benchm
 ---
 
 ## 📂 Documentation
-For an exhaustive deep dive into the code, logic, and Viva preparation, please refer to our master guide:
-👉 **[PROJECT_GUIDE.md](PROJECT_GUIDE.md)**
+For an exhaustive deep dive into the code, logic, and Viva preparation, please refer to the team's master guide:
+[PROJECT_GUIDE.md](PROJECT_GUIDE.md)
 
 ---
 
