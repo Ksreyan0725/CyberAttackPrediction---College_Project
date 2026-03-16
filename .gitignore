@@ -16,6 +16,7 @@ CyberAttackPrediction/Dataset/*.csv
 CyberAttackPrediction/model/*.hdf5
 *.pkl
 *.h5
+*.zip
 
 # OS Files
 .DS_Store
