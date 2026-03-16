@@ -10,9 +10,8 @@ A comprehensive final year BCA project that predicts network intrusions using ad
 
 ## 🚀 Key Features
 
-- **Multi-Model Analysis**: Utilizes Random Forest, DNN, and Hybrid Stacking for high-accuracy detection.
-- **Generative AI Insights**: Provides natural language explanations for detected attacks (e.g., Neptune, Teardrop, Smurf).
-- **Modern Web UI**: A clean, Bootstrap 5-powered dashboard for easy data upload and analysis.
+- **Smart Security**: Implements an inactivity-based logout (1 hour) and page-context-aware reload protection for results.
+- **Split Login UI**: A premium, dual-panel login screen with character-by-character typing animations.
 - **Explainable AI (XAI)**: Includes SHAP interpretation to show *why* the AI made a specific decision.
 - **Academic Ready**: Comes with a 2000+ line [PROJECT_GUIDE.md](PROJECT_GUIDE.md) and full team details.
 
@@ -82,10 +81,11 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
         - 📄 [default.css](CyberAttackPrediction/static/default.css) (Colors and Layout)
     - 📁 [templates](CyberAttackPrediction/templates/) (The Webpages)
         - 📄 [base.html](CyberAttackPrediction/templates/base.html) (The Master Layout)
-        - 📄 [index.html](CyberAttackPrediction/templates/index.html) (Home Page)
-        - 📄 [Predict.html](CyberAttackPrediction/templates/Predict.html) (The Upload Page)
-        - 📄 [UserLogin.html](CyberAttackPrediction/templates/UserLogin.html) (Login Page)
-        - 📄 [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results Page)
+        - [index.html](CyberAttackPrediction/templates/index.html) (Home Page)
+        - [Predict.html](CyberAttackPrediction/templates/Predict.html) (The Upload Page)
+        - [UserLogin.html](CyberAttackPrediction/templates/UserLogin.html) (Split Login Page)
+        - [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results Page)
+        - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Explainers)
     - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
     - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
     - 🐍 [Main.py](CyberAttackPrediction/Main.py) (The Heart of the Project)

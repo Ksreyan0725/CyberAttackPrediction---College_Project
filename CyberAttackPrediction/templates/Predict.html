@@ -2,103 +2,477 @@
 
 {% block title %}Predict Cyber Attack - CyberShield AI{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Ensure the body takes full height and uses flex to push footer to bottom */
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    
+    body {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Prevent scrolling on this page */
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+    }
+
+    main {
+        flex: 1; /* Take up all available space between navbar and footer */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .footer {
+        flex-shrink: 0; /* Don't allow footer to shrink */
+        margin-top: 0 !important;
+        padding: 5px 0 !important; /* Extremely compact footer */
+    }
+
+    .mt-n5 { margin-top: 0 !important; }
+    .bg-primary-light { background-color: rgba(13, 110, 253, 0.1); }
+    .border-dashed { border-style: dashed !important; }
+    .cursor-pointer { cursor: pointer; }
+    .transition-all { transition: all 0.3s ease; }
+    
+    .xx-small { font-size: 0.65rem; }
+    .x-small { font-size: 0.75rem; }
+        .upload-box {
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px dashed rgba(13, 202, 240, 0.4);
+        border-radius: 20px;
+        padding: 2.5rem 1.5rem; /* Reduced padding */
+        text-align: center;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        cursor: pointer;
+    }
+    
+    .upload-box:hover, .upload-box.dragover {
+        background: rgba(13, 110, 253, 0.08);
+        border-color: #0d6efd;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .upload-box.file-selected {
+        border-color: #198754; 
+        background: rgba(25, 135, 84, 0.08);
+    }
+
+    .file-info-display {
+        display: none;
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        border: 1px solid var(--glass-border);
+        text-align: left;
+    }
+
+    .file-info-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .file-icon {
+        font-size: 2rem;
+        color: #0dcaf0;
+    }
+
+    .file-details {
+        flex: 1;
+    }
+
+    .file-name-text {
+        font-weight: 700;
+        color: #ffffff;
+        font-size: 1.1rem;
+        word-break: break-all;
+    }
+
+    .file-meta {
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    .upload-status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 100px;
+        background: rgba(13, 202, 240, 0.2);
+        color: #0dcaf0;
+        font-weight: 600;
+    }
+
+    [data-theme="light"] .upload-box {
+        background: #ffffff;
+        border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    [data-theme="light"] .file-name-text {
+        color: #1e293b;
+    }
+
+    [data-theme="light"] .file-info-display {
+        background: #f8fafc;
+        border-color: rgba(0, 0, 0, 0.05);
+    }
+
+    [data-theme="light"] .file-meta {
+        color: #64748b;
+    }
+
+    [data-theme="light"] .text-white-enhanced {
+        color: #1e293b !important;
+        text-shadow: none;
+    }
+
+    [data-theme="light"] .text-light-enhanced {
+        color: #475569 !important;
+    }
+
+    [data-theme="light"] .custom-toast {
+        background: white;
+        color: #1e293b;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+
+    /* High contrast text improvements */
+    .text-white-enhanced {
+        color: #ffffff !important;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .text-light-enhanced {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 1.05rem;
+    }
+
+    .btn-analyze {
+        font-size: 1.1rem;
+        padding: 1rem 2rem;
+        letter-spacing: 0.5px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-analyze:not(:disabled):hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 10px 25px rgba(13, 110, 253, 0.5);
+    }
+
+    /* Form spacing */
+    .form-group-spacing {
+        margin-bottom: 2.5rem;
+    }
+
+    /* Centered Toast Notifications */
+    .toast-container {
+        position: fixed;
+        top: 2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        pointer-events: none;
+        width: auto;
+        max-width: 90%;
+    }
+
+    .custom-toast {
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px);
+        border: 1px solid var(--glass-border);
+        color: white;
+        border-radius: 50px; /* Pill shape for notifications */
+        padding: 0.75rem 1.5rem;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideDownFade 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        pointer-events: auto;
+    }
+
+    @keyframes slideDownFade {
+        from { transform: translateY(-30px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Analysis Progress styles */
+    .progress-container {
+        display: none;
+        margin-top: 1.5rem;
+    }
+
+    .progress-outer {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 100px;
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+    }
+
+    .progress-inner {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, var(--info-color), #3b82f6);
+        box-shadow: 0 0 15px var(--info-color);
+        transition: width 0.1s linear;
+    }
+
+    .progress-text {
+        font-family: 'Monaco', 'Consolas', monospace;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="hero-section text-center animate__animated animate__fadeIn">
-    <div class="container">
-        <h1 class="display-4 fw-bold mb-3">Threat Detection Engine</h1>
-        <p class="lead opacity-75">Upload your network logs to analyze and predict potential cyber threats.</p>
-    </div>
-</div>
+<div class="row justify-content-center w-100 m-0">
+    <div class="col-lg-6">
+        <div class="card glass-card shadow-2xl border-0 animate__animated animate__fadeInUp">
+            <div class="card-header border-glass text-center py-3">
+                <h2 class="h5 mb-0 dynamic-text"><i class="fas fa-shield-virus me-2 text-info"></i>Threat Detection Engine</h2>
+                <p class="xx-small dynamic-muted mb-0 opacity-75 mt-1">From Traditional ML to Generative AI</p>
+            </div>
+            <div class="card-body p-4">
+                <div class="text-center mb-3">
+                    <h5 class="fw-bold dynamic-text mb-1">Analyze Network Traffic</h5>
+                    <p class="dynamic-muted opacity-75 xx-small">Upload CSV dataset for instant evaluation</p>
+                </div>
 
-<div class="container py-5 mt-n5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card glass-card shadow-2xl border-0 animate__animated animate__zoomIn">
-                <div class="card-body p-5">
-                    <div class="text-center mb-5">
-                        <div class="bg-primary-light p-4 rounded-circle d-inline-block mb-3">
-                            <i class="fas fa-file-upload h1 text-info mb-0"></i>
-                        </div>
-                        <h2 class="fw-bold text-white">Upload Dataset</h2>
-                        <p class="text-light opacity-75">Supports .csv files with network traffic features</p>
-                    </div>
-
-                    <form name="f1" method="post" action="/Predict" enctype="multipart/form-data" class="dropzone-area">
-                        <div class="upload-box border-2 border-dashed border-info rounded-4 p-5 text-center mb-4 transition-all" id="upload-box" style="background: rgba(255,255,255,0.03);">
-                            <input type="file" name="t1" id="file-input" class="d-none" accept=".csv" required>
-                            <label for="file-input" class="cursor-pointer">
-                                <i class="fas fa-cloud-upload-alt display-3 text-info mb-3"></i>
-                                <h4 class="fw-bold file-name text-white">Click to browse or drag and drop</h4>
-                                <p class="text-light opacity-50 small">Only .csv files are allowed</p>
-                            </label>
+                    <form name="f1" method="post" action="/PredictAction" enctype="multipart/form-data" id="prediction-form">
+                        <div class="form-group-spacing mb-3">
+                            <div class="upload-box py-3" id="drop-zone">
+                                <input type="file" name="t1" id="file-input" class="d-none" accept=".csv" required>
+                                <div id="upload-prompt">
+                                    <i class="fas fa-cloud-upload-alt h1 text-info mb-2"></i>
+                                    <h5 class="fw-bold dynamic-text">Drop your file here</h5>
+                                    <p class="dynamic-muted opacity-60 small">or click to browse your computer</p>
+                                    <span class="badge bg-dark-subtle text-info px-2 py-1 mt-1 border border-info border-opacity-25 x-small">CSV Only</span>
+                                </div>
+                                
+                                <div id="file-details-container" class="file-info-display p-3 mt-0">
+                                    <div class="file-info-header">
+                                        <div class="file-icon h4 mb-0">
+                                            <i class="fas fa-file-csv"></i>
+                                        </div>
+                                        <div class="file-details">
+                                            <div id="selected-file-name" class="file-name-text small">filename.csv</div>
+                                            <div class="d-flex align-items-center gap-2 mt-1">
+                                                <span id="selected-file-size" class="file-meta x-small">0 KB</span>
+                                                <span class="upload-status-badge x-small">Ready</span>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" id="remove-file" title="Remove file">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-lg py-3 shadow-lg">
-                                <i class="fas fa-microchip me-2"></i>Analyze & Predict
+                            <button type="submit" class="btn btn-primary btn-lg btn-analyze shadow-lg" id="submit-btn" style="border-radius: 12px;">
+                                <i class="fas fa-microchip me-2"></i>Start Deep Analysis
                             </button>
+                        </div>
+
+                        <!-- Progress Section (Hidden by default) -->
+                        <div id="analysis-progress" class="progress-container animate__animated animate__fadeIn">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="progress-text dynamic-text opacity-75">CONDUCTING NEURAL DATA SCAN...</span>
+                                <span id="progress-percent" class="progress-text text-info fw-bold">0%</span>
+                            </div>
+                            <div class="progress-outer">
+                                <div id="progress-bar-fill" class="progress-inner"></div>
+                            </div>
+                            <p class="xx-small dynamic-muted mt-2 text-center italic">Scanning network packets for anomalies and adversarial patterns...</p>
                         </div>
                     </form>
                 </div>
-                <div class="card-footer bg-light p-4 border-0">
-                    <div class="d-flex align-items-center justify-content-between text-muted small">
-                        <span><i class="fas fa-info-circle me-1"></i> Ensure your CSV follows the NSL-KDD format.</span>
-                        <a href="{{ url_for('static', filename='Dataset/kdd_test.csv') }}" class="text-primary text-decoration-none fw-bold">
-                            <i class="fas fa-download me-1"></i>Download Sample
+                <div class="card-footer p-3 border-0" style="background: rgba(0,0,0,0.15);">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-muted">
+                        <div class="x-small d-flex align-items-center gap-2">
+                            <i class="fas fa-info-circle text-info"></i>
+                            <span class="dynamic-text opacity-75">Dataset should follow the <strong>NSL-KDD</strong> format.</span>
+                        </div>
+                        <a href="{{ url_for('static', filename='Dataset/kdd_test.csv') }}" class="btn btn-xs btn-outline-info px-2 py-1 rounded-pill x-small">
+                            <i class="fas fa-download me-1"></i>Sample
                         </a>
                     </div>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<style>
-    .mt-n5 { margin-top: -80px !important; }
-    .bg-primary-light { background-color: rgba(13, 110, 253, 0.1); }
-    .border-dashed { border-style: dashed !important; }
-    .cursor-pointer { cursor: pointer; }
-    .transition-all { transition: all 0.3s ease; }
-    .upload-box:hover {
-        background-color: rgba(13, 110, 253, 0.05);
-        border-color: #0d6efd !important;
-        transform: scale(1.01);
-    }
-    .shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-</style>
-
-<script>
-    document.getElementById('file-input').addEventListener('change', function(e) {
-        var fileName = e.target.files[0].name;
-        document.querySelector('.file-name').textContent = fileName;
-        document.getElementById('upload-box').classList.add('bg-success-light', 'border-success');
-        document.getElementById('upload-box').style.borderColor = '#198754';
-    });
-</script>
+<!-- Toast Container for Notifications -->
+<div id="toast-container" class="toast-container"></div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    function validateForm(form) {
-        const fileInput = form.t1;
-        if (fileInput.files.length === 0) {
-            alert("Please select a test data file (CSV) to upload.");
-            fileInput.focus();
-            return false;
-        }
-        
-        const fileName = fileInput.files[0].name;
-        if (!fileName.endsWith('.csv')) {
-            alert("Invalid file format. Please upload a .csv file.");
-            return false;
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const uploadPrompt = document.getElementById('upload-prompt');
+    const fileDetails = document.getElementById('file-details-container');
+    const fileNameDisplay = document.getElementById('selected-file-name');
+    const fileSizeDisplay = document.getElementById('selected-file-size');
+    const removeFileBtn = document.getElementById('remove-file');
+    const submitBtn = document.getElementById('submit-btn');
+    const toastContainer = document.getElementById('toast-container');
+
+    // Click to browse
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    // Stop propagation on remove button to prevent triggering browse
+    removeFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        resetUpload();
+        showToast('File removed successfully', 'info');
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', handleFiles);
+
+    // Drag and drop handlers
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        fileInput.files = files;
+        handleFiles();
+    });
+
+    function handleFiles() {
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        if (!file.name.toLowerCase().endsWith('.csv')) {
+            showToast('Invalid file type. Please select a CSV file.', 'error');
+            resetUpload();
+            return;
         }
 
-        // Show loading state on button
-        const submitBtn = form.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing Data...';
+        // Success state
+        uploadPrompt.style.display = 'none';
+        fileDetails.style.display = 'block';
+        dropZone.classList.add('file-selected');
         
-        return true;
+        fileNameDisplay.textContent = file.name;
+        fileSizeDisplay.textContent = formatBytes(file.size);
+        
+        showToast('File selected: ' + file.name, 'success');
     }
+
+    function resetUpload() {
+        fileInput.value = '';
+        uploadPrompt.style.display = 'block';
+        fileDetails.style.display = 'none';
+        dropZone.classList.remove('file-selected');
+    }
+
+    function formatBytes(bytes, decimals = 2) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const dm = decimals < 0 ? 0 : decimals;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        
+        let icon = 'fa-info-circle';
+        if (type === 'success') icon = 'fa-check-circle text-success';
+        if (type === 'error') icon = 'fa-exclamation-circle text-danger';
+        
+        toast.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+        `;
+        
+        toastContainer.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translate(-50%, -30px)'; // Center-preserving exit
+            toast.style.transition = 'all 0.4s ease';
+            setTimeout(() => toast.remove(), 400);
+        }, 4000); // Slightly longer for readability since they are centered
+    }
+
+    // Form submission with simulated progress
+    const predictionForm = document.getElementById('prediction-form');
+    const progressBar = document.getElementById('progress-bar-fill');
+    const progressPercentText = document.getElementById('progress-percent');
+    const progressSection = document.getElementById('analysis-progress');
+
+    predictionForm.onsubmit = function(e) {
+        e.preventDefault(); // Prevent immediate submission
+
+        if (!fileInput.files.length) {
+            showToast('Please select a file first', 'error');
+            return false;
+        }
+        
+        // UI Transition
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Initializing...';
+        progressSection.style.display = 'block';
+
+        let progress = 0;
+        const duration = 2500; // 2.5 seconds total
+        const interval = 30; // 30ms updates
+        const increment = (100 / (duration / interval));
+
+        const timer = setInterval(() => {
+            progress += increment + (Math.random() * 0.5); // Add some "jitter" for realism
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(timer);
+                
+                // Final touches before submission
+                submitBtn.innerHTML = '<i class="fas fa-check-circle me-2"></i>Analysis Complete';
+                submitBtn.classList.replace('btn-primary', 'btn-success');
+                
+                setTimeout(() => {
+                    predictionForm.submit(); // Perform the real submission
+                }, 500);
+            }
+            
+            progressBar.style.width = progress + '%';
+            progressPercentText.textContent = Math.round(progress) + '%';
+        }, interval);
+
+        return false;
+    };
 </script>
 {% endblock %}

@@ -3,6 +3,7 @@ import numpy as np
 import pickle
 import os
 import webbrowser
+import json
 from threading import Timer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -13,7 +14,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 
 #=================flask code starts here
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -62,14 +63,53 @@ load_ml_model()
 def index():
     return render_template('index.html')
 
+@app.route('/HowItWorks')
+def HowItWorks():
+    return render_template('HowItWorks.html')
+
 @app.route('/UserLogin', methods=['GET', 'POST'])
 def UserLogin():
-    return render_template('UserLogin.html')
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    creds_file = os.path.join(base_dir, "saved_creds.json")
+    has_saved = os.path.exists(creds_file)
+    return render_template('UserLogin.html', has_saved=has_saved)
+
+@app.route('/VerifySavedLogin', methods=['POST'])
+def VerifySavedLogin():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    creds_file = os.path.join(base_dir, "saved_creds.json")
+    
+    if os.path.exists(creds_file):
+        try:
+            with open(creds_file, 'r') as f:
+                creds = json.load(f)
+            
+            # Verify against env (same as UserLoginAction)
+            admin_user = os.getenv('ADMIN_USER', 'admin')
+            admin_pass = os.getenv('ADMIN_PASS', 'admin')
+            
+            if creds.get('user') == admin_user and creds.get('pass') == admin_pass:
+                session['user'] = admin_user
+                session['remembered'] = True
+                return jsonify({"status": "success"})
+        except Exception as e:
+            print(f"Error reading creds: {e}")
+            
+    return jsonify({"status": "error", "message": "Saved credentials invalid or missing"})
+
+@app.route('/ResetCredentials', methods=['POST'])
+def ResetCredentials():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    creds_file = os.path.join(base_dir, "saved_creds.json")
+    if os.path.exists(creds_file):
+        os.remove(creds_file)
+    return jsonify({"status": "success"})
 
 @app.route('/UserLoginAction', methods=['POST'])
 def UserLoginAction():
     user = request.form.get('t1')
     password = request.form.get('t2')
+    remember = request.form.get('remember') == 'on'
     
     # Secure credential check using .env
     admin_user = os.getenv('ADMIN_USER', 'admin')
@@ -77,6 +117,16 @@ def UserLoginAction():
     
     if user == admin_user and password == admin_pass:
         session['user'] = user
+        
+        if remember:
+            session['remembered'] = True
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            creds_file = os.path.join(base_dir, "saved_creds.json")
+            with open(creds_file, 'w') as f:
+                json.dump({'user': user, 'pass': password}, f)
+        else:
+            session['remembered'] = False
+                
         return redirect(url_for('predictView'))
     else:
         return render_template('UserLogin.html', msg="Invalid login details")
@@ -90,7 +140,7 @@ def Logout():
 def predictView():
     if 'user' not in session:
         return redirect(url_for('UserLogin'))
-    return render_template('Predict.html')
+    return render_template('Predict.html', page_type='input')
 
 @app.route('/PredictAction', methods=['POST'])
 def PredictAction():
@@ -138,10 +188,10 @@ def PredictAction():
         preds = rf_model.predict(scaled_test)
         
         # Generate styled HTML results
-        output = '<table class="table table-hover table-bordered table-striped align-middle"><thead><tr class="table-dark text-white">'
-        output += '<th class="text-white"><i class="fas fa-database me-2"></i>Test Data Sample</th>'
-        output += '<th class="text-white"><i class="fas fa-shield-alt me-2"></i>Predicted Attack Type</th>'
-        output += '<th class="text-white"><i class="fas fa-magic me-2"></i>GenAI Insights</th></tr></thead><tbody>'
+        output = '<table class="table table-hover table-bordered table-striped align-middle"><thead><tr class="glass-bg border-glass">'
+        output += '<th class="dynamic-text"><i class="fas fa-database me-2" style="color: var(--primary-color)"></i>Test Data Sample</th>'
+        output += '<th class="dynamic-text"><i class="fas fa-shield-alt me-2" style="color: var(--primary-color)"></i>Predicted Attack Type</th>'
+        output += '<th class="dynamic-text"><i class="fas fa-magic me-2" style="color: var(--primary-color)"></i>GenAI Insights</th></tr></thead><tbody>'
         
         for i in range(len(preds)):
             attack_type = labels[preds[i]]
@@ -151,18 +201,18 @@ def PredictAction():
             genai_insight = get_genai_insight(attack_type)
             
             output += "<tr>"
-            output += f'<td><div class="text-truncate" style="max-width: 400px;" title="{row_data_str}"><code class="text-dark">{row_data_str}</code></div></td>'
+            output += f'<td><div class="text-truncate" style="max-width: 400px;" title="{row_data_str}"><code class="dynamic-text opacity-75">{row_data_str}</code></div></td>'
             
             if attack_type == "normal":
                 output += f'<td><span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check-circle me-1"></i> {attack_type.upper()}</span></td>'
             else:
                 output += f'<td><span class="badge bg-danger py-2 px-3 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> {attack_type.upper()}</span></td>'
             
-            output += f'<td><div class="text-dark small fw-medium">{genai_insight}</div></td>'
+            output += f'<td><div class="dynamic-text small fw-medium">{genai_insight}</div></td>'
             output += "</tr>"
             
         output += "</tbody></table>"
-        return render_template('UserScreen.html', msg=output)
+        return render_template('UserScreen.html', msg=output, page_type='result')
         
     except Exception as e:
         print(f"Error during prediction: {e}")

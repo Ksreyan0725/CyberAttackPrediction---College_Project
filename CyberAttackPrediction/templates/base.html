@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cyber Attack Prediction{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -12,38 +13,40 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         :root {
-            --primary-color: #0d6efd;
-            --secondary-color: #6c757d;
-            --dark-color: #212529;
-            --light-color: #f8f9fa;
-            --success-color: #198754;
-            --danger-color: #dc3545;
-            --info-color: #0dcaf0;
+            --primary-color: #3b82f6;
+            --secondary-color: #64748b;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
             
-            /* Theme Variables (Default Dark/Liquid Glass) */
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --text-main: #e2e8f0;
+            /* Theme Variables (Default Dark) */
+            --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+            --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --navbar-bg: rgba(15, 23, 42, 0.4);
+            --navbar-bg: rgba(2, 6, 23, 0.7);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(255, 255, 255, 0.03);
-            --footer-bg: #212529;
+            --card-bg: rgba(15, 23, 42, 0.4);
+            --footer-bg: #020617;
             --input-bg: rgba(255, 255, 255, 0.05);
             --input-text: #ffffff;
+            --hero-bg: transparent;
         }
 
         [data-theme="light"] {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --navbar-bg: rgba(255, 255, 255, 0.6);
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --navbar-bg: rgba(255, 255, 255, 0.7);
             --glass-bg: rgba(255, 255, 255, 0.8);
             --glass-border: rgba(0, 0, 0, 0.1);
             --card-bg: #ffffff;
             --footer-bg: #f8fafc;
             --input-bg: #ffffff;
-            --input-text: #1e293b;
+            --input-text: #0f172a;
+            --hero-bg: #ffffff;
         }
 
         html, body {
@@ -69,7 +72,7 @@
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--glass-border);
-            padding: 0.8rem 0;
+            padding: 0.5rem 0; /* More compact navbar */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
         }
@@ -85,14 +88,15 @@
         .navbar-brand {
             font-weight: 800;
             letter-spacing: -0.5px;
-            font-size: 1.4rem;
+            font-size: 1.2rem; /* Reduced size */
         }
 
         .nav-link {
             font-weight: 500;
             transition: all 0.3s ease;
-            margin: 0 5px;
+            margin: 0 3px; /* Reduced margin */
             border-radius: 8px;
+            font-size: 0.9rem; /* Reduced size */
         }
 
         .nav-link:hover {
@@ -131,8 +135,8 @@
         .footer {
             background-color: var(--footer-bg);
             color: var(--text-main);
-            padding: 40px 0;
-            margin-top: 80px;
+            padding: 20px 0; /* More compact footer padding */
+            margin-top: 40px; /* Reduced margin */
             border-top: 1px solid var(--glass-border);
             transition: all 0.3s ease;
         }
@@ -196,7 +200,7 @@
         .hero-section {
             background: transparent;
             color: inherit;
-            padding: 100px 0 120px;
+            padding: 40px 0 60px; /* More compact hero padding */
             margin-bottom: 0;
             clip-path: none;
         }
@@ -215,11 +219,23 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #374151;
         }
-    </style>
 
         /* Page transitions */
         .fade-in {
-            animation: fadeIn 0.8s ease-out;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Logout specific styling */
+        .nav-logout {
+            color: #ff4d4d !important;
+            font-weight: 700 !important;
+            transition: all 0.3s ease;
+        }
+        .nav-logout:hover {
+            color: #ff1a1a !important;
+            text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1) !important;
         }
 
         @keyframes fadeIn {
@@ -229,7 +245,10 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body data-logged-in="{{ 'true' if session.get('user') else 'false' }}" 
+      data-remembered="{{ 'true' if session.get('remembered') else 'false' }}"
+      data-page-type="{{ page_type }}"
+      data-logout-url="{{ url_for('Logout') }}">
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -253,10 +272,10 @@
                         <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i> Predict</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-danger" href="{{ url_for('Logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        <a class="nav-link nav-logout" href="{{ url_for('Logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
                     </li>
                     <li class="nav-item ms-lg-3">
-                        <span class="nav-link disabled text-white fw-bold">
+                        <span class="nav-link disabled fw-bold" style="color: var(--primary-color) !important;">
                             <i class="fas fa-user-circle me-1"></i> {{ session.get('user') }}
                         </span>
                     </li>
@@ -336,6 +355,49 @@
             }
             lastScrollTop = scrollTop;
         });
+
+        // Smart Logout Features
+        const body = document.body;
+        const isLoggedIn = body.getAttribute('data-logged-in') === 'true';
+        const isRemembered = body.getAttribute('data-remembered') === 'true';
+        const pageType = body.getAttribute('data-page-type');
+        const logoutUrl = body.getAttribute('data-logout-url');
+
+        if (isLoggedIn && logoutUrl) {
+            // 1. Smart Reload Logout (Secures Result Page only)
+            window.addEventListener('load', function() {
+                const navEntries = performance.getEntriesByType("navigation");
+                if (navEntries.length > 0 && navEntries[0].type === "reload") {
+                    // SECURE: Logout if results page is reloaded (to protect data)
+                    if (pageType === 'result') {
+                        window.location.href = logoutUrl;
+                    }
+                    // Browsing (input) reloads are SAFE
+                }
+            });
+
+            // 2. Inactivity (Idle) Logout - 1 Hour
+            let idleTimeout;
+            const IDLE_TIME = 60 * 60 * 1000; // 1 hour in ms
+
+            function resetIdleTimer() {
+                clearTimeout(idleTimeout);
+                idleTimeout = setTimeout(() => {
+                    // Visual warning before redirect
+                    showToast("Session expired due to inactivity. Logging out...", "error");
+                    setTimeout(() => {
+                        window.location.href = logoutUrl;
+                    }, 2000);
+                }, IDLE_TIME);
+            }
+
+            // Events that reset the idle timer
+            ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
+                document.addEventListener(evt, resetIdleTimer, true);
+            });
+            
+            resetIdleTimer();
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>

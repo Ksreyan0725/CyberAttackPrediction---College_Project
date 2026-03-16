@@ -13,68 +13,135 @@
     body {
         display: flex;
         flex-direction: column;
-        overflow: hidden; /* Prevent scrolling on this page */
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        background: var(--bg-gradient);
         background-attachment: fixed;
     }
 
     main {
-        flex: 1; /* Take up all available space between navbar and footer */
+        flex: 1;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: 2rem 1rem;
     }
 
-    .footer {
-        flex-shrink: 0; /* Don't allow footer to shrink */
-    }
-
-    .login-container {
+    .login-wrapper {
         width: 100%;
-        max-width: 450px;
-        animation: fadeInUp 0.8s ease-out;
+        max-width: 900px;
+        background: var(--glass-bg);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 30px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: row;
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 24px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5) !important;
-        color: white;
+    /* Left Side - Info Panel */
+    .info-panel {
+        flex: 1.2;
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+        padding: 1.75rem 2.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-right: 1px solid var(--glass-border);
+        position: relative;
+        overflow: hidden;
     }
 
-    .card-header {
-        background: rgba(255, 255, 255, 0.05);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 2rem !important;
+    .info-panel::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        z-index: 0;
+    }
+
+    .brand-section {
+        position: relative;
+        z-index: 1;
+    }
+
+    .brand-logo {
+        width: 45px;
+        height: 45px;
+        background: var(--primary-color);
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .brand-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, var(--text-main), var(--primary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .feature-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 1rem;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+        color: var(--text-main);
+    }
+
+    .feature-icon {
+        width: 32px;
+        height: 32px;
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 1rem;
+        color: var(--primary-color);
+        flex-shrink: 0;
+    }
+
+    /* Right Side - Form Panel */
+    .form-panel {
+        flex: 1;
+        padding: 1.75rem 2.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.01);
     }
 
     .form-control {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white !important;
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--input-text) !important;
         border-radius: 12px;
-        padding: 0.75rem 1rem;
-    }
-
-    .form-control::placeholder {
-        color: rgba(255, 255, 255, 0.4);
-    }
-
-    .form-control:focus {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
     }
 
     .input-group-text {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: #3b82f6;
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
         border-right: none;
+        color: var(--primary-color);
+        border-radius: 12px 0 0 12px;
     }
 
     .form-control {
@@ -83,52 +150,163 @@
 
     .btn-primary {
         border-radius: 12px;
-        padding: 0.8rem;
+        padding: 0.7rem;
+        font-size: 0.95rem;
         font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    /* Speed Login Custom Styles */
+    .speed-login-box {
+        text-align: center;
+        padding: 1rem;
+    }
+
+    .user-avatar-circle {
+        width: 80px;
+        height: 80px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 2px solid var(--primary-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: var(--primary-color);
+    }
+
+    @media (max-width: 900px) {
+        .login-wrapper {
+            flex-direction: column;
+            max-width: 500px;
+        }
+        .info-panel {
+            padding: 1.5rem;
+            border-right: none;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .form-panel {
+            padding: 1.5rem;
+        }
+        .brand-title {
+            font-size: 1.8rem;
+        }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="login-container">
-    <div class="card shadow-lg border-0">
-        <div class="card-header bg-primary text-white text-center py-4">
-            <h2 class="h4 mb-0"><i class="fas fa-user-lock me-2"></i>User Login</h2>
+<div class="login-wrapper">
+    <!-- Left: Informational Panel -->
+    <div class="info-panel">
+        <div class="brand-section">
+            <div class="brand-logo">
+                <i class="fas fa-shield-alt fa-2x text-white"></i>
+            </div>
+            <h1 class="brand-title">CyberShield AI</h1>
+            <div class="typing-container mb-3" style="min-height: 3.5rem;">
+                <p id="typingText" class="dynamic-muted mb-0" style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.2;"></p><span id="cursor" class="text-primary fw-bold ms-1 animate__animated animate__flash animate__infinite" style="display: inline;">|</span>
+            </div>
+            <p class="dynamic-muted small mb-0">Next-generation threat detection powered by advanced machine learning models. Secure, intelligent, and proactive.</p>
+            
+            <div class="mt-4">
+                <a href="/HowItWorks" class="btn btn-outline-primary btn-sm rounded-pill px-4">
+                    <i class="fas fa-info-circle me-1"></i> Know More / How it works
+                </a>
+            </div>
+            
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
+                    <div>
+                        <h6 class="mb-0 dynamic-text small fw-bold">ML-Driven Analytics</h6>
+                        <p class="xx-small dynamic-muted mb-0">Deep analysis of network patterns to identify potential breaches.</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                    <div>
+                        <h6 class="mb-0 dynamic-text small fw-bold">Real-time Prediction</h6>
+                        <p class="xx-small dynamic-muted mb-0">Instant classification of traffic into risk categories.</p>
+                    </div>
+                </li>
+                <li class="feature-item">
+                    <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
+                    <div>
+                        <h6 class="mb-0 dynamic-text small fw-bold">Secure Access</h6>
+                        <p class="xx-small dynamic-muted mb-0">Robust authentication and persistent session management.</p>
+                    </div>
+                </li>
+            </ul>
         </div>
-        <div class="card-body p-4 p-md-5">
+    </div>
+
+    <!-- Right: Login Panel -->
+    <div class="form-panel">
+        {% if has_saved %}
+        <!-- Direct Login View -->
+        <div id="directLoginArea" class="speed-login-box animate__animated animate__fadeIn">
+            <div class="user-avatar-circle">
+                <i class="fas fa-user-shield fa-2x"></i>
+            </div>
+            <h4 class="dynamic-text">Welcome Back</h4>
+            <p class="x-small dynamic-muted mb-4">You have a saved session. Access the dashboard directly.</p>
+            
+            <div class="d-grid gap-2">
+                <button type="button" id="btnDirectLogin" class="btn btn-primary shadow-sm py-3">
+                    <i class="fas fa-rocket me-2"></i>Quick Access
+                </button>
+                <button type="button" id="btnResetCreds" class="btn btn-link xx-small text-danger opacity-75 text-decoration-none mt-2">
+                    <i class="fas fa-sign-out-alt me-1"></i> Not you? Clear session
+                </button>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Standard Login Form -->
+        <div id="standardLoginArea" class="{% if has_saved %}d-none{% endif %} animate__animated animate__fadeIn">
+            <div class="text-center mb-4">
+                <h4 class="dynamic-text fw-bold">Administrator Login</h4>
+                <p class="xx-small dynamic-muted">Enter your credentials to manage the platform</p>
+            </div>
+
             {% if msg %}
-            <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
-                {{ msg|safe }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="alert alert-info alert-dismissible fade show mb-4 p-2 small" role="alert">
+                <i class="fas fa-info-circle me-2"></i>{{ msg|safe }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem;"></button>
             </div>
             {% endif %}
 
             <form name="f1" method="post" action="/UserLoginAction" onsubmit="return validateForm(this);">
-                <div class="mb-4">
-                    <label for="t1" class="form-label fw-bold text-muted small">USERNAME</label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-light border-0"><i class="fas fa-user text-primary"></i></span>
-                        <input type="text" class="form-control border-0 bg-light" id="t1" name="t1" placeholder="Enter username" required>
+                <div class="mb-3">
+                    <label for="t1" class="form-label fw-bold dynamic-muted xx-small mb-1">USERNAME</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" id="t1" name="t1" placeholder="Admin username" required>
                     </div>
                 </div>
-                <div class="mb-4">
-                    <label for="t2" class="form-label fw-bold text-muted small">PASSWORD</label>
-                    <div class="input-group shadow-sm">
-                        <span class="input-group-text bg-light border-0"><i class="fas fa-key text-primary"></i></span>
-                        <input type="password" class="form-control border-0 bg-light" id="t2" name="t2" placeholder="Enter password" required>
+                <div class="mb-3">
+                    <label for="t2" class="form-label fw-bold dynamic-muted xx-small mb-1">PASSWORD</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" id="t2" name="t2" placeholder="••••••••" required>
                     </div>
                 </div>
-                <div class="d-grid gap-2 mt-4">
-                    <button type="submit" class="btn btn-primary btn-lg shadow-sm">
-                        <i class="fas fa-sign-in-alt me-2"></i>Login
+                
+                <div class="form-check mb-4 mt-2">
+                    <input class="form-check-input" type="checkbox" name="remember" id="remember">
+                    <label class="form-check-label xx-small dynamic-muted" for="remember">
+                        Keep me logged in on this machine
+                    </label>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="fas fa-sign-in-alt me-2"></i>Authenticate
                     </button>
                 </div>
             </form>
-        </div>
-        <div class="card-footer bg-light text-center py-3 border-0">
-            <small class="text-muted">Need help? Contact project administrator</small>
         </div>
     </div>
 </div>
@@ -149,5 +327,65 @@
         }
         return true;
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Typing Animation Logic
+        const textToType = "From Traditional Machine Learning to Generative Artificial Intelligence";
+        const typingTextElement = document.getElementById('typingText');
+        let charIndex = 0;
+
+        function typeEffect() {
+            if (charIndex < textToType.length) {
+                typingTextElement.textContent += textToType.charAt(charIndex);
+                charIndex++;
+                setTimeout(typeEffect, 50); // Speed of typing
+            } else {
+                // Keep cursor flashing but stop typing
+                document.getElementById('cursor').classList.add('animate__flash');
+            }
+        }
+        
+        // Start typing after a short delay
+        setTimeout(typeEffect, 1000);
+
+        const btnDirectLogin = document.getElementById('btnDirectLogin');
+        const btnResetCreds = document.getElementById('btnResetCreds');
+        
+        if (btnDirectLogin) {
+            btnDirectLogin.addEventListener('click', function() {
+                btnDirectLogin.disabled = true;
+                btnDirectLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+                
+                fetch('/VerifySavedLogin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        window.location.href = '/Predict';
+                    } else {
+                        alert('Saved credentials invalid. Please login manually.');
+                        location.reload();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error:', err);
+                    alert('Connection error. Please try again.');
+                    btnDirectLogin.disabled = false;
+                    btnDirectLogin.innerHTML = '<i class="fas fa-rocket me-2"></i>Quick Access';
+                });
+            });
+        }
+
+        if (btnResetCreds) {
+            btnResetCreds.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear saved credentials?')) {
+                    fetch('/ResetCredentials', { method: 'POST' })
+                    .then(() => location.reload());
+                }
+            });
+        }
+    });
 </script>
 {% endblock %}
