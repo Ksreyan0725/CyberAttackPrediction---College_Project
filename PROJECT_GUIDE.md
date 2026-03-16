@@ -38,28 +38,23 @@
 
 ---
 
-## �️ PROJECT STRUCTURE (THE FOLDER MAP)
-*This is how the files are organized on the computer.*
+## 🏗️ PROJECT STRUCTURE (CLICKABLE FILE MAP)
+*Click on any file or folder to open it directly!*
 
-```text
-📁 CyberAttackPrediction (Main Folder)
-│
-├── 📁 static (Styles & Design)
-│   └── 📁 css (Colors and Layout files)
-│
-├── 📁 templates (The Webpages)
-│   ├── base.html (The Master Layout)
-│   ├── index.html (Home Page)
-│   ├── Predict.html (The Upload Page)
-│   └── UserScreen.html (The Results Page)
-│
-├── 📁 model (The AI's Memory)
-│   └── trained_rf_model.pkl (The Trained AI Brain)
-│
-├── Main.py (The Heart/Controller of the Project)
-├── train_model.py (The script that trains the AI)
-└── requirements.txt (List of all needed libraries)
-```
+- 📁 [CyberAttackPrediction](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction) (Main Project Folder)
+    - 📁 [static](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static) (Styles & Images)
+        - � [default.css](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/default.css) (Colors and Layout)
+    - 📁 [templates](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates) (The Webpages)
+        - 📄 [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html) (The Master Layout)
+        - 📄 [index.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/index.html) (Home Page)
+        - 📄 [Predict.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/Predict.html) (The Upload Page)
+        - 📄 [UserLogin.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserLogin.html) (Login Page)
+        - 📄 [UserScreen.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserScreen.html) (Results Page)
+    - 📁 [model](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/model) (The AI's Brain Files)
+    - 📁 [Dataset](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Dataset) (The Textbooks/Data)
+    - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
+    - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
+    - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
 
 ---
 
@@ -88,7 +83,7 @@
 
 ---
 
-## �🏫 THE "SECURITY GUARD" ANALOGY (EXPLAINING THE PROJECT)
+## �� THE "SECURITY GUARD" ANALOGY (EXPLAINING THE PROJECT)
 Imagine a very busy school gate (The Internet). Thousands of students (Data) enter every day.
 - **Traditional Security**: The guard has a list of "Banned People." If someone on the list shows up, they are stopped. But what if a new troublemaker arrives? The guard won't know!
 - **Our AI Security (ML)**: Instead of just a list, the guard is "trained" to watch behavior. If someone is running too fast, wearing a mask, or trying to climb a wall, the guard stops them—even if they've never seen that person before.
