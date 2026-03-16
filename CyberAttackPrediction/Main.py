@@ -184,6 +184,10 @@ def get_genai_insight(attack_type):
 def open_browser():
     webbrowser.open_new("http://127.0.0.1:5000/")
 
+@app.route('/documentation')
+def documentation():
+    return render_template('documentation.html')
+
 if __name__ == '__main__':
     # Automatically open browser after 1.5 seconds
     if not os.environ.get("WERKZEUG_RUN_MAIN"):

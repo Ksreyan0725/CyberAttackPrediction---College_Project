@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Project Documentation - CyberShield AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .doc-section {
+        margin-bottom: 4rem;
+    }
+    .feature-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--glass-border);
+    }
+    .feature-card:hover {
+        background: var(--glass-bg);
+        transform: translateY(-5px);
+    }
+    .sticky-toc {
+        position: sticky;
+        top: 100px;
+    }
+    .toc-link {
+        display: block;
+        padding: 0.5rem 1rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        border-left: 2px solid transparent;
+        transition: all 0.3s ease;
+    }
+    .toc-link:hover, .toc-link.active {
+        color: var(--text-main);
+        border-left-color: var(--primary-color);
+        background: var(--glass-bg);
+    }
+    .code-block {
+        background: rgba(0,0,0,0.3);
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-family: 'Courier New', Courier, monospace;
+        border: 1px solid var(--glass-border);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center animate__animated animate__fadeIn">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Project Documentation</h1>
+        <p class="lead opacity-75">A comprehensive guide to the Cyber Attack Prediction System</p>
+    </div>
+</div>
+
+<div class="container py-5 mt-n5">
+    <div class="row g-5">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="glass-card p-4 sticky-toc animate__animated animate__fadeInLeft">
+                <h5 class="fw-bold mb-4">On This Page</h5>
+                <nav>
+                    <a href="#overview" class="toc-link">Project Overview</a>
+                    <a href="#security-guard" class="toc-link">The Security Guard Analogy</a>
+                    <a href="#architecture" class="toc-link">System Architecture</a>
+                    <a href="#ml-models" class="toc-link">Machine Learning Models</a>
+                    <a href="#genai" class="toc-link">Generative AI Insights</a>
+                    <a href="#features" class="toc-link">Network Features</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 animate__animated animate__fadeInUp">
+            <div class="glass-card p-5 border-0">
+                
+                <!-- Overview -->
+                <section id="overview" class="doc-section">
+                    <h2 class="display-6 fw-bold mb-4 text-info"><i class="fas fa-info-circle me-3"></i>Project Overview</h2>
+                    <p class="fs-5 dynamic-text opacity-90 mb-4">
+                        This project, <strong>"Cyber Attack Prediction: From Traditional ML to Generative AI,"</strong> is designed to protect digital infrastructure by identifying malicious network traffic patterns before they cause damage.
+                    </p>
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4 bg-primary-light border border-primary border-opacity-25 h-100">
+                                <h5 class="fw-bold"><i class="fas fa-bullseye me-2 text-primary"></i>The Problem</h5>
+                                <p class="small mb-0">Traditional security systems rely on "signatures" (lists of known bad actors). They fail when a new, unknown attack occurs.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4 bg-success-light border border-success border-opacity-25 h-100">
+                                <h5 class="fw-bold"><i class="fas fa-lightbulb me-2 text-success"></i>The Solution</h5>
+                                <p class="small mb-0">Our system uses AI to learn <em>behavior</em>. It can spot a hacker even if it has never seen that specific attack before.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analogy -->
+                <section id="security-guard" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-user-shield me-3"></i>The Security Guard Analogy</h3>
+                    <div class="card bg-dark border-0 overflow-hidden mb-4 shadow-lg">
+                        <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="card-img-top opacity-75" alt="Security Visualization" style="max-height: 300px; object-fit: contain; background: #fff; padding: 20px;">
+                        <div class="card-body p-4">
+                            <p class="mb-0 italic">"Imagine a school gate. A traditional guard only stops people on a black-list. Our AI guard watches how people act—if someone tries to climb a wall, they are stopped immediately."</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Architecture -->
+                <section id="architecture" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-sitemap me-3"></i>System Architecture</h3>
+                    <div class="code-block mb-4">
+                        <div class="text-info mb-2">// Data Flow Journey</div>
+                        <span class="text-white">User Upload</span> ➔ <span class="text-warning">Data Pre-processing</span> ➔ <span class="text-primary">ML Prediction</span> ➔ <span class="text-success">GenAI Explanation</span>
+                    </div>
+                    <p class="dynamic-muted">The system is built using Flask (Backend), Bootstrap 5 (Frontend), and Scikit-Learn (AI Engine). It processes 41 unique features for every single network connection attempt.</p>
+                </section>
+
+                <!-- ML Models -->
+                <section id="ml-models" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-brain me-3"></i>Machine Learning Models</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card feature-card h-100">
+                                <h5 class="fw-bold text-primary">Random Forest</h5>
+                                <p class="small dynamic-muted mb-0">Our primary model. It works like a "Committee of Experts" (Decision Trees) voting on whether a connection is safe or not.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card feature-card h-100">
+                                <h5 class="fw-bold text-danger">Deep Learning (DNN)</h5>
+                                <p class="small dynamic-muted mb-0">A complex neural network that finds hidden connections in big data that simpler models might miss.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- GenAI -->
+                <section id="genai" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-magic me-3"></i>Generative AI Insights</h3>
+                    <div class="p-4 rounded-4" style="background: rgba(13, 202, 240, 0.05); border: 1px dashed var(--info-color);">
+                        <p class="mb-0">Most AI just says "Attack" or "Normal." Our <strong>Generative Insight Engine</strong> takes it a step further. It explains <em>why</em> it thinks there is an attack and gives the administrator a 3-step plan to fix it in plain English.</p>
+                    </div>
+                </section>
+
+                <div class="text-center mt-5">
+                    <a href="{{ url_for('UserLogin') }}" class="btn btn-primary btn-lg px-5">
+                        Try It Now <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mt-n5 { margin-top: -80px !important; }
+    .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
+    .bg-success-light { background: rgba(25, 135, 84, 0.1); }
+</style>
+{% endblock %}
