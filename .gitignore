@@ -21,6 +21,7 @@ CyberAttackPrediction/model/*.hdf5
 # OS Files
 .DS_Store
 Thumbs.db
+.env
 
 # VS Code
 .vscode/

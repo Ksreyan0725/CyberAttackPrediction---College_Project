@@ -1,94 +1,102 @@
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Cyber Attack Prediction</title>
-<meta name="keywords" content="" />
-<meta name="Premium Series" content="" />
-<link rel="stylesheet" href="{{ url_for('static', filename='default.css') }}">
-<script language="javascript">
-	function validate(formObj)
-	{
-	if(formObj.t1.value.length==0)
-	{
-	alert("Please Upload test data");
-	formObj.t1.focus();
-	return false;
-	}
-	
-	formObj.actionUpdateData.value="update";
-	return true;
-	}
-	</script>
-<style>
-body {
-  background-image: url("{{ url_for('static', filename='images/back.jpg') }}");
-}
-</style>
-</head>
-<body>
-<!-- start header -->
-<div id="header">
-	<div id="logo">
-		<h2><span><center><br/><font size="4" color="white">Cyber Attack Prediction: From Traditional Machine Learning to Generative Artificial Intelligence
-</font>
-</center></span></h2>
-		
-	</div>
-	<div id="menu">
-		<ul id="main">
-			<li class="current_page_item"><a href="Predict"><font size="4" color="white">Predict Cyber Attack</a></li><td></td>
-			<li><a href="index"><font size="4" color="white">Logout</a></li><td></td>
-			<td></td>		
-     
-		</ul>
-		
-	</div>
-	
+{% extends "base.html" %}
+
+{% block title %}Predict Cyber Attack - CyberShield AI{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center pb-5">
+    <div class="container">
+        <h1 class="display-5 fw-bold"><i class="fas fa-search-radar me-2"></i>Attack Prediction</h1>
+        <p class="lead opacity-75">Upload network traffic data to identify potential threats</p>
+    </div>
 </div>
 
-<div id="wrapper">
-	<!-- start page -->
-	<div id="page">
-		  <form name ="f1" method="post" action="/PredictAction" enctype="multipart/form-data" onsubmit="return validate(this);">
-		<!-- start content -->
-		<div id="content">
-		<div class="flower"><img src="{{ url_for('static', filename='images/tra.jpg') }}" alt="" width="500" height="200" /></center></div>
-			<br/><br/>
-			<div class="flower"><center><h1>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			Cybet Attack Prediction Screen<h1></div>
-			<br/>
-		
-			
-		<center><font face="verdana" color="blue">{{ msg|safe }}</center></font>
-	
-		
-			<table align="center">
-<tr><td><font size="3" color="black">Upload&nbsp;Test&nbsp;Data</td><td><input type="file" name="t1" size="60"/></td></tr>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0" style="margin-top: -50px;">
+                <div class="card-body p-5">
+                    {% if msg %}
+                    <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                        {{ msg|safe }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endif %}
 
-</td></tr>
+                    <form name="f1" method="post" action="/PredictAction" enctype="multipart/form-data" onsubmit="return validateForm(this);">
+                        <div class="text-center mb-5">
+                            <div class="display-1 text-primary mb-3">
+                                <i class="fas fa-file-upload"></i>
+                            </div>
+                            <h3 class="h4">Upload Test Dataset</h3>
+                            <p class="text-muted">Select a CSV file containing network features for analysis</p>
+                        </div>
 
-</td></tr>
-<tr><td></td><td><input type="submit" value="Submit"></td>
-</td></tr></table>
-</form>
-			</table>
-			</center><br /><div class="post">
-				
-				<div class="entry">
-					
-				</div>
-			</div>
-		</div>
-		<!-- end content -->
-		<!-- start sidebars -->
-		
-		<!-- end sidebars -->
-		<div style="clear: both;">&nbsp;</div>
-	</div>
-	<!-- end page -->
+                        <div class="mb-4">
+                            <label for="t1" class="form-label fw-bold">Select CSV File</label>
+                            <div class="input-group">
+                                <input type="file" class="form-control form-control-lg" id="t1" name="t1" accept=".csv" required>
+                                <label class="input-group-text bg-primary text-white" for="t1">
+                                    <i class="fas fa-folder-open me-1"></i> Browse
+                                </label>
+                            </div>
+                            <div class="form-text mt-2">
+                                <i class="fas fa-info-circle me-1"></i> Supported formats: .csv (NSL-KDD or CIC-IDS compatible)
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2 mt-5">
+                            <button type="submit" class="btn btn-primary btn-lg shadow-sm py-3">
+                                <i class="fas fa-microchip me-2"></i> Run Prediction Analysis
+                            </button>
+                            <a href="{{ url_for('UserLoginAction') }}" class="btn btn-link text-muted mt-2">
+                                <i class="fas fa-arrow-left me-1"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="row mt-5 g-4">
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <h5 class="text-primary mb-3"><i class="fas fa-database me-2"></i>Data Processing</h5>
+                        <p class="small text-muted mb-0">The system automatically handles missing values, encodes categorical data, and normalizes features using StandardScaler before inference.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <h5 class="text-danger mb-3"><i class="fas fa-brain me-2"></i>ML Inference</h5>
+                        <p class="small text-muted mb-0">Analysis is performed using a Random Forest Classifier trained on over 20,000 samples of cyber attack signatures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-</body>
-</html>
+{% endblock %}
 
+{% block extra_js %}
+<script>
+    function validateForm(form) {
+        const fileInput = form.t1;
+        if (fileInput.files.length === 0) {
+            alert("Please select a test data file (CSV) to upload.");
+            fileInput.focus();
+            return false;
+        }
+        
+        const fileName = fileInput.files[0].name;
+        if (!fileName.endsWith('.csv')) {
+            alert("Invalid file format. Please upload a .csv file.");
+            return false;
+        }
 
+        // Show loading state on button
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Processing Data...';
+        
+        return true;
+    }
+</script>
+{% endblock %}

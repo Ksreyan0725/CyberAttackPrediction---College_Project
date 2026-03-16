@@ -1,73 +1,83 @@
-<html>
-<head>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<title>Cyber Attack Prediction</title>
-<meta name="keywords" content="" />
-<meta name="Premium Series" content="" />
-<link rel="stylesheet" href="{{ url_for('static', filename='default.css') }}">
-<style>
-body {
-  background-image: url("{{ url_for('static', filename='images/back.jpg') }}");
-}
-</style>
-</head>
-<body>
-<!-- start header -->
-<div id="header">
-	<div id="logo">
-		<h2><span><center><br/><font size="4" color="white">Cyber Attack Prediction: From Traditional Machine Learning to Generative Artificial Intelligence
-</font>
-</center></span></h2>
-		
-	</div>
-	<div id="menu">
-		<ul id="main">
-			<li class="current_page_item"><a href="index"><font size="4" color="white">Home</a></li><td></td>
-			<li><a href="UserLogin"><font size="4" color="white">User Login</a></li><td></td>
-			<td></td>		
-     
-		</ul>
-		
-	</div>
-	
-</div>
-<div id="wrapper">
-	<!-- start page -->
-	<div id="page">
-		
-		<!-- start content -->
-		<div id="content">
-			<div class="flower"><img src="{{ url_for('static', filename='images/tra.jpg') }}" alt="" width="500" height="200" /></center></div>
-			<br/><br/>
-			<center><font size="3" color="black">The escalating sophistication of cyber threats poses significant risks to individuals, organizations,
-and nations. Cybercrime, encompassing activities like hacking and data breaches, has severe economic
-and societal consequences. In today's interconnected world, robust cybersecurity measures are paramount
-to mitigate these risks and protect sensitive information. However, traditional security solutions struggle
-to keep pace with the evolving threat landscape. Artificial Intelligence (AI) offers a powerful arsenal of
-techniques to address these challenges.</font></center>
-		<center>
-		
-			<table align="center">
-			<tr>
-			<h3>
-			</p></h3>
-			</table>
-			</center><br /><div class="post">
-				
-				<div class="entry">
-					
-				</div>
-			</div>
-		</div>
-		<!-- end content -->
-		<!-- start sidebars -->
-		
-		<!-- end sidebars -->
-		<div style="clear: both;">&nbsp;</div>
-	</div>
-	<!-- end page -->
-</div>
-</body>
-</html>
+{% extends "base.html" %}
 
+{% block title %}Home - Cyber Attack Prediction{% endblock %}
 
+{% block content %}
+<div class="hero-section text-center">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3">Cyber Attack Prediction</h1>
+        <p class="lead mb-4">From Traditional Machine Learning to Generative Artificial Intelligence</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('UserLogin') }}" class="btn btn-primary btn-lg px-4 shadow-sm">
+                <i class="fas fa-sign-in-alt me-2"></i>Get Started
+            </a>
+            <a href="#about" class="btn btn-outline-light btn-lg px-4 shadow-sm">
+                <i class="fas fa-info-circle me-2"></i>Learn More
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="about">
+    <div class="row align-items-center mb-5">
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            <div class="p-4 bg-white rounded shadow-sm">
+                <h2 class="h3 mb-4 text-primary"><i class="fas fa-shield-virus me-2"></i>Project Overview</h2>
+                <p class="text-muted leading-relaxed">
+                    The escalating sophistication of cyber threats poses significant risks to individuals, organizations, and nations. Cybercrime, encompassing activities like hacking and data breaches, has severe economic and societal consequences.
+                </p>
+                <p class="text-muted leading-relaxed">
+                    Artificial Intelligence (AI) offers a powerful arsenal of techniques to address these challenges. This project explores the transition from traditional Machine Learning models to advanced Generative AI approaches for predicting and mitigating cyber attacks.
+                </p>
+                <div class="mt-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>High Accuracy Prediction using ML</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>Real-time Attack Classification</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        <span>Generative AI Insights</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card overflow-hidden">
+                <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="img-fluid" alt="Cyber Security Visualization" style="max-height: 400px; object-fit: cover;">
+                <div class="card-body bg-dark text-white p-4">
+                    <h5 class="card-title h4 mb-2">Protecting Digital Assets</h5>
+                    <p class="card-text text-light small opacity-75">Advanced threat detection using the latest in neural network architectures and ensemble learning techniques.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0">
+                <div class="mb-3 text-primary h1"><i class="fas fa-microchip"></i></div>
+                <h3 class="h5 mb-3">Traditional ML</h3>
+                <p class="text-muted small mb-0">Utilizing robust algorithms like Random Forest, SVM, and Gradient Boosting for structured data classification.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0">
+                <div class="mb-3 text-danger h1"><i class="fas fa-brain"></i></div>
+                <h3 class="h5 mb-3">Deep Learning</h3>
+                <p class="text-muted small mb-0">Leveraging Multi-Layer Perceptrons and CNNs to identify complex patterns in network traffic data.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 p-4 border-0">
+                <div class="mb-3 text-success h1"><i class="fas fa-magic"></i></div>
+                <h3 class="h5 mb-3">Generative AI</h3>
+                <p class="text-muted small mb-0">Exploring GANs and LLMs to generate synthetic attack signatures and provide natural language explanations.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

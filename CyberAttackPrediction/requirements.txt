@@ -18,6 +18,7 @@ pip install ipykernel==6.6.12
 pip install nbconvert==7.6.0
 pip install Flask==2.1.0
 pip install shap==0.38.1
+pip install python-dotenv==1.0.0
 
 
 
