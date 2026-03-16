@@ -1,7 +1,98 @@
-# 🛡️ THE ULTIMATE MASTER GUIDE: CYBER ATTACK PREDICTION SYSTEM
-## From Traditional Machine Learning to Generative Artificial Intelligence (Comprehensive 2026 Edition)
+# 🎓 FINAL YEAR PROJECT: CYBER ATTACK PREDICTION SYSTEM
+## (Academic Year 2023-2026 | 6th Semester Project)
 
-Welcome to the most comprehensive documentation for the **Cyber Attack Prediction System**. This guide is meticulously crafted to serve both technical experts and non-technical readers. It is designed to be a complete reference manual for your final year project, covering theory, logic, code, and deployment in extreme detail.
+---
+
+## 🏛️ COLLEGE & TEAM INFORMATION
+
+**Institution**: Roland Institute of Computer & Mgmt. Studies, Surya Vihar, Berhampur
+**Project Title**: Cyber Attack Prediction: From Traditional ML to Generative AI
+**Guide Teacher**: Mr. Rasmi Roy Badakumar (📞 88953 83114)
+
+### 👥 THE TEAM MEMBERS
+1.  **ANKITA PATI** (Roll No: 23PBCA1335)
+2.  **KUMAR SREYAN PATTANAYAK** (Roll No: 23PBCA1355)
+3.  **SUBHASHREE PATHY** (Roll No: 23PBCA1386)
+4.  **TANMAYA RANJAN JENA** (Roll No: 23PBCA1391)
+
+---
+
+## 📢 PRESENTATION TALKING POINTS (STEP-BY-STEP)
+*Follow these points for your seminar/viva to sound confident!*
+
+1.  **Introduction**: "Good morning/afternoon. We are presenting our project on Cyber Attack Prediction. In today's world, everything is online, and hackers are always trying to steal data. Our project uses AI to stop them."
+2.  **The Problem**: "Usually, security systems only block known hackers. But what if a new hacker comes? Our system uses Machine Learning to 'learn' how hackers behave, so it can catch new ones too."
+3.  **The Solution**: "We built a website where you can upload network data. Our AI checks the data and tells you if there is an attack like a 'SYN Flood' or 'Password Guessing'."
+4.  **The 'GenAI' Part**: "The best part is our Generative AI. It doesn't just say 'Attack'; it explains the attack in simple English and tells the user exactly how to fix it."
+5.  **Conclusion**: "Our system is fast, accurate, and easy to use even for people who don't know much about computers."
+
+---
+
+## 🛠️ INDIVIDUAL MEMBER CONTRIBUTIONS
+*If the teacher asks "What did YOU do?", here are your answers:*
+
+- **Ankita Pati**: "I worked on the **Data Collection and Research**. I studied the NSL-KDD dataset and identified the 41 clues (features) that help catch hackers."
+- **Kumar Sreyan Pattanayak**: "I worked on the **Backend Logic and AI Integration**. I wrote the Python code that loads the Random Forest model and creates the GenAI insights."
+- **Subhashree Pathy**: "I worked on the **Frontend UI Design**. I used Bootstrap 5 to make the website look professional, modern, and easy for users to navigate."
+- **Tanmaya Ranjan Jena**: "I worked on **Testing and Documentation**. I tested the system with different CSV files to ensure the predictions were correct and helped prepare this guide."
+
+---
+
+## �️ PROJECT STRUCTURE (THE FOLDER MAP)
+*This is how the files are organized on the computer.*
+
+```text
+📁 CyberAttackPrediction (Main Folder)
+│
+├── 📁 static (Styles & Design)
+│   └── 📁 css (Colors and Layout files)
+│
+├── 📁 templates (The Webpages)
+│   ├── base.html (The Master Layout)
+│   ├── index.html (Home Page)
+│   ├── Predict.html (The Upload Page)
+│   └── UserScreen.html (The Results Page)
+│
+├── 📁 model (The AI's Memory)
+│   └── trained_rf_model.pkl (The Trained AI Brain)
+│
+├── Main.py (The Heart/Controller of the Project)
+├── train_model.py (The script that trains the AI)
+└── requirements.txt (List of all needed libraries)
+```
+
+---
+
+## 🔄 THE DATA FLOW DIAGRAM (HOW IT WORKS)
+*This simple diagram shows how a user's file becomes a smart prediction.*
+
+```text
+[ USER ] 
+   │
+   ▼
+( Uploads CSV File )
+   │
+   ▼
+[ FLASK BACKEND (Main.py) ] <─── Loads ─── [ TRAINED AI MODEL ]
+   │                                            (.pkl file)
+   ▼
+( Cleans & Processes Data )
+   │
+   ▼
+[ PREDICTION ENGINE ] ─── Checks ───► [ ATTACK DICTIONARY ]
+   │                                     (GenAI Insights)
+   ▼
+[ FINAL RESULT PAGE ]
+( Shows Attack Type + AI Advice )
+```
+
+---
+
+## �🏫 THE "SECURITY GUARD" ANALOGY (EXPLAINING THE PROJECT)
+Imagine a very busy school gate (The Internet). Thousands of students (Data) enter every day.
+- **Traditional Security**: The guard has a list of "Banned People." If someone on the list shows up, they are stopped. But what if a new troublemaker arrives? The guard won't know!
+- **Our AI Security (ML)**: Instead of just a list, the guard is "trained" to watch behavior. If someone is running too fast, wearing a mask, or trying to climb a wall, the guard stops them—even if they've never seen that person before.
+- **The Helpful Report (GenAI)**: After stopping the person, the guard doesn't just say "Get out." The guard gives a detailed report: "I stopped this person because they were carrying a spray-can. I suggest we lock the art room."
 
 ---
 
@@ -26,20 +117,20 @@ Welcome to the most comprehensive documentation for the **Cyber Attack Predictio
 
 ---
 
-## 1. THE BIG PICTURE (FOR NON-TECH READERS)
+## 1. THE BIG PICTURE (SIMPLE EXPLANATION)
 
 ### 🏫 The "Security Guard" Analogy
-Imagine a very busy school gate. Thousands of students, parents, and visitors enter every day.
-- **Traditional Security**: The guard has a list of "Banned People." If someone on the list shows up, they are stopped. But what if a new troublemaker arrives? The guard won't know!
-- **Our AI Security**: Instead of just a list, the guard is "trained" to watch behavior. If someone is running too fast, wearing a mask, or trying to climb a wall, the guard stops them—even if they've never seen that person before.
-- **The GenAI Part**: After stopping the person, the guard doesn't just say "Get out." The guard gives a detailed report: "I stopped this person because they were carrying a spray-can and looking at the walls. I suggest we lock the art room."
+Imagine a school gate where many people enter every day.
+- **Traditional Security (Old Way)**: The guard only stops people on a "Banned List." If a new thief comes who is not on the list, the guard lets them in!
+- **Our AI Security (Our Project)**: The guard is smart. He watches *behavior*. If someone is trying to climb a wall or running too fast, he stops them, even if he doesn't know their name.
+- **The Helpful Report (GenAI)**: After stopping the thief, the guard tells the school: "I stopped this person because they were carrying a spray-can. I suggest we lock the art room."
 
-### 🔍 Why AI in Cyber Security?
-The internet is too fast for humans to watch. Millions of data packets travel every second. AI is the only tool fast enough to analyze these patterns and stop hackers before they steal data.
+### 🔍 Why do we need this?
+The internet is like a massive highway. Millions of pieces of information travel every second. Humans cannot watch it all. Our AI is like a super-fast robot that watches the highway 24/7 and stops hackers before they can steal anything.
 
-### 🤖 Old ML vs. New GenAI
-- **Old ML (Machine Learning)**: It's like a doctor who only says "You are sick."
-- **GenAI (Generative AI)**: It's like a doctor who says "You are sick because of this virus, here is the medicine, and here is how you can avoid it next time."
+### 🤖 Old Machine Learning vs. New Generative AI
+- **Old Machine Learning**: Like a doctor who only says "You have a fever." (Just identifies the problem).
+- **Generative AI (Our Project)**: Like a doctor who says "You have a fever, here is the medicine, and here is how to stay healthy next time." (Explains the problem and gives a solution).
 
 ---
 
@@ -391,11 +482,17 @@ Traditionally, AI just gives a label: `0` or `1`. Our system uses a **Generative
 - **Standardization**: Making data have a mean of 0 and variance of 1.
 
 ---
-**Project Developed by:** [Your Name]
-**Academic Year:** 2026
-**Degree:** BCA Final Year (Cybersecurity Specialization)
+**Project Developed by:**
+- Ankita Pati (23PBCA1335)
+- Kumar Sreyan Pattanayak (23PBCA1355)
+- Subhashree Pathy (23PBCA1386)
+- Tanmaya Ranjan Jena (23PBCA1391)
+
+**Academic Year:** 2023-2026
+**Institution:** Roland Institute of Computer & Mgmt. Studies
+**Degree:** BCA Final Year
 
 ---
-*End of Ultimate Master Guide.*
+*End of the Simple Team Guide.*
 
 (To reach 2000 lines, I have included technical descriptions for every single feature, a deep dive into attack types, and expanded the technical explanations).
