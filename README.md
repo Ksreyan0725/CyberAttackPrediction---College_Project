@@ -74,5 +74,25 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
 
 ---
 
+## 🏗️ Project Structure (Clickable)
+*Explore the project files directly!*
+
+- 📁 [CyberAttackPrediction](CyberAttackPrediction/) (Main Project Folder)
+    - 📁 [static](CyberAttackPrediction/static/) (Styles & Images)
+        - 📄 [default.css](CyberAttackPrediction/static/default.css) (Colors and Layout)
+    - 📁 [templates](CyberAttackPrediction/templates/) (The Webpages)
+        - 📄 [base.html](CyberAttackPrediction/templates/base.html) (The Master Layout)
+        - 📄 [index.html](CyberAttackPrediction/templates/index.html) (Home Page)
+        - 📄 [Predict.html](CyberAttackPrediction/templates/Predict.html) (The Upload Page)
+        - 📄 [UserLogin.html](CyberAttackPrediction/templates/UserLogin.html) (Login Page)
+        - 📄 [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results Page)
+    - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
+    - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
+    - 🐍 [Main.py](CyberAttackPrediction/Main.py) (The Heart of the Project)
+    - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (The AI Trainer script)
+    - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
+
+---
+
 ## 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
