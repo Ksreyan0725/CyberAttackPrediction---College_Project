@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.7+-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/framework-Flask-red.svg)](https://flask.palletsprojects.com/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Jupyter](https://img.shields.io/badge/notebook-Jupyter-orange.svg)](https://jupyter.org/)
 
 A comprehensive final year BCA project that predicts network intrusions using advanced Machine Learning (Random Forest) and provides human-readable mitigation strategies using a simulated Generative AI engine.
 
@@ -90,10 +90,10 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
         - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Explainers)
     - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
     - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
-    - 📓 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research & Extension)
-    - 📓 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposal)
     - 🐍 [Main.py](CyberAttackPrediction/Main.py) (The Heart of the Project)
     - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (The AI Trainer script)
+    - 📔 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research & Extension)
+    - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposal)
     - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
 - 📁 [Soft](Soft/) (Essential Software/Installers)
     - 📁 [vs_Community](Soft/vs_Community/) (Visual Studio Setup)
@@ -104,7 +104,7 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
 - 📜 [Guide Book.txt](Guide%20Book.txt) / [PROJECT_GUIDE.md](PROJECT_GUIDE.md) (Detailed instructions)
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher)
 
+
 ---
 
-## 📄 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+*Built with ❤️ for Academic Excellence - 2026*
