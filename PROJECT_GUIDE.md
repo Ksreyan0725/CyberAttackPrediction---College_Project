@@ -455,9 +455,9 @@ Traditionally, AI just gives a label: `0` or `1`. Our system uses a **Generative
 - **Cause**: Your X (features) and Y (labels) have different lengths.
 - **Solution**: Check your data loading code. Usually happens if a row was dropped during cleaning but not from both X and Y.
 
-### ❌ Error: `AttributeError: 'Flask' object has no attribute 'json_encoder'`
-- **Cause**: You are using Flask 3.0+ but the code was written for Flask 2.0.
-- **Solution**: Update the JSON handling or downgrade Flask to version 2.3.3.
+### ❌ Error: `FileNotFoundError: No such file or directory: 'Dataset/kdd_train.csv'`
+- **Cause**: The script is being run from the wrong directory, or the file path is incorrect.
+- **Solution**: The code has been updated to use `os.path.dirname(os.path.abspath(__file__))`, which automatically finds the correct folder. If you still see this, ensure the `Dataset` folder is inside the `CyberAttackPrediction` directory.
 
 ### ❌ Error: `Internal Server Error (500)` on File Upload
 - **Cause**: The uploaded CSV is missing columns or has the wrong headers.

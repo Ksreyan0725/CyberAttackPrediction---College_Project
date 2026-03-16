@@ -24,10 +24,10 @@
             <div class="p-4 bg-white rounded shadow-sm">
                 <h2 class="h3 mb-4 text-primary"><i class="fas fa-shield-virus me-2"></i>Project Overview</h2>
                 <p class="text-muted leading-relaxed">
-                    The escalating sophistication of cyber threats poses significant risks to individuals, organizations, and nations. Cybercrime, encompassing activities like hacking and data breaches, has severe economic and societal consequences.
+                    Nowadays, cyber attacks are becoming smarter and more dangerous for everyone—from regular people to large companies. Problems like hacking and data theft can cause huge financial losses and harm our society.
                 </p>
                 <p class="text-muted leading-relaxed">
-                    Artificial Intelligence (AI) offers a powerful arsenal of techniques to address these challenges. This project explores the transition from traditional Machine Learning models to advanced Generative AI approaches for predicting and mitigating cyber attacks.
+                    Artificial Intelligence (AI) provides us with the best tools to fight back. This project shows how we can use smart computer models, moving from traditional Machine Learning to modern Generative AI, to predict and stop cyber attacks before they happen.
                 </p>
                 <div class="mt-4">
                     <div class="d-flex align-items-center mb-2">
@@ -46,11 +46,15 @@
             </div>
         </div>
         <div class="col-lg-6">
-            <div class="card overflow-hidden">
-                <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="img-fluid" alt="Cyber Security Visualization" style="max-height: 400px; object-fit: cover;">
+            <div class="card overflow-hidden shadow-lg border-0">
+                <div class="position-relative">
+                    <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="img-fluid w-100" alt="Cyber Security Visualization" style="object-fit: contain; background: #000; min-height: 300px;">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                        <h5 class="text-white mb-0 h5">Digital Asset Protection</h5>
+                    </div>
+                </div>
                 <div class="card-body bg-dark text-white p-4">
-                    <h5 class="card-title h4 mb-2">Protecting Digital Assets</h5>
-                    <p class="card-text text-light small opacity-75">Advanced threat detection using the latest in neural network architectures and ensemble learning techniques.</p>
+                    <p class="card-text text-light small opacity-75 mb-0">Advanced threat detection using the latest in neural network architectures and ensemble learning techniques.</p>
                 </div>
             </div>
         </div>

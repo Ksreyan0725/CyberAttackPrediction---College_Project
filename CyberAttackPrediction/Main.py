@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
+import webbrowser
+from threading import Timer
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import StackingClassifier
@@ -31,7 +33,10 @@ def load_ml_model():
     """Loads the pre-trained model and preprocessing tools from disk."""
     global rf_model, scaler, labels, label_encoder, feature_columns
     try:
-        model_path = os.path.join("model", "trained_rf_model.pkl")
+        # Base directory of the script
+        base_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(base_dir, "model", "trained_rf_model.pkl")
+        
         if os.path.exists(model_path):
             with open(model_path, "rb") as f:
                 model_data = pickle.load(f)
@@ -40,10 +45,10 @@ def load_ml_model():
                 labels = model_data['labels']
                 label_encoder = model_data['label_encoder']
                 feature_columns = model_data['feature_columns']
-            print("Successfully loaded pre-trained model.")
+            print(f"Successfully loaded pre-trained model from {model_path}.")
             return True
         else:
-            print("Pre-trained model not found. Please run train_model.py first.")
+            print(f"Pre-trained model not found at {model_path}. Please run train_model.py first.")
             return False
     except Exception as e:
         print(f"Error loading model: {e}")
@@ -72,7 +77,7 @@ def UserLoginAction():
     
     if user == admin_user and password == admin_pass:
         session['user'] = user
-        return render_template('UserScreen.html', msg="Welcome " + user)
+        return redirect(url_for('predictView'))
     else:
         return render_template('UserLogin.html', msg="Invalid login details")
 
@@ -133,10 +138,10 @@ def PredictAction():
         preds = rf_model.predict(scaled_test)
         
         # Generate styled HTML results
-        output = '<table class="table table-hover table-bordered table-striped align-middle"><thead><tr class="table-dark">'
-        output += '<th><i class="fas fa-database me-2"></i>Test Data Sample</th>'
-        output += '<th><i class="fas fa-shield-alt me-2"></i>Predicted Attack Type</th>'
-        output += '<th><i class="fas fa-magic me-2"></i>GenAI Insights</th></tr></thead><tbody>'
+        output = '<table class="table table-hover table-bordered table-striped align-middle"><thead><tr class="table-dark text-white">'
+        output += '<th class="text-white"><i class="fas fa-database me-2"></i>Test Data Sample</th>'
+        output += '<th class="text-white"><i class="fas fa-shield-alt me-2"></i>Predicted Attack Type</th>'
+        output += '<th class="text-white"><i class="fas fa-magic me-2"></i>GenAI Insights</th></tr></thead><tbody>'
         
         for i in range(len(preds)):
             attack_type = labels[preds[i]]
@@ -146,14 +151,14 @@ def PredictAction():
             genai_insight = get_genai_insight(attack_type)
             
             output += "<tr>"
-            output += f'<td><div class="text-truncate" style="max-width: 400px;" title="{row_data_str}"><code>{row_data_str}</code></div></td>'
+            output += f'<td><div class="text-truncate" style="max-width: 400px;" title="{row_data_str}"><code class="text-dark">{row_data_str}</code></div></td>'
             
             if attack_type == "normal":
                 output += f'<td><span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check-circle me-1"></i> {attack_type.upper()}</span></td>'
             else:
                 output += f'<td><span class="badge bg-danger py-2 px-3 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> {attack_type.upper()}</span></td>'
             
-            output += f'<td><small class="text-muted fst-italic">{genai_insight}</small></td>'
+            output += f'<td><div class="text-dark small fw-medium">{genai_insight}</div></td>'
             output += "</tr>"
             
         output += "</tbody></table>"
@@ -176,5 +181,12 @@ def get_genai_insight(attack_type):
     }
     return insights.get(attack_type.lower(), "AI suggests this is a known signature. Monitor for unusual lateral movement in the network.")
 
+def open_browser():
+    webbrowser.open_new("http://127.0.0.1:5000/")
+
 if __name__ == '__main__':
+    # Automatically open browser after 1.5 seconds
+    if not os.environ.get("WERKZEUG_RUN_MAIN"):
+        Timer(1.5, open_browser).start()
+    
     app.run(debug=True)

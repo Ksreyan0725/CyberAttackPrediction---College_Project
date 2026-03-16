@@ -6,14 +6,24 @@ from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 
-# Ensure model directory exists
-if not os.path.exists("model"):
-    os.makedirs("model")
+# Get the base directory where this script is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_DIR = os.path.join(BASE_DIR, "model")
+DATASET_PATH = os.path.join(BASE_DIR, "Dataset", "kdd_train.csv")
+MODEL_OUTPUT_PATH = os.path.join(MODEL_DIR, "trained_rf_model.pkl")
 
-print("Training model...")
+# Ensure model directory exists
+if not os.path.exists(MODEL_DIR):
+    os.makedirs(MODEL_DIR)
+
+print(f"Training model using data from: {DATASET_PATH}")
 
 # Load dataset
-dataset = pd.read_csv("Dataset/kdd_train.csv", nrows=20000)
+if not os.path.exists(DATASET_PATH):
+    print(f"ERROR: Dataset not found at {DATASET_PATH}")
+    exit(1)
+
+dataset = pd.read_csv(DATASET_PATH, nrows=20000)
 labels = np.unique(dataset['labels']).ravel()
 
 # Preprocessing
@@ -50,7 +60,7 @@ model_data = {
     'feature_columns': dataset.columns.tolist()
 }
 
-with open("model/trained_rf_model.pkl", "wb") as f:
+with open(MODEL_OUTPUT_PATH, "wb") as f:
     pickle.dump(model_data, f)
 
-print("Model, scaler, and encoders saved to model/trained_rf_model.pkl")
+print(f"Model, scaler, and encoders saved to {MODEL_OUTPUT_PATH}")
