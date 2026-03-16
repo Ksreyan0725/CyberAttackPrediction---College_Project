@@ -1,0 +1,102 @@
+CYBER ATTACK PREDICTION - COMPREHENSIVE PROJECT GUIDE
+=====================================================
+
+Welcome to the Cyber Attack Prediction project! This detailed guide covers the architecture, datasets, machine learning models, and usage instructions for the entire system.
+
+1. PROJECT OVERVIEW & ARCHITECTURE
+----------------------------------
+This project is an advanced Machine Learning and Deep Learning-based Intrusion Detection System (IDS). 
+Its primary goal is to analyze network traffic features and classify them as either "Normal" or a specific type of "Cyber Attack" (such as DoS, Probe, R2L, or U2R).
+
+The project is split into two distinct environments:
+   A. Research & Training Environment (Jupyter Notebooks): Where the data is analyzed, preprocessed, and where multiple algorithms are evaluated and compared against each other.
+   B. Production Web Application (Flask): A user-friendly interface that utilizes a trained Random Forest model to provide real-time predictions on uploaded test data.
+
+
+2. EXTENSIVE DATASET ANALYSIS
+-----------------------------
+The research portion of this project evaluates the models across four major, industry-standard cybersecurity datasets to ensure robustness:
+
+   * NSL-KDD (kdd_train.csv): The core dataset used by the web application. It contains 41 network traffic features (like duration, protocol_type, src_bytes, etc.) and classifies traffic into "normal" or various attack types (neptune, smurf, etc.).
+   * CIC-IDS-2017: A modern dataset containing benign and the most up-to-date common attacks.
+   * CIC-DDoS-2019: A dataset specifically focused on Distributed Denial of Service (DDoS) attack traffic.
+   * X-IIoTID: An Industrial Internet of Things (IIoT) specific intrusion dataset.
+
+   Data Preprocessing Steps:
+   - Label Encoding: All non-numeric categorical data (like 'protocol_type' = 'tcp') is converted into machine-readable numeric values.
+   - Imputation: Missing values in the datasets are replaced with the column mean or 0.
+   - Normalization: Features are scaled using StandardScaler so large values don't dominate the algorithm.
+
+
+3. MACHINE LEARNING & DEEP LEARNING MODELS
+------------------------------------------
+The Jupyter Notebooks evaluate a massive array of algorithms to find the most accurate predictor:
+
+   * Traditional Machine Learning: 
+     - Random Forest Classifier (The final model chosen for the Web App due to its balance of speed and accuracy)
+     - K-Nearest Neighbors (KNN)
+     - Support Vector Machines (SVM - Linear Kernel)
+     - Multi-Layer Perceptron (MLP)
+     - Logistic Regression
+     - Naive Bayes (GaussianNB)
+
+   * Deep Learning:
+     - Deep Neural Networks (DNN) built using Keras/TensorFlow. The models use dense layers with ReLU activation to learn complex non-linear patterns.
+
+   * Proposed Hybrid Stacking Model:
+     - The project implements an advanced "Stacking Classifier". It combines the predictions of MLP, KNN, and Random Forest base models, and feeds them into a final Random Forest meta-estimator to achieve maximum accuracy.
+
+   * Explainable AI (XAI):
+     - The project utilizes the "SHAP" (SHapley Additive exPlanations) library. This generates visual plots (Force Plots/Summary Plots) to explain *why* the model made a specific prediction by showing which network features had the highest impact on the decision.
+
+
+4. FOLDER STRUCTURE
+-------------------
+Inside the CyberAttackPrediction folder:
+
+   * Main.py: The Flask backend server. It handles routing, user login, on-the-fly model training, and serving predictions to the frontend.
+   * ExtensionCyberAttack.ipynb & ProposeCyberAttack.ipynb: The core research notebooks containing all the model comparisons, Deep Learning code, and SHAP visualizations.
+   * Dataset (folder): Contains kdd_train.csv, testData.csv, and other datasets.
+   * templates (folder): HTML templates (index.html, Predict.html) that render the user interface.
+   * model (folder): Used to save Keras HDF5 weights (.hdf5 files) for the Deep Learning models to avoid retraining.
+
+In the main Project folder:
+   * .venv (folder): This is the "Virtual Environment". Think of it as a completely sealed-off bubble just for this project. It contains a specific, slightly older version of Python (Python 3.7.2) and the exact versions of all the software libraries (like Pandas, TensorFlow, and Scikit-learn) required to make the machine learning models run flawlessly. Because this .venv folder is completely isolated, you can install or update newer versions of Python globally on your laptop without accidentally breaking this specific project.
+
+
+5. HOW TO RUN THE PROJECT (Detailed Instructions)
+-----------------------------------------------
+We have created two custom launcher files right here in the main Project folder. These files exist to automatically load the correct, isolated Python 3.7.2 virtual environment (the ".venv" folder). 
+
+This is incredibly important because it means this project will always work perfectly, even if you install a brand new version of Python globally on your laptop.
+
+
+A. Run the Machine Learning & Research Notebooks:
+   File to run: Start_Jupyter_Venv.bat
+   
+   Steps:
+   1. Double-click the file named "Start_Jupyter_Venv.bat" located in your main Project folder.
+   2. A black command prompt window will open. You will see text confirming it is "Starting Jupyter Notebook using the .venv"
+   3. Wait a few seconds. A new tab will automatically open in your default web browser (like Chrome or Firefox).
+   4. In your browser, you will see a list of files. Click on the file named "ExtensionCyberAttack.ipynb" or "ProposeCyberAttack.ipynb".
+   5. You can now scroll through the notebook, read the research, and click the "Run" button at the top to execute the code blocks and generate the graphs.
+   6. When you are completely finished, you can close the browser tab, and then close the black command prompt window.
+
+
+B. Run the User-Facing Web Application:
+   File to run: Start_WebApp_Venv.bat
+   
+   Steps:
+   1. Double-click the file named "Start_WebApp_Venv.bat" located in your main Project folder.
+   2. A black command prompt window will open. You will see text confirming it is "Starting the Web App (Main.py) using the .venv"
+   3. The command prompt will then show some text indicating the Flask server has started. Wait until you see a line that says "Running on http://127.0.0.1:5000/". Do not close this black window, or the website will stop working!
+   4. Open your web browser manually (if it didn't open automatically).
+   5. In the address bar at the top, type exactly: http://127.0.0.1:5000 
+   6. The Cyber Attack Prediction website will load. Click "Login".
+   7. For the username enter: admin
+   8. For the password enter: admin
+   9. You are now logged in and can upload the "testData.csv" file to test the predictive model!
+   10. When you are completely finished testing the website, go back to the black command prompt window and close it.
+
+
+Important Note: Because we are using the new Start_Jupyter_Venv.bat and Start_WebApp_Venv.bat files, you do NOT need to double click the old runJupyter.bat or runFlask.bat files that are hidden inside the CyberAttackPrediction folder. Just use the two custom files right here in the main folder!

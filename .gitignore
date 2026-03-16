@@ -1,0 +1,29 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Softwares
+Soft/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data & Models (Commonly large files)
+CyberAttackPrediction/Dataset/*.csv
+CyberAttackPrediction/model/*.hdf5
+*.pkl
+*.h5
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# Project Specific
+CyberAttackPrediction/SCREEENS.pdf
+CyberAttackPrediction/SCREENS.docx
