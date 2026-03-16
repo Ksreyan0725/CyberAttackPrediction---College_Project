@@ -14,6 +14,7 @@ A comprehensive final year BCA project that predicts network intrusions using ad
 - **Smart Security**: Implements an inactivity-based logout (1 hour) and page-context-aware reload protection for results.
 - **Split Login UI**: A premium, dual-panel login screen with character-by-character typing animations and password visibility toggle.
 - **Explainable AI (XAI)**: Includes SHAP interpretation to show *why* the AI made a specific decision.
+- **Jupyter Research**: Includes `.ipynb` notebooks used for the initial model proposal, extension research, and performance benchmarking.
 - **Academic Ready**: Comes with a 2000+ line [PROJECT_GUIDE.md](PROJECT_GUIDE.md) and full team details.
 
 ---
@@ -89,6 +90,8 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
         - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Explainers)
     - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
     - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
+    - 📓 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research & Extension)
+    - 📓 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposal)
     - 🐍 [Main.py](CyberAttackPrediction/Main.py) (The Heart of the Project)
     - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (The AI Trainer script)
     - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
