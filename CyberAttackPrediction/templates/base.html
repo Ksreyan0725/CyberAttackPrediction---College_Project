@@ -11,6 +11,17 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- Smart Theme Initialization (Prevents Flash) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
+    
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -21,15 +32,15 @@
             --danger-color: #ef4444;
             --info-color: #06b6d4;
             
-            /* Theme Variables (Default Dark) */
-            --bg-gradient: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+            /* Theme Variables (Default Dark - Neutralized) */
+            --bg-gradient: linear-gradient(135deg, #050505 0%, #151515 100%);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --navbar-bg: rgba(2, 6, 23, 0.7);
+            --navbar-bg: rgba(5, 5, 5, 0.7);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(15, 23, 42, 0.4);
-            --footer-bg: #020617;
+            --card-bg: rgba(20, 20, 20, 0.6);
+            --footer-bg: #050505;
             --input-bg: rgba(255, 255, 255, 0.05);
             --input-text: #ffffff;
             --hero-bg: transparent;
@@ -114,6 +125,73 @@
             transition: all 0.4s ease;
         }
 
+        /* Pure Liquid Glass Effect (Based on User Reference) */
+        .liquid-glass {
+            background: rgba(var(--glass-rgb, 255, 255, 255), 0.1) !important;
+            backdrop-filter: blur(20px) !important;
+            -webkit-backdrop-filter: blur(20px) !important;
+            border-radius: 30px !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4) !important;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Satin shine for Liquid Glass */
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        [data-theme="light"] .liquid-glass {
+            --glass-rgb: 255, 255, 255;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.05) !important;
+        }
+
+        [data-theme="dark"] .liquid-glass {
+            --glass-rgb: 255, 255, 255;
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Glass Form Elements */
+        .liquid-glass .form-control,
+        .liquid-glass .input-group-text,
+        .liquid-glass #togglePassword {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            backdrop-filter: blur(10px);
+            color: var(--text-main) !important;
+        }
+
+        [data-theme="light"] .liquid-glass .form-control,
+        [data-theme="light"] .liquid-glass .input-group-text,
+        [data-theme="light"] .liquid-glass #togglePassword {
+            background: rgba(255, 255, 255, 0.6) !important;
+            border: 1px solid rgba(0, 0, 0, 0.05) !important;
+        }
+
+        .liquid-glass .input-group-text {
+            color: var(--primary-color) !important;
+            opacity: 0.8;
+        }
+
+        .liquid-glass .form-control:focus {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+        }
+
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(25px) saturate(200%);
@@ -128,7 +206,7 @@
         .card:hover {
             background: var(--card-bg);
             border: 1px solid var(--glass-border);
-            transform: translateY(-10px);
+            transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
@@ -200,7 +278,7 @@
         .hero-section {
             background: transparent;
             color: inherit;
-            padding: 40px 0 60px; /* More compact hero padding */
+            padding: 30px 0 30px; /* Balanced padding */
             margin-bottom: 0;
             clip-path: none;
         }
@@ -241,6 +319,65 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Global Placeholder Visibility */
+        ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 0.7;
+        }
+
+        [data-theme="light"] ::placeholder {
+            color: var(--text-muted) !important;
+            opacity: 0.6;
+        }
+
+        /* Premium Buttons - Linear Gradients */
+        .btn-primary, .btn-submit, .btn-login {
+            background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%) !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+            transition: all 0.3s ease !important;
+        }
+        .btn-primary:hover, .btn-submit:hover, .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            filter: brightness(1.1);
+        }
+
+        /* Smart Checkboxes (Dark Theme Optimized) */
+        .form-check-input {
+            background-color: var(--input-bg) !important;
+            border: 1px solid var(--glass-border) !important;
+            cursor: pointer;
+        }
+        .form-check-input:checked {
+            background-color: var(--primary-color) !important;
+            border-color: var(--primary-color) !important;
+        }
+        [data-theme="dark"] .form-check-input {
+            filter: brightness(0.8);
+        }
+        [data-theme="dark"] .form-check-input:not(:checked) {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Fix focused input background in dark theme */
+        [data-theme="dark"] .form-control:focus {
+            background-color: var(--input-bg) !important;
+            color: var(--input-text) !important;
+            box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25);
+            border-color: var(--primary-color);
+        }
+
+        /* Prevent Autofill from turning inputs white in dark mode */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active{
+            -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
+            -webkit-text-fill-color: var(--input-text) !important;
+            transition: background-color 5000s ease-in-out 0s;
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -295,7 +432,7 @@
     </nav>
 
     <!-- Content -->
-    <main style="padding-top: 70px;">
+    <main style="padding-top: 65px;">
         {% block content %}{% endblock %}
     </main>
 
@@ -313,13 +450,7 @@
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
         
-        // Check for saved theme or system preference
-        const savedTheme = localStorage.getItem('theme');
-        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        
-        function setTheme(theme) {
-            document.documentElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
+        function updateThemeIcon(theme) {
             if (theme === 'light') {
                 themeIcon.classList.replace('fa-moon', 'fa-sun');
             } else {
@@ -327,14 +458,26 @@
             }
         }
 
-        // Initialize theme
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else if (systemPrefersDark) {
-            setTheme('dark');
-        } else {
-            setTheme('light');
+        function setTheme(theme, isManual = true) {
+            document.documentElement.setAttribute('data-theme', theme);
+            if (isManual) {
+                localStorage.setItem('theme', theme);
+            }
+            updateThemeIcon(theme);
         }
+
+        // Initialize icon state on load
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            updateThemeIcon(currentTheme);
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light', false);
+            }
+        });
 
         themeToggle.addEventListener('click', () => {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -397,6 +540,27 @@
             });
             
             resetIdleTimer();
+        }
+
+        // Global Typing Animation Utility
+        function initTypingEffect(elementId, text, speed = 50, delay = 1000) {
+            const element = document.getElementById(elementId);
+            const cursor = document.getElementById('cursor');
+            if (!element) return;
+            
+            let charIndex = 0;
+            setTimeout(() => {
+                function type() {
+                    if (charIndex < text.length) {
+                        element.textContent += text.charAt(charIndex);
+                        charIndex++;
+                        setTimeout(type, speed);
+                    } else if (cursor) {
+                        cursor.classList.add('animate__flash');
+                    }
+                }
+                type();
+            }, delay);
         }
     </script>
     {% block extra_js %}{% endblock %}

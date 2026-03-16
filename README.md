@@ -10,8 +10,9 @@ A comprehensive final year BCA project that predicts network intrusions using ad
 
 ## 🚀 Key Features
 
+- **Liquid Glass UI**: Premium glassmorphism aesthetic with translucent panels and animated background refractive blobs.
 - **Smart Security**: Implements an inactivity-based logout (1 hour) and page-context-aware reload protection for results.
-- **Split Login UI**: A premium, dual-panel login screen with character-by-character typing animations.
+- **Split Login UI**: A premium, dual-panel login screen with character-by-character typing animations and password visibility toggle.
 - **Explainable AI (XAI)**: Includes SHAP interpretation to show *why* the AI made a specific decision.
 - **Academic Ready**: Comes with a 2000+ line [PROJECT_GUIDE.md](PROJECT_GUIDE.md) and full team details.
 
@@ -91,6 +92,14 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
     - 🐍 [Main.py](CyberAttackPrediction/Main.py) (The Heart of the Project)
     - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (The AI Trainer script)
     - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
+- 📁 [Soft](Soft/) (Essential Software/Installers)
+    - 📁 [vs_Community](Soft/vs_Community/) (Visual Studio Setup)
+    - 🐍 [Python_v3.7.2.exe](Soft/Python_%2864bit%29_v3.7.2.exe)
+    - 📄 [mysql-5.5.46.msi](Soft/mysql-5.5.46-win32.msi)
+    - 📄 [node-v12.13.1.msi](Soft/node-v12.13.1-x64.msi)
+- 📁 [model](model/) (Extra Model storage)
+- 📜 [Guide Book.txt](Guide%20Book.txt) / [PROJECT_GUIDE.md](PROJECT_GUIDE.md) (Detailed instructions)
+- ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher)
 
 ---
 

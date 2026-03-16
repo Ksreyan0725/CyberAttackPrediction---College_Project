@@ -23,18 +23,46 @@
         align-items: center;
         justify-content: center;
         padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    /* Decorative Blobs */
+    .blob {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: var(--primary-color);
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.15;
+        animation: float 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+    }
+
+    .blob-1 {
+        top: -10%;
+        left: -10%;
+        background: #3b82f6;
+    }
+
+    .blob-2 {
+        bottom: -10%;
+        right: -10%;
+        background: #8b5cf6;
+        animation-delay: -10s;
+    }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(100px, 50px) scale(1.1); }
     }
 
     .login-wrapper {
         width: 100%;
         max-width: 900px;
-        background: var(--glass-bg);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 30px;
-        overflow: hidden;
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        background: transparent; /* Absolute transparency */
         display: flex;
         flex-direction: row;
         animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
@@ -43,14 +71,19 @@
     /* Left Side - Info Panel */
     .info-panel {
         flex: 1.2;
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.05) 100%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         padding: 1.75rem 2.25rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        border-right: 1px solid var(--glass-border);
+        border: 1px solid var(--glass-border);
+        border-right: none;
+        border-radius: 30px 0 0 30px;
         position: relative;
         overflow: hidden;
+        box-shadow: -20px 25px 50px -12px rgba(0, 0, 0, 0.3);
     }
 
     .info-panel::before {
@@ -124,7 +157,8 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        background: rgba(255, 255, 255, 0.01);
+        border-radius: 0 30px 30px 0 !important;
+        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
     .form-control {
@@ -197,7 +231,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="login-wrapper">
+<main>
+    <!-- Background Decor -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="login-wrapper">
     <!-- Left: Informational Panel -->
     <div class="info-panel">
         <div class="brand-section">
@@ -205,45 +244,20 @@
                 <i class="fas fa-shield-alt fa-2x text-white"></i>
             </div>
             <h1 class="brand-title">CyberShield AI</h1>
-            <div class="typing-container mb-3" style="min-height: 3.5rem;">
-                <p id="typingText" class="dynamic-muted mb-0" style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.2;"></p><span id="cursor" class="text-primary fw-bold ms-1 animate__animated animate__flash animate__infinite" style="display: inline;">|</span>
+            <div class="typing-container mb-4" style="min-height: 4rem;">
+                <p id="typingText" class="dynamic-muted mb-0" style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.4; font-size: 0.95rem;"></p><span id="cursor" class="text-primary fw-bold ms-1 animate__animated animate__flash animate__infinite" style="display: inline;">|</span>
             </div>
-            <p class="dynamic-muted small mb-0">Next-generation threat detection powered by advanced machine learning models. Secure, intelligent, and proactive.</p>
             
-            <div class="mt-4">
-                <a href="/HowItWorks" class="btn btn-outline-primary btn-sm rounded-pill px-4">
+            <div class="mt-2">
+                <a href="/HowItWorks#session-security" class="btn btn-outline-primary btn-sm rounded-pill px-4">
                     <i class="fas fa-info-circle me-1"></i> Know More / How it works
                 </a>
             </div>
-            
-            <ul class="feature-list">
-                <li class="feature-item">
-                    <div class="feature-icon"><i class="fas fa-brain"></i></div>
-                    <div>
-                        <h6 class="mb-0 dynamic-text small fw-bold">ML-Driven Analytics</h6>
-                        <p class="xx-small dynamic-muted mb-0">Deep analysis of network patterns to identify potential breaches.</p>
-                    </div>
-                </li>
-                <li class="feature-item">
-                    <div class="feature-icon"><i class="fas fa-bolt"></i></div>
-                    <div>
-                        <h6 class="mb-0 dynamic-text small fw-bold">Real-time Prediction</h6>
-                        <p class="xx-small dynamic-muted mb-0">Instant classification of traffic into risk categories.</p>
-                    </div>
-                </li>
-                <li class="feature-item">
-                    <div class="feature-icon"><i class="fas fa-fingerprint"></i></div>
-                    <div>
-                        <h6 class="mb-0 dynamic-text small fw-bold">Secure Access</h6>
-                        <p class="xx-small dynamic-muted mb-0">Robust authentication and persistent session management.</p>
-                    </div>
-                </li>
-            </ul>
         </div>
     </div>
 
     <!-- Right: Login Panel -->
-    <div class="form-panel">
+    <div class="form-panel liquid-glass">
         {% if has_saved %}
         <!-- Direct Login View -->
         <div id="directLoginArea" class="speed-login-box animate__animated animate__fadeIn">
@@ -291,6 +305,9 @@
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-lock"></i></span>
                         <input type="password" class="form-control" id="t2" name="t2" placeholder="••••••••" required>
+                        <button class="btn btn-outline-secondary border-start-0" type="button" id="togglePassword">
+                            <i class="fas fa-eye-slash" id="eyeIcon"></i>
+                        </button>
                     </div>
                 </div>
                 
@@ -309,7 +326,7 @@
             </form>
         </div>
     </div>
-</div>
+</main>
 {% endblock %}
 
 {% block extra_js %}
@@ -329,28 +346,29 @@
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Typing Animation Logic
-        const textToType = "From Traditional Machine Learning to Generative Artificial Intelligence";
-        const typingTextElement = document.getElementById('typingText');
-        let charIndex = 0;
-
-        function typeEffect() {
-            if (charIndex < textToType.length) {
-                typingTextElement.textContent += textToType.charAt(charIndex);
-                charIndex++;
-                setTimeout(typeEffect, 50); // Speed of typing
-            } else {
-                // Keep cursor flashing but stop typing
-                document.getElementById('cursor').classList.add('animate__flash');
-            }
-        }
-        
-        // Start typing after a short delay
-        setTimeout(typeEffect, 1000);
+        // Use Global Typing Animation Utility
+        const typingSummary = "Secure. Persistent. Proactive. Save your login securely to skip authentication on your next visit.";
+        initTypingEffect('typingText', typingSummary, 40, 1000);
 
         const btnDirectLogin = document.getElementById('btnDirectLogin');
         const btnResetCreds = document.getElementById('btnResetCreds');
-        
+        const loginForm = document.querySelector('form[name="f1"]'); // Changed to select by name as no ID
+        const standardLoginArea = document.getElementById('standardLoginArea');
+
+        // Password Toggle Logic
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('t2');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                eyeIcon.classList.toggle('fa-eye');
+                eyeIcon.classList.toggle('fa-eye-slash');
+            });
+        }
+
         if (btnDirectLogin) {
             btnDirectLogin.addEventListener('click', function() {
                 btnDirectLogin.disabled = true;
