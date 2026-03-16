@@ -101,40 +101,48 @@
 
     <div class="content-grid">
         <div class="info-box">
-            <div class="box-icon"><i class="fas fa-database fa-lg"></i></div>
-            <h4 class="dynamic-text mb-3">Traditional ML</h4>
-            <p class="dynamic-muted small">We utilize Random Forest and Stacking Classifiers to analyze historical network traffic. These models excel at identifying known attack signatures with high precision and low false-positive rates.</p>
+            <div class="box-icon"><i class="fas fa-layer-group fa-lg"></i></div>
+            <h4 class="dynamic-text mb-3">Hybrid Stacking ML</h4>
+            <p class="dynamic-muted small">Our core engine utilizes a <strong>Stacking Classifier</strong> ensemble. It combines the strengths of <strong>Random Forests</strong> for pattern recognition and <strong>Deep Neural Networks (DNN)</strong> for high-dimensional feature extraction, ensuring state-of-the-art accuracy in threat classification.</p>
         </div>
 
         <div class="info-box">
-            <div class="box-icon"><i class="fas fa-magic fa-lg"></i></div>
-            <h4 class="dynamic-text mb-3">Generative AI</h4>
-            <p class="dynamic-muted small">Our GenAI integration provides human-readable insights. It doesn't just say "Threat Detected"—it explains the anomaly, predicts potential impact, and suggests immediate mitigation strategies.</p>
+            <div class="box-icon"><i class="fas fa-brain fa-lg"></i></div>
+            <h4 class="dynamic-text mb-3">Generative AI Insights</h4>
+            <p class="dynamic-muted small">Beyond simple detection, our <strong>GenAI Engine</strong> translates raw technical logs into actionable intelligence. It maps complex attack vectors (like <em>DoS, Probe, U2R</em>) to human-readable mitigation strategies, providing a bridge between IT logs and security response.</p>
         </div>
     </div>
 
     <div class="info-box mb-5">
-        <h4 class="dynamic-text mb-4 text-center">Implementation Pipeline</h4>
+        <h4 class="dynamic-text mb-4 text-center">Architectural Pipeline</h4>
         <div class="row text-center g-4">
             <div class="col-md-3">
-                <i class="fas fa-filter text-primary mb-2"></i>
-                <h6 class="dynamic-text x-small">Preprocessing</h6>
-                <p class="xx-small dynamic-muted">Data scaling & encoding</p>
+                <div class="p-3">
+                    <i class="fas fa-microchip text-primary mb-3 fa-2x"></i>
+                    <h6 class="dynamic-text small fw-bold">NSL-KDD Dataset</h6>
+                    <p class="xx-small dynamic-muted">Industry-standard benchmark data for network intrusion detection.</p>
+                </div>
             </div>
-            <div class="col-md-3">
-                <i class="fas fa-search text-primary mb-2"></i>
-                <h6 class="dynamic-text x-small">Classification</h6>
-                <p class="xx-small dynamic-muted">Model-based prediction</p>
+            <div class="col-md-3 border-start border-glass">
+                <div class="p-3">
+                    <i class="fas fa-cog text-primary mb-3 fa-2x"></i>
+                    <h6 class="dynamic-text small fw-bold">Feature Engineering</h6>
+                    <p class="xx-small dynamic-muted">One-hot encoding and MinMax scaling for standardized data normalization.</p>
+                </div>
             </div>
-            <div class="col-md-3">
-                <i class="fas fa-lightbulb text-primary mb-2"></i>
-                <h6 class="dynamic-text x-small">Inference</h6>
-                <p class="xx-small dynamic-muted">Contextual analysis</p>
+            <div class="col-md-3 border-start border-glass">
+                <div class="p-3">
+                    <i class="fas fa-project-diagram text-primary mb-3 fa-2x"></i>
+                    <h6 class="dynamic-text small fw-bold">Stacking Ensemble</h6>
+                    <p class="xx-small dynamic-muted">Multi-layer model aggregation for robust predictive performance.</p>
+                </div>
             </div>
-            <div class="col-md-3">
-                <i class="fas fa-shield-alt text-primary mb-2"></i>
-                <h6 class="dynamic-text x-small">Mitigation</h6>
-                <p class="xx-small dynamic-muted">Actionable feedback</p>
+            <div class="col-md-3 border-start border-glass">
+                <div class="p-3">
+                    <i class="fas fa-comment-dots text-primary mb-3 fa-2x"></i>
+                    <h6 class="dynamic-text small fw-bold">GenAI Synthesis</h6>
+                    <p class="xx-small dynamic-muted">Context-aware natural language generation for cyber-incident reporting.</p>
+                </div>
             </div>
         </div>
     </div>
