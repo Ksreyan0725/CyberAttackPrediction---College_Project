@@ -2,7 +2,16 @@ import pandas as pd
 import numpy as np
 import pickle
 import os
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import StackingClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neural_network import MLPClassifier
+
+#=================flask code starts here
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory
 from dotenv import load_dotenv
 
 # Load environment variables
