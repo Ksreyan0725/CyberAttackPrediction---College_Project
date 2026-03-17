@@ -15,7 +15,7 @@ A comprehensive final year BCA project that predicts network intrusions using ad
 - **Split Login UI**: A premium, dual-panel login screen with character-by-character typing animations and password visibility toggle.
 - **Explainable AI (XAI)**: Includes SHAP interpretation to show *why* the AI made a specific decision.
 - **Jupyter Research**: Includes `.ipynb` notebooks used for the initial model proposal, extension research, and performance benchmarking.
-- **Academic Ready**: Comes with a 2000+ line [PROJECT_GUIDE.md](PROJECT_GUIDE.md) and full team details.
+- **Academic Ready**: Comes with a 2000+ line [PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) and full team details.
 
 ---
 
@@ -71,7 +71,11 @@ This project primarily uses the **NSL-KDD** dataset, an industry-standard benchm
 
 ## 📂 Documentation
 For an exhaustive deep dive into the code, logic, and Viva preparation, please refer to the master guide:
-[PROJECT_GUIDE.md](PROJECT_GUIDE.md)
+- 📖 [PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) (Master Guide)
+- 🎓 [BeReady.md](docs/BeReady.md) (Interactive Study Guide Checklist)
+- 📝 [BeReady.txt](docs/BeReady.txt) (Plain Text Study Guide)
+- 📜 [Guide Book.txt](docs/Guide%20Book.txt) (Alternative text guide)
+- 🎨 [UI_Refinement_Walkthrough.md](docs/UI_Refinement_Walkthrough.md) (UI improvements details)
 
 ---
 
@@ -101,7 +105,7 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
     - 📄 [mysql-5.5.46.msi](Soft/mysql-5.5.46-win32.msi)
     - 📄 [node-v12.13.1.msi](Soft/node-v12.13.1-x64.msi)
 - 📁 [model](model/) (Extra Model storage)
-- 📜 [Guide Book.txt](Guide%20Book.txt) / [PROJECT_GUIDE.md](PROJECT_GUIDE.md) (Detailed instructions)
+- 📁 [docs/](docs/) (Documentation, Study Guides, & Manuals)
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher)
 
 
