@@ -106,6 +106,7 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
     - 📄 [node-v12.13.1.msi](Soft/node-v12.13.1-x64.msi)
 - 📁 [model](model/) (Extra Model storage)
 - 📁 [docs/](docs/) (Documentation, Study Guides, & Manuals)
+- 📁 [backups/](backups/) (Original zip files provided by college)
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher)
 
 

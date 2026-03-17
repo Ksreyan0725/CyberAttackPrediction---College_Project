@@ -3,9 +3,6 @@
 venv/
 ENV/
 
-# Softwares
-# Soft/
-
 # Python Cache
 __pycache__/
 *.py[cod]
@@ -26,6 +23,5 @@ Thumbs.db
 # VS Code
 .vscode/
 
-# Project Specific
-Project materials/
 
+# End of .gitignore
