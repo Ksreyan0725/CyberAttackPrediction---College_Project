@@ -1,0 +1,15 @@
+
+
+unify the logo (favicon reuse)
+
+port change to 2026
+
+readme update (missing Jupiter start_jupiter_venv)
+
+information update improve accuracy with code & tools.
+
+theme update budefault should be worked on fresh reload then auto clear local storage ... in fresh default browser should be applied and if user changes then it reloaded freshly the page then if pge closed local storage if clear then default must work if default is set to light theme the theme button show the dark theme button and vice-versa.
+
+
+deep dive into technical details option for remember me when clicked the section wil shows show as drop down..
+

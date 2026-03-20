@@ -29,16 +29,14 @@ labels = np.unique(dataset['labels']).ravel()
 # Preprocessing
 label_encoder = []
 columns = dataset.columns
-types = dataset.dtypes.values
-for j in range(len(types)):
-    name = types[j]
-    if name == 'object':
+for col in dataset.columns:
+    if not pd.api.types.is_numeric_dtype(dataset[col]):
         le = LabelEncoder()
-        dataset[columns[j]] = pd.Series(le.fit_transform(dataset[columns[j]].astype(str)))
-        label_encoder.append([columns[j], le])
+        dataset[col] = le.fit_transform(dataset[col].astype(str))
+        label_encoder.append([col, le])
 
 dataset.fillna(0, inplace=True)
-Y = dataset['labels'].ravel()
+Y = dataset['labels'].values.ravel()
 Y = Y.astype('int')
 dataset.drop(['labels'], axis=1, inplace=True)
 
