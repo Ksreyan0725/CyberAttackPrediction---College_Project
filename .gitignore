@@ -23,6 +23,8 @@ Thumbs.db
 # VS Code
 .vscode/
 
+#TODO
+TODO.md
 
 # End of .gitignore
 CyberAttackPrediction/scripts/
