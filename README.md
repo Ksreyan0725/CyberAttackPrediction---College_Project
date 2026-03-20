@@ -118,7 +118,10 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
 - 📁 [model](model/) (Extra Model storage)
 - 📁 [docs/](docs/) (Documentation, Study Guides, & Manuals)
 - 📁 [backups/](backups/) (Original zip files provided by college)
-- ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher)
+- ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher for Web App)
+- ⚙️ [Start_Jupyter_Venv.bat](Start_Jupyter_Venv.bat) (Launcher for Jupyter Notebook research)
+- 📜 [install_deps.ps1](install_deps.ps1) (Automated dependency installation script)
+- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking)
 
 ---
 
