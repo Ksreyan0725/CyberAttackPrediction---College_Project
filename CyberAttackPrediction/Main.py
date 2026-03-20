@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+from train_model import run_training
 
 #=================flask code starts here
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
@@ -236,7 +237,28 @@ def open_browser():
 
 @app.route('/documentation')
 def documentation():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
     return render_template('documentation.html')
+
+@app.route('/Train')
+def train_view():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
+    return render_template('Train.html', page_type='train')
+
+@app.route('/TrainAction', methods=['POST'])
+def TrainAction():
+    if 'user' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+    
+    result = run_training()
+    
+    # If training was successful, reload the model in memory
+    if result.get('status') == 'success':
+        load_ml_model()
+        
+    return jsonify(result)
 
 if __name__ == '__main__':
     # Automatically open browser after 1.5 seconds

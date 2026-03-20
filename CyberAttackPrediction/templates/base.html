@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,18 +11,18 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
     <!-- Smart Theme Initialization (Prevents Flash) -->
     <script>
-        (function() {
+        (function () {
             const savedTheme = localStorage.getItem('theme');
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', theme);
         })();
     </script>
-    
+
     <style>
         :root {
             --primary-color: #3b82f6;
@@ -31,7 +32,7 @@
             --success-color: #10b981;
             --danger-color: #ef4444;
             --info-color: #06b6d4;
-            
+
             /* Theme Variables (Default Dark - Neutralized) */
             --bg-gradient: linear-gradient(135deg, #050505 0%, #151515 100%);
             --text-main: #f8fafc;
@@ -60,7 +61,8 @@
             --hero-bg: #ffffff;
         }
 
-        html, body {
+        html,
+        body {
             overflow-x: hidden;
             width: 100%;
         }
@@ -75,20 +77,27 @@
         }
 
         /* Universal Text Classes */
-        .dynamic-text { color: var(--text-main) !important; }
-        .dynamic-muted { color: var(--text-muted) !important; }
+        .dynamic-text {
+            color: var(--text-main) !important;
+        }
+
+        .dynamic-muted {
+            color: var(--text-muted) !important;
+        }
 
         .navbar {
             background: var(--navbar-bg);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--glass-border);
-            padding: 0.5rem 0; /* More compact navbar */
+            padding: 0.5rem 0;
+            /* More compact navbar */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
         }
 
-        .navbar-brand, .nav-link {
+        .navbar-brand,
+        .nav-link {
             color: var(--text-main) !important;
         }
 
@@ -99,15 +108,18 @@
         .navbar-brand {
             font-weight: 800;
             letter-spacing: -0.5px;
-            font-size: 1.2rem; /* Reduced size */
+            font-size: 1.2rem;
+            /* Reduced size */
         }
 
         .nav-link {
             font-weight: 500;
             transition: all 0.3s ease;
-            margin: 0 3px; /* Reduced margin */
+            margin: 0 3px;
+            /* Reduced margin */
             border-radius: 8px;
-            font-size: 0.9rem; /* Reduced size */
+            font-size: 0.9rem;
+            /* Reduced size */
         }
 
         .nav-link:hover {
@@ -213,8 +225,10 @@
         .footer {
             background-color: var(--footer-bg);
             color: var(--text-main);
-            padding: 20px 0; /* More compact footer padding */
-            margin-top: 40px; /* Reduced margin */
+            padding: 20px 0;
+            /* More compact footer padding */
+            margin-top: 40px;
+            /* Reduced margin */
             border-top: 1px solid var(--glass-border);
             transition: all 0.3s ease;
         }
@@ -234,6 +248,18 @@
             background: var(--glass-bg);
             color: var(--text-main);
             margin-left: 10px;
+            outline: none !important; /* Fix: Prevent persistent focus border */
+        }
+
+        .theme-toggle:focus, .theme-toggle:active {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Suppress persistent focus ring on nav links for mouse users */
+        .nav-link:focus, .navbar-toggler:focus {
+            box-shadow: none !important;
+            outline: none !important;
         }
 
         .btn {
@@ -266,7 +292,8 @@
 
         .btn-outline-dynamic:hover {
             background: var(--text-main) !important;
-            color: #0f172a !important; /* Dark text on light hover background */
+            color: #0f172a !important;
+            /* Dark text on light hover background */
             border-color: var(--text-main) !important;
         }
 
@@ -278,7 +305,8 @@
         .hero-section {
             background: transparent;
             color: inherit;
-            padding: 30px 0 30px; /* Balanced padding */
+            padding: 30px 0 30px;
+            /* Balanced padding */
             margin-bottom: 0;
             clip-path: none;
         }
@@ -287,13 +315,16 @@
         ::-webkit-scrollbar {
             width: 10px;
         }
+
         ::-webkit-scrollbar-track {
             background: transparent;
         }
+
         ::-webkit-scrollbar-thumb {
             background: #4b5563;
             border-radius: 5px;
         }
+
         ::-webkit-scrollbar-thumb:hover {
             background: #374151;
         }
@@ -310,6 +341,7 @@
             font-weight: 700 !important;
             transition: all 0.3s ease;
         }
+
         .nav-logout:hover {
             color: #ff1a1a !important;
             text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
@@ -317,8 +349,15 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Global Placeholder Visibility */
@@ -333,13 +372,18 @@
         }
 
         /* Premium Buttons - Linear Gradients */
-        .btn-primary, .btn-submit, .btn-login {
+        .btn-primary,
+        .btn-submit,
+        .btn-login {
             background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%) !important;
             border: none !important;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
             transition: all 0.3s ease !important;
         }
-        .btn-primary:hover, .btn-submit:hover, .btn-login:hover {
+
+        .btn-primary:hover,
+        .btn-submit:hover,
+        .btn-login:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
             filter: brightness(1.1);
@@ -351,13 +395,16 @@
             border: 1px solid var(--glass-border) !important;
             cursor: pointer;
         }
+
         .form-check-input:checked {
             background-color: var(--primary-color) !important;
             border-color: var(--primary-color) !important;
         }
+
         [data-theme="dark"] .form-check-input {
             filter: brightness(0.8);
         }
+
         [data-theme="dark"] .form-check-input:not(:checked) {
             background-color: rgba(255, 255, 255, 0.1) !important;
         }
@@ -372,9 +419,9 @@
 
         /* Prevent Autofill from turning inputs white in dark mode */
         input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
-        input:-webkit-autofill:focus, 
-        input:-webkit-autofill:active{
+        input:-webkit-autofill:hover,
+        input:-webkit-autofill:focus,
+        input:-webkit-autofill:active {
             -webkit-box-shadow: 0 0 0 30px var(--input-bg) inset !important;
             -webkit-text-fill-color: var(--input-text) !important;
             transition: background-color 5000s ease-in-out 0s;
@@ -382,10 +429,10 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body data-logged-in="{{ 'true' if session.get('user') else 'false' }}" 
-      data-remembered="{{ 'true' if session.get('remembered') else 'false' }}"
-      data-page-type="{{ page_type }}"
-      data-logout-url="{{ url_for('Logout') }}">
+
+<body data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
+    data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
+    data-logout-url="{{ url_for('Logout') }}">
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
@@ -401,15 +448,22 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1"></i> Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('documentation') }}"><i class="fas fa-book me-1"></i> Documentation</a>
-                    </li>
                     {% if session.get('user') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i> Predict</a>
+                        <a class="nav-link" href="{{ url_for('documentation') }}"><i class="fas fa-book me-1"></i>
+                            Documentation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link nav-logout" href="{{ url_for('Logout') }}"><i class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i>
+                            Predict</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('train_view') }}"><i class="fas fa-microchip me-1"></i>
+                            Train Model</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link nav-logout" href="{{ url_for('Logout') }}"><i
+                                class="fas fa-sign-out-alt me-1"></i> Logout</a>
                     </li>
                     <li class="nav-item ms-lg-3">
                         <span class="nav-link disabled fw-bold" style="color: var(--primary-color) !important;">
@@ -418,13 +472,36 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
+                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1"></i>
+                            Login</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
                         <div class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
                             <i class="fas fa-moon"></i>
                         </div>
+                        <script>
+                            (function () {
+                                const savedTheme = localStorage.getItem('theme');
+                                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                const currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+                                const toggle = document.getElementById('theme-toggle');
+                                const icon = toggle.querySelector('i');
+                                const navbar = toggle.closest('.navbar');
+
+                                if (currentTheme === 'dark') {
+                                    icon.className = 'fas fa-sun';
+                                    toggle.title = "Switch to Light Mode";
+                                    navbar.classList.add('navbar-dark');
+                                    navbar.classList.remove('navbar-light');
+                                } else {
+                                    icon.className = 'fas fa-moon';
+                                    toggle.title = "Switch to Dark Mode";
+                                    navbar.classList.add('navbar-light');
+                                    navbar.classList.remove('navbar-dark');
+                                }
+                            })();
+                        </script>
                     </li>
                 </ul>
             </div>
@@ -449,17 +526,27 @@
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
-        
+
         function updateThemeIcon(theme) {
             if (theme === 'light') {
-                themeIcon.classList.replace('fa-moon', 'fa-sun');
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = "Switch to Dark Mode";
             } else {
-                themeIcon.classList.replace('fa-sun', 'fa-moon');
+                themeIcon.className = 'fas fa-sun';
+                themeToggle.title = "Switch to Light Mode";
             }
         }
 
         function setTheme(theme, isManual = true) {
             document.documentElement.setAttribute('data-theme', theme);
+            const navbar = document.querySelector('.navbar');
+
+            if (theme === 'light') {
+                navbar.classList.replace('navbar-dark', 'navbar-light');
+            } else {
+                navbar.classList.replace('navbar-light', 'navbar-dark');
+            }
+
             if (isManual) {
                 localStorage.setItem('theme', theme);
             }
@@ -472,10 +559,17 @@
             updateThemeIcon(currentTheme);
         });
 
-        // Listen for system theme changes
+        // Listen for system theme changes (only if no manual preference)
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (!localStorage.getItem('theme')) {
                 setTheme(e.matches ? 'dark' : 'light', false);
+            }
+        });
+
+        // Tab Synchronization
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'theme') {
+                setTheme(e.newValue, false);
             }
         });
 
@@ -487,7 +581,7 @@
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
 
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop > lastScrollTop && scrollTop > 100) {
                 // Scroll down
@@ -508,7 +602,7 @@
 
         if (isLoggedIn && logoutUrl) {
             // 1. Smart Reload Logout (Secures Result Page only)
-            window.addEventListener('load', function() {
+            window.addEventListener('load', function () {
                 const navEntries = performance.getEntriesByType("navigation");
                 if (navEntries.length > 0 && navEntries[0].type === "reload") {
                     // SECURE: Logout if results page is reloaded (to protect data)
@@ -538,7 +632,7 @@
             ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(evt => {
                 document.addEventListener(evt, resetIdleTimer, true);
             });
-            
+
             resetIdleTimer();
         }
 
@@ -547,7 +641,7 @@
             const element = document.getElementById(elementId);
             const cursor = document.getElementById('cursor');
             if (!element) return;
-            
+
             let charIndex = 0;
             setTimeout(() => {
                 function type() {
@@ -565,4 +659,5 @@
     </script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

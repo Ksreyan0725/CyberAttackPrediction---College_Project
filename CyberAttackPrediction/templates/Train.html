@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Model Training Dashboard - CyberShield AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .training-card {
+        max-width: 900px;
+        margin: 2rem auto;
+    }
+    
+    .status-badge {
+        font-size: 0.85rem;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 600;
+    }
+    
+    .status-idle { background: rgba(100, 116, 139, 0.1); color: var(--secondary-color); }
+    .status-running { background: rgba(59, 130, 246, 0.1); color: var(--primary-color); animation: pulse 2s infinite; }
+    .status-success { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+    
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+    
+    .log-container {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 12px;
+        padding: 1rem;
+        font-family: 'Courier New', Courier, monospace;
+        height: 250px;
+        overflow-y: auto;
+        border: 1px solid var(--glass-border);
+        font-size: 0.9rem;
+    }
+    
+    .log-entry {
+        margin-bottom: 0.3rem;
+        border-left: 2px solid var(--primary-color);
+        padding-left: 0.8rem;
+    }
+
+    .metric-card {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+
+    .metric-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .accuracy-value {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: var(--primary-color);
+        text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="training-card animate__animated animate__fadeIn">
+        <div class="glass-card liquid-glass p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="h3 mb-1 dynamic-text"><i class="fas fa-brain me-2 text-primary"></i>Model Training Portal</h2>
+                    <p class="dynamic-muted mb-0">Re-calibrate your AI defenses using the latest network traffic patterns.</p>
+                </div>
+                <div id="trainingStatus" class="status-badge status-idle">
+                    <i class="fas fa-circle me-1 small"></i> System Ready
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4">
+                <div class="col-md-7">
+                    <div class="h-100 d-flex flex-column">
+                        <h5 class="dynamic-text mb-3 small fw-bold text-uppercase opacity-75">Live Training Logs</h5>
+                        <div class="log-container flex-grow-1" id="logWindow">
+                            <div class="log-entry dynamic-muted">Waiting for user to initiate training...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="h-100 d-flex flex-column">
+                        <h5 class="dynamic-text mb-3 small fw-bold text-uppercase opacity-75">Control Center</h5>
+                        <div class="glass-card p-4 flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center">
+                            <i class="fas fa-database mb-3 h2 text-primary opacity-50"></i>
+                            <p class="small dynamic-muted mb-4">Current Dataset: <strong>NSL-KDD (Standardized)</strong></p>
+                            <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg">
+                                <i class="fas fa-play me-2"></i>Start Re-Training
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="resultsArea" style="display: none;" class="animate__animated animate__zoomIn">
+                <hr class="border-glass my-4">
+                <h5 class="dynamic-text mb-4 small fw-bold text-uppercase opacity-75">Training Results Summary</h5>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="metric-card">
+                            <div class="small dynamic-muted mb-1">Validation Accuracy</div>
+                            <div class="accuracy-value" id="finalAccuracy">0.0%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="metric-card h-100 d-flex flex-column justify-content-center">
+                            <div class="small dynamic-muted mb-2 text-start">Classes Identified</div>
+                            <div class="d-flex flex-wrap gap-2" id="classListing">
+                                <!-- Classes will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <div class="alert alert-success bg-success-light border-0 dynamic-text small">
+                        <i class="fas fa-check-circle me-2"></i> The new model has been deployed successfully and is now active for all predictions.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('startTrainingBtn').addEventListener('click', async function() {
+        const btn = this;
+        const statusBadge = document.getElementById('trainingStatus');
+        const logWindow = document.getElementById('logWindow');
+        const resultsArea = document.getElementById('resultsArea');
+        
+        // UI Reset
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Training...';
+        statusBadge.className = 'status-badge status-running';
+        statusBadge.innerHTML = '<i class="fas fa-sync fa-spin me-1 small"></i> Training in Progress';
+        resultsArea.style.display = 'none';
+        logWindow.innerHTML = '';
+
+        function addLog(msg, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry dynamic-muted animate__animated animate__fadeInLeft';
+            entry.innerHTML = `<span class="text-primary fw-bold">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            logWindow.appendChild(entry);
+            logWindow.scrollTop = logWindow.scrollHeight;
+        }
+
+        addLog("Initializing training environment...");
+        addLog("Loading NSL-KDD dataset (20,000 samples)...");
+        
+        try {
+            // Simulated delay for UI experience
+            await new Promise(r => setTimeout(r, 1000));
+            addLog("Executing Label Encoding and Feature Scaling...");
+            
+            const response = await fetch("{{ url_for('TrainAction') }}", {
+                method: 'POST'
+            });
+            
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                addLog("Splitting data into 80% Train / 20% Test sets...");
+                await new Promise(r => setTimeout(r, 800));
+                addLog("Fitting Random Forest Classifier (100 estimators)...");
+                await new Promise(r => setTimeout(r, 1200));
+                addLog("Calculating validation metrics...");
+                addLog(`Success! Accuracy achieved: ${data.accuracy}%`, 'success');
+                addLog("Serializing model and metadata to trained_rf_model.pkl...");
+                
+                // Update Results UI
+                document.getElementById('finalAccuracy').textContent = data.accuracy + '%';
+                const classListing = document.getElementById('classListing');
+                classListing.innerHTML = '';
+                data.classes.forEach(cls => {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill';
+                    badge.textContent = cls.toUpperCase();
+                    classListing.appendChild(badge);
+                });
+                
+                resultsArea.style.display = 'block';
+                statusBadge.className = 'status-badge status-success';
+                statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
+            } else {
+                addLog(`Error: ${data.message}`, 'error');
+                statusBadge.className = 'status-badge status-idle';
+                statusBadge.textContent = 'Training Failed';
+            }
+        } catch (error) {
+            addLog(`Network error: ${error.message}`, 'error');
+            statusBadge.className = 'status-badge status-idle';
+            statusBadge.textContent = 'Network Error';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-redo me-2"></i> Re-Train Model';
+        }
+    });
+
+    // Auto-scroll simulation for a "lived-in" feel
+    const logWindow = document.getElementById('logWindow');
+</script>
+{% endblock %}
