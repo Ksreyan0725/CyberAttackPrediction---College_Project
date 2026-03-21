@@ -13,7 +13,15 @@ CyberAttackPrediction/Dataset/*.csv
 CyberAttackPrediction/model/*.hdf5
 *.pkl
 *.h5
-*.zip
+
+# Allow specific extensions in backups
+!backups/**/*.zip
+!backups/**/*.7z
+!backups/**/*.md
+
+# Allow Software folder
+!backups/**/Software/
+!Software/
 
 # OS Files
 .DS_Store
@@ -28,3 +36,23 @@ TODO.md
 
 # End of .gitignore
 CyberAttackPrediction/scripts/
+
+# Backups & Legacy Data
+backups/**/*
+!backups/**/
+backups/CyberAttackPrediction/
+backups/**/.venv_backup/
+backups/**/Dataset/
+backups/**/model/
+backups/**/__pycache__/
+
+!backups/**/*.zip
+!backups/**/*.7z
+!backups/**/*.md
+!backups/**/Software/**
+!Software/**
+
+# Unzip Folders
+*unzip*/
+[Uu]nzip*/
+temp_unzip/
