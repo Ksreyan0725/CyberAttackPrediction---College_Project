@@ -30,7 +30,6 @@
         border-radius: 30px;
         padding: 3rem;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-        animation: fadeIn 0.8s ease-out;
     }
 
     .section-title {
@@ -93,7 +92,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="info-card">
+<div class="info-card reveal-premium">
     <div class="text-center mb-5">
         <h1 class="display-5 section-title">How CyberShield AI Works</h1>
         <p class="dynamic-muted lead">Bridging the gap between traditional security and intelligent automation.</p>
@@ -113,7 +112,7 @@
         </div>
     </div>
 
-    <div class="info-box mb-5">
+    <div class="info-box mb-5 reveal-premium anim-delay-300">
         <h4 class="dynamic-text mb-4 text-center">Architectural Pipeline</h4>
         <div class="row text-center g-4">
             <div class="col-md-3">
@@ -148,7 +147,7 @@
     </div>
 
     <!-- Detailed Remember Me Section -->
-    <div class="info-box mb-4" id="session-security">
+    <div class="info-box mb-4 reveal-premium anim-delay-400" id="session-security">
         <h4 class="dynamic-text mb-4"><i class="fas fa-key me-2 text-primary"></i>Session Security & Persistence</h4>
         <div class="row g-4">
             <div class="col-md-6">
@@ -167,6 +166,21 @@
                 </ul>
             </div>
         </div>
+
+        <button class="btn btn-outline-primary w-100 mt-4" type="button" data-bs-toggle="collapse" data-bs-target="#technicalDeepDive" aria-expanded="false" aria-controls="technicalDeepDive">
+            Deep Dive into Technical Details <i class="fas fa-chevron-down ms-2 transition-transform" id="deepDiveIcon"></i>
+        </button>
+        <div class="collapse mt-3" id="technicalDeepDive">
+            <div class="card card-body" style="background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border); border-radius: 15px;">
+                <h6 class="dynamic-text fw-bold border-bottom border-secondary pb-2 mb-3"><i class="fas fa-code text-info me-2"></i>Under The Hood</h6>
+                
+                <p class="xx-small dynamic-muted mb-2"><strong class="text-primary">1. The Database (users.db):</strong> Think of this as the secure filing cabinet for the application. When you sign up, your account details and passwords are securely saved into a local file named <code>users.db</code>. Whenever you try to log in, the system checks this cabinet to make sure you belong.</p>
+                
+                <p class="xx-small dynamic-muted mb-2"><strong class="text-primary">2. The Server Memory (Flask Session):</strong> Once you log in successfully, the server gives your browser a special, temporary "VIP wristband" (known as a secure session cookie). As long as you wear this wristband, you can freely use protected tools like the AI Predictor without having to type your password again.</p>
+                
+                <p class="xx-small dynamic-muted mb-0"><strong class="text-primary">3. The Browser Memory (LocalStorage):</strong> Standard login forgets you once you close the tab. If you click <strong>"Remember Me"</strong>, the application commands your web browser (like Chrome or Edge) to memorize your email. The very next time you visit the website, your browser uses this memory to automatically fill everything in for you like magic!</p>
+            </div>
+        </div>
     </div>
 
     <div class="text-center mt-4">
@@ -175,4 +189,47 @@
         </a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // --- 1. Smart Scroll Position Memory & Hash Links ---
+        if (window.location.hash) {
+            // If the user arrived via a link like /HowItWorks#session-security, smoothly scroll to it!
+            const target = document.querySelector(window.location.hash);
+            if (target) {
+                setTimeout(() => {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300); // slight delay to let DOM/animations settle
+            }
+        } else {
+            // Otherwise, restore the last place they were reading!
+            const savedScroll = localStorage.getItem("howItWorksScroll");
+            if (savedScroll) {
+                window.scrollTo({ top: parseInt(savedScroll, 10), behavior: 'instant' });
+            }
+        }
+        
+        window.addEventListener("beforeunload", () => {
+            localStorage.setItem("howItWorksScroll", window.scrollY);
+        });
+
+        // --- 2. Auto-Scroll on Dropdown Expand ---
+        const deepDiveCollapse = document.getElementById('technicalDeepDive');
+        const deepDiveIcon = document.getElementById('deepDiveIcon');
+        
+        if(deepDiveCollapse && deepDiveIcon) {
+            deepDiveCollapse.addEventListener('show.bs.collapse', () => {
+                deepDiveIcon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+            });
+            deepDiveCollapse.addEventListener('hide.bs.collapse', () => {
+                deepDiveIcon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+            });
+            
+            // Wait for Bootstrap to finish measuring/expanding the card, then scroll it fully into view
+            deepDiveCollapse.addEventListener('shown.bs.collapse', () => {
+                deepDiveCollapse.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            });
+        }
+    });
+</script>
 {% endblock %}

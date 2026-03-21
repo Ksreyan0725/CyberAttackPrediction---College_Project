@@ -1,5 +1,11 @@
 # 🛡️ Cyber Attack Prediction: From Traditional ML to Generative AI
 
+<!-- markdownlint-disable MD033 -->
+<p align="center">
+  <img src="CyberAttackPrediction/static/images/favicon.svg" alt="CyberShield AI Logo" width="120" height="120">
+</p>
+<!-- markdownlint-enable MD033 -->
+
 [![Python Version](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/)
 [![Flask](https://img.shields.io/badge/framework-Flask-red.svg)](https://flask.palletsprojects.com/)
 [![Jupyter](https://img.shields.io/badge/notebook-Jupyter-orange.svg)](https://jupyter.org/)

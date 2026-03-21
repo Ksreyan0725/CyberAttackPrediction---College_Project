@@ -105,13 +105,11 @@
     .brand-logo {
         width: 45px;
         height: 45px;
-        background: var(--primary-color);
-        border-radius: 15px;
+        background: transparent;
         display: flex;
         align-items: center;
         justify-content: center;
         margin-bottom: 1rem;
-        box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
     }
 
     .brand-title {
@@ -240,8 +238,20 @@
     <!-- Left: Informational Panel -->
     <div class="info-panel">
         <div class="brand-section">
-            <div class="brand-logo">
-                <i class="fas fa-shield-alt fa-2x text-white"></i>
+            <div class="brand-logo bg-transparent border-0 p-0 mb-3" style="width: 70px; height: 70px; margin: 0 auto;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100" style="filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));">
+                    <defs>
+                        <linearGradient id="logoGradLog" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="var(--primary-color)"/>
+                            <stop offset="1" stop-color="var(--info-color)"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none" stroke="url(#logoGradLog)" stroke-width="4" stroke-linejoin="round"/>
+                    <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
+                    <circle cx="35" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
+                    <circle cx="65" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
+                    <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+                </svg>
             </div>
             <h1 class="brand-title">CyberShield AI</h1>
             <div class="typing-container mb-4" style="min-height: 4rem;">
@@ -260,7 +270,7 @@
     <div class="form-panel liquid-glass">
         {% if has_saved %}
         <!-- Direct Login View -->
-        <div id="directLoginArea" class="speed-login-box animate__animated animate__fadeIn">
+        <div id="directLoginArea" class="speed-login-box reveal-premium">
             <div class="user-avatar-circle">
                 <i class="fas fa-user-shield fa-2x"></i>
             </div>
@@ -271,25 +281,28 @@
                 <button type="button" id="btnDirectLogin" class="btn btn-primary shadow-sm py-3">
                     <i class="fas fa-rocket me-2"></i>Quick Access
                 </button>
-                <button type="button" id="btnResetCreds" class="btn btn-link xx-small text-danger opacity-75 text-decoration-none mt-2">
-                    <i class="fas fa-sign-out-alt me-1"></i> Not you? Clear session
-                </button>
+                <div class="mt-3 xx-small dynamic-muted">
+                    Not you? <button type="button" id="btnResetCreds" class="btn btn-link p-0 ms-1 text-danger fw-bold text-decoration-none" style="font-size: 0.75rem; vertical-align: baseline;">Clear session</button>
+                </div>
             </div>
         </div>
         {% endif %}
 
         <!-- Standard Login Form -->
-        <div id="standardLoginArea" class="{% if has_saved %}d-none{% endif %} animate__animated animate__fadeIn">
+        <div id="standardLoginArea" class="{% if has_saved %}d-none{% endif %} reveal-premium anim-delay-200">
             <div class="text-center mb-4">
                 <h4 class="dynamic-text fw-bold">Administrator Login</h4>
                 <p class="xx-small dynamic-muted">Enter your credentials to manage the platform</p>
             </div>
 
             {% if msg %}
-            <div class="alert alert-info alert-dismissible fade show mb-4 p-2 small" role="alert">
-                <i class="fas fa-info-circle me-2"></i>{{ msg|safe }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" style="padding: 0.75rem;"></button>
-            </div>
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const message = "{{ msg|safe }}";
+                    const type = message.toLowerCase().includes('success') ? 'success' : (message.toLowerCase().includes('invalid') ? 'error' : 'info');
+                    showToast(message, type);
+                });
+            </script>
             {% endif %}
 
             <form name="f1" method="post" action="/UserLoginAction" onsubmit="return validateForm(this);">
@@ -333,15 +346,20 @@
 <script>
     function validateForm(form) {
         if (form.t1.value.trim() === "") {
-            alert("Please enter your username");
+            showToast("Please enter your username", "error");
             form.t1.focus();
             return false;
         }
         if (form.t2.value.trim() === "") {
-            alert("Please enter your password");
+            showToast("Please enter your password", "error");
             form.t2.focus();
             return false;
         }
+        
+        // Show loading state on Authenticate button
+        const btn = form.querySelector('button[type="submit"]');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="skeleton-box" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle;"></span> Authenticating...';
         return true;
     }
 
@@ -381,15 +399,16 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
-                        window.location.href = '/Predict';
+                        showToast('Authenticated! Redirecting...', 'success');
+                        setTimeout(() => window.location.href = '/Predict', 500);
                     } else {
-                        alert('Saved credentials invalid. Please login manually.');
-                        location.reload();
+                        showToast('Saved credentials invalid. Please login manually.', 'error');
+                        setTimeout(() => location.reload(), 1500);
                     }
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    alert('Connection error. Please try again.');
+                    showToast('Connection error. Please try again.', 'error');
                     btnDirectLogin.disabled = false;
                     btnDirectLogin.innerHTML = '<i class="fas fa-rocket me-2"></i>Quick Access';
                 });
@@ -398,10 +417,12 @@
 
         if (btnResetCreds) {
             btnResetCreds.addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear saved credentials?')) {
-                    fetch('/ResetCredentials', { method: 'POST' })
-                    .then(() => location.reload());
-                }
+                showToast('Clearing session data...', 'info');
+                fetch('/ResetCredentials', { method: 'POST' })
+                .then(() => {
+                    showToast('Session cleared!', 'success');
+                    setTimeout(() => location.reload(), 800);
+                });
             });
         }
     });

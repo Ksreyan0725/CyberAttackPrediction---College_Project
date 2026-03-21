@@ -128,7 +128,7 @@ def UserLoginAction():
         else:
             session['remembered'] = False
                 
-        return redirect(url_for('predictView'))
+        return redirect(url_for('train_view'))
     else:
         return render_template('UserLogin.html', msg="Invalid login details")
 
@@ -233,7 +233,7 @@ def get_genai_insight(attack_type):
     return insights.get(attack_type.lower(), "AI suggests this is a known signature. Monitor for unusual lateral movement in the network.")
 
 def open_browser():
-    webbrowser.open_new("http://127.0.0.1:5000/")
+    webbrowser.open_new("http://127.0.0.1:2026/")
 
 @app.route('/documentation')
 def documentation():
@@ -245,7 +245,11 @@ def documentation():
 def train_view():
     if 'user' not in session:
         return redirect(url_for('UserLogin'))
-    return render_template('Train.html', page_type='train')
+    
+    # Check if a model has already been trained
+    model_ready = os.path.exists('trained_rf_model.pkl')
+    
+    return render_template('Train.html', page_type='train', model_ready=model_ready)
 
 @app.route('/TrainAction', methods=['POST'])
 def TrainAction():
@@ -265,4 +269,4 @@ if __name__ == '__main__':
     if not os.environ.get("WERKZEUG_RUN_MAIN"):
         Timer(1.5, open_browser).start()
     
-    app.run(debug=True)
+    app.run(debug=True, port=2026)

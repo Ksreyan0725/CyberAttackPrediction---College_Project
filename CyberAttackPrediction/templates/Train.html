@@ -67,7 +67,7 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="training-card animate__animated animate__fadeIn">
+    <div class="training-card reveal-premium">
         <div class="glass-card liquid-glass p-4 mb-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
@@ -94,9 +94,24 @@
                         <div class="glass-card p-4 flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center">
                             <i class="fas fa-database mb-3 h2 text-primary opacity-50"></i>
                             <p class="small dynamic-muted mb-4">Current Dataset: <strong>NSL-KDD (Standardized)</strong></p>
+                            
+                            {% if model_ready %}
+                            <div class="alert alert-info bg-primary-light border-0 small w-100 mb-3 py-2 dynamic-text rounded-3">
+                                <i class="fas fa-check-circle me-1 text-primary"></i> Trained model active.
+                            </div>
+                            <div class="d-flex flex-column gap-2 w-100">
+                                <a href="{{ url_for('predictView') }}" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg text-white">
+                                    <i class="fas fa-search me-2"></i>Proceed to Prediction
+                                </a>
+                                <button id="startTrainingBtn" class="btn btn-outline-dynamic btn-sm w-100 py-2 rounded-pill mt-2">
+                                    <i class="fas fa-sync me-2"></i>Re-Train Model
+                                </button>
+                            </div>
+                            {% else %}
                             <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg">
                                 <i class="fas fa-play me-2"></i>Start Re-Training
                             </button>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -122,9 +137,12 @@
                     </div>
                 </div>
                 <div class="mt-4 text-center">
-                    <div class="alert alert-success bg-success-light border-0 dynamic-text small">
+                    <div class="alert alert-success bg-success-light border-0 dynamic-text small mb-4">
                         <i class="fas fa-check-circle me-2"></i> The new model has been deployed successfully and is now active for all predictions.
                     </div>
+                    <a href="{{ url_for('predictView') }}" class="btn btn-primary btn-lg rounded-pill px-5 shadow-lg reveal-premium anim-delay-500">
+                        <i class="fas fa-search me-2"></i> Proceed to Prediction
+                    </a>
                 </div>
             </div>
         </div>
@@ -142,15 +160,20 @@
         
         // UI Reset
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Training...';
+        btn.innerHTML = '<span class="skeleton-box bg-white opacity-50 me-2" style="width: 20px;"></span><span class="skeleton-box bg-white opacity-50" style="width: 100px;"></span>';
         statusBadge.className = 'status-badge status-running';
         statusBadge.innerHTML = '<i class="fas fa-sync fa-spin me-1 small"></i> Training in Progress';
         resultsArea.style.display = 'none';
         logWindow.innerHTML = '';
 
+        // Added global toast 
+        if(typeof showToast === 'function') {
+            showToast('Training process initialized. Please wait...', 'info');
+        }
+
         function addLog(msg, type = 'info') {
             const entry = document.createElement('div');
-            entry.className = 'log-entry dynamic-muted animate__animated animate__fadeInLeft';
+            entry.className = 'log-entry dynamic-muted reveal-premium';
             entry.innerHTML = `<span class="text-primary fw-bold">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
             logWindow.appendChild(entry);
             logWindow.scrollTop = logWindow.scrollHeight;

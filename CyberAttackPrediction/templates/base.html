@@ -13,14 +13,69 @@
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
-    <!-- Smart Theme Initialization (Prevents Flash) -->
+    <!-- Smart Theme & Storage Management -->
     <script>
         (function () {
             const savedTheme = localStorage.getItem('theme');
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            const theme = savedTheme ? savedTheme : (systemPrefersDark ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', theme);
+
+            // Animation Memory: Only play entry animations once per session
+            if (sessionStorage.getItem('sessionActive')) {
+                document.documentElement.classList.add('disable-entry-animations');
+            } else {
+                sessionStorage.setItem('sessionActive', 'true');
+            }
+
+            // Auto-clear on tab close or hard refresh, but strictly preserve theme preference
+            window.addEventListener('beforeunload', function () {
+                const currentTheme = localStorage.getItem('theme');
+                localStorage.clear();
+                if (currentTheme) {
+                    localStorage.setItem('theme', currentTheme);
+                }
+            });
         })();
+    </script>
+
+    <script>
+        // Global Premium Toast System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `premium-toast toast-${type}`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+
+            toast.innerHTML = `
+                <div class="toast-icon"><i class="fas fa-${icon}"></i></div>
+                <div class="toast-body">
+                    <div class="small fw-bold dynamic-text">${message}</div>
+                </div>
+            `;
+
+            container.appendChild(toast);
+            
+            // Force reflow
+            toast.offsetHeight;
+            
+            // Show
+            toast.classList.add('show');
+
+            // Auto hide
+            setTimeout(() => {
+                toast.classList.add('hide');
+                setTimeout(() => {
+                    toast.remove();
+                }, 500);
+            }, 4000);
+        }
+
+        // Override console errors or specific alerts if needed
+        // For now, intentional calls only
     </script>
 
     <style>
@@ -126,6 +181,128 @@
             background: rgba(255, 255, 255, 0.1);
             transform: translateY(-1px);
         }
+
+        /* Premium UI Animations */
+        @keyframes revealPremium {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(5px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes revealDepth {
+            0% { opacity: 0; transform: perspective(1000px) translate3d(0, 0, -100px); filter: brightness(0.5); }
+            100% { opacity: 1; transform: perspective(1000px) translate3d(0, 0, 0); filter: brightness(1); }
+        }
+
+        @keyframes revealSoft {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .reveal-premium {
+            animation: revealPremium 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+        }
+
+        .reveal-depth {
+            animation: revealDepth 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+        }
+
+        .reveal-soft {
+            animation: revealSoft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+        }
+
+        .anim-delay-100 { animation-delay: 0.1s; }
+        .anim-delay-200 { animation-delay: 0.2s; }
+        .anim-delay-300 { animation-delay: 0.3s; }
+        .anim-delay-400 { animation-delay: 0.4s; }
+        .anim-delay-500 { animation-delay: 0.5s; }
+
+        /* Skeleton Loading Effect */
+        .skeleton-box {
+            display: inline-block;
+            height: 1em;
+            position: relative;
+            overflow: hidden;
+            background-color: rgba(var(--text-main-rgb), 0.05);
+            border-radius: 4px;
+        }
+
+        .skeleton-box::after {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%);
+            background-image: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0,
+                rgba(255, 255, 255, 0.2) 20%,
+                rgba(255, 255, 255, 0.5) 60%,
+                rgba(255, 255, 255, 0)
+            );
+            animation: shimmer 2s infinite;
+            content: '';
+        }
+
+        @keyframes shimmer {
+            100% { transform: translateX(100%); }
+        }
+
+        /* Premium Toast Notifications */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: none;
+        }
+
+        .premium-toast {
+            pointer-events: auto;
+            min-width: 300px;
+            max-width: 90vw;
+            background: rgba(var(--card-bg-rgb), 0.85);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateY(-150%);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+        }
+
+        .premium-toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .premium-toast.hide {
+            transform: translateY(-150%);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .toast-success .toast-icon { background: rgba(25, 135, 84, 0.2); color: #198754; }
+        .toast-error .toast-icon { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+        .toast-info .toast-icon { background: rgba(13, 202, 240, 0.2); color: #0dcaf0; }
 
         .glass-card {
             background: var(--card-bg);
@@ -248,16 +425,19 @@
             background: var(--glass-bg);
             color: var(--text-main);
             margin-left: 10px;
-            outline: none !important; /* Fix: Prevent persistent focus border */
+            outline: none !important;
+            /* Fix: Prevent persistent focus border */
         }
 
-        .theme-toggle:focus, .theme-toggle:active {
+        .theme-toggle:focus,
+        .theme-toggle:active {
             outline: none !important;
             box-shadow: none !important;
         }
 
         /* Suppress persistent focus ring on nav links for mouse users */
-        .nav-link:focus, .navbar-toggler:focus {
+        .nav-link:focus,
+        .navbar-toggler:focus {
             box-shadow: none !important;
             outline: none !important;
         }
@@ -426,6 +606,12 @@
             -webkit-text-fill-color: var(--input-text) !important;
             transition: background-color 5000s ease-in-out 0s;
         }
+
+        /* Hide Browser Native Password Eye (Double Eye Fix) */
+        input::-ms-reveal,
+        input::-ms-clear {
+            display: none !important;
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -437,8 +623,20 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">
-                <i class="fas fa-shield-alt me-2"></i>CyberShield AI
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ url_for('index') }}" style="letter-spacing: -0.5px; font-size: 1.25rem;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+                    <defs>
+                        <linearGradient id="logoGradNav" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+                            <stop offset="0" stop-color="var(--primary-color)"/>
+                            <stop offset="1" stop-color="var(--info-color)"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none" stroke="url(#logoGradNav)" stroke-width="4" stroke-linejoin="round"/>
+                    <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
+                    <circle cx="35" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
+                    <circle cx="65" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
+                    <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+                </svg><span style="background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-color) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">CyberShield AI</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -454,21 +652,31 @@
                             Documentation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i>
-                            Predict</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('train_view') }}"><i class="fas fa-microchip me-1"></i>
                             Train Model</a>
                     </li>
+                    {% if page_type != 'train' %}
                     <li class="nav-item">
-                        <a class="nav-link nav-logout" href="{{ url_for('Logout') }}"><i
-                                class="fas fa-sign-out-alt me-1"></i> Logout</a>
+                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i>
+                            Predict</a>
                     </li>
-                    <li class="nav-item ms-lg-3">
-                        <span class="nav-link disabled fw-bold" style="color: var(--primary-color) !important;">
+                    {% endif %}
+                    <li class="nav-item dropdown ms-lg-3">
+                        <a class="nav-link dropdown-toggle fw-bold" href="#" id="userDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false"
+                            style="color: var(--primary-color) !important;">
                             <i class="fas fa-user-circle me-1"></i> {{ session.get('user') }}
-                        </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end glass-card border-glass p-2"
+                            aria-labelledby="userDropdown"
+                            style="background: var(--glass-bg); backdrop-filter: blur(10px);">
+                            <li>
+                                <a class="dropdown-item nav-link nav-logout rounded-3 px-3"
+                                    href="{{ url_for('Logout') }}">
+                                    <i class="fas fa-sign-out-alt me-1"></i> Logout
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     {% else %}
                     <li class="nav-item">
@@ -477,28 +685,41 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <div class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
-                            <i class="fas fa-moon"></i>
+                        <div class="d-flex align-items-center h-100 ms-lg-2">
+                            <button id="clearAppData" class="btn btn-link nav-link p-2 me-1"
+                                title="Clear App Data & Refresh" style="font-size: 1.1rem;">
+                                <i class="fas fa-broom"></i>
+                            </button>
+                            <div class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+                                <i class="fas fa-moon"></i>
+                            </div>
                         </div>
                         <script>
                             (function () {
                                 const savedTheme = localStorage.getItem('theme');
                                 const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                                const currentTheme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+                                const currentTheme = savedTheme ? savedTheme : (systemPrefersDark ? 'dark' : 'light');
                                 const toggle = document.getElementById('theme-toggle');
                                 const icon = toggle.querySelector('i');
                                 const navbar = toggle.closest('.navbar');
 
                                 if (currentTheme === 'dark') {
-                                    icon.className = 'fas fa-sun';
-                                    toggle.title = "Switch to Light Mode";
                                     navbar.classList.add('navbar-dark');
                                     navbar.classList.remove('navbar-light');
                                 } else {
-                                    icon.className = 'fas fa-moon';
-                                    toggle.title = "Switch to Dark Mode";
                                     navbar.classList.add('navbar-light');
                                     navbar.classList.remove('navbar-dark');
+                                }
+
+                                if (savedTheme === 'dark') {
+                                    icon.className = 'fas fa-moon';
+                                    toggle.title = "Theme: Dark Mode";
+                                } else if (savedTheme === 'light') {
+                                    icon.className = 'fas fa-sun';
+                                    toggle.title = "Theme: Light Mode";
+                                } else {
+                                    icon.className = 'fas fa-desktop';
+                                    toggle.title = "Theme: System Sync";
                                 }
                             })();
                         </script>
@@ -521,61 +742,73 @@
     </footer>
 
     <!-- Bootstrap 5 JS Bundle -->
+    <div id="toastContainer"></div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Theme Toggle Logic
         const themeToggle = document.getElementById('theme-toggle');
         const themeIcon = themeToggle.querySelector('i');
 
-        function updateThemeIcon(theme) {
-            if (theme === 'light') {
-                themeIcon.className = 'fas fa-moon';
-                themeToggle.title = "Switch to Dark Mode";
-            } else {
+        function updateThemeIcon(savedState) {
+            if (savedState === 'light') {
                 themeIcon.className = 'fas fa-sun';
-                themeToggle.title = "Switch to Light Mode";
+                themeToggle.title = "Theme: Light Mode";
+            } else if (savedState === 'dark') {
+                themeIcon.className = 'fas fa-moon';
+                themeToggle.title = "Theme: Dark Mode";
+            } else {
+                themeIcon.className = 'fas fa-desktop';
+                themeToggle.title = "Theme: System Sync";
             }
         }
 
-        function setTheme(theme, isManual = true) {
-            document.documentElement.setAttribute('data-theme', theme);
+        function setTheme(state, isManual = true) {
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const effectiveTheme = (state && state !== 'auto') ? state : (systemPrefersDark ? 'dark' : 'light');
+            
+            document.documentElement.setAttribute('data-theme', effectiveTheme);
             const navbar = document.querySelector('.navbar');
 
-            if (theme === 'light') {
+            if (effectiveTheme === 'light') {
                 navbar.classList.replace('navbar-dark', 'navbar-light');
             } else {
                 navbar.classList.replace('navbar-light', 'navbar-dark');
             }
 
             if (isManual) {
-                localStorage.setItem('theme', theme);
+                if (!state || state === 'auto') {
+                    localStorage.removeItem('theme');
+                } else {
+                    localStorage.setItem('theme', state);
+                }
             }
-            updateThemeIcon(theme);
+            updateThemeIcon(state || 'auto');
         }
 
-        // Initialize icon state on load
-        window.addEventListener('DOMContentLoaded', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            updateThemeIcon(currentTheme);
-        });
-
-        // Listen for system theme changes (only if no manual preference)
+        // Listen for system theme changes (only affects 'auto' mode)
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
             if (!localStorage.getItem('theme')) {
-                setTheme(e.matches ? 'dark' : 'light', false);
+                setTheme('auto', false);
             }
         });
 
         // Tab Synchronization
         window.addEventListener('storage', (e) => {
             if (e.key === 'theme') {
-                setTheme(e.newValue, false);
+                setTheme(e.newValue || 'auto', false);
             }
         });
 
+        // Toggle sequence: light -> dark -> auto -> light...
         themeToggle.addEventListener('click', () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+            const currentState = localStorage.getItem('theme') || 'auto';
+            let nextState;
+            if (currentState === 'light') nextState = 'dark';
+            else if (currentState === 'dark') nextState = 'auto';
+            else nextState = 'light';
+            
+            setTheme(nextState);
         });
 
         let lastScrollTop = 0;
@@ -656,6 +889,21 @@
                 type();
             }, delay);
         }
+
+        // Clear App Data Action
+        document.getElementById('clearAppData').addEventListener('click', function () {
+            if (confirm('Are you sure you want to clear all local application data and refresh?')) {
+                localStorage.clear();
+                sessionStorage.clear();
+                location.reload();
+            }
+        });
+
+        // Initialize all Bootstrap tooltips globally
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
     </script>
     {% block extra_js %}{% endblock %}
 </body>

@@ -26,11 +26,8 @@
         padding: 10px;
     }
 
-    .footer {
-        flex-shrink: 0; /* Don't allow footer to shrink */
-        margin-top: 0 !important;
-        padding: 5px 0 !important; /* Extremely compact footer */
-    }
+/* Standard footer used from base.html */ /* Don't allow footer to shrink */
+
 
     .mt-n5 { margin-top: 0 !important; }
     .bg-primary-light { background-color: rgba(13, 110, 253, 0.1); }
@@ -173,33 +170,6 @@
         margin-bottom: 2.5rem;
     }
 
-    /* Centered Toast Notifications */
-    .toast-container {
-        position: fixed;
-        top: 2rem;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 9999;
-        pointer-events: none;
-        width: auto;
-        max-width: 90%;
-    }
-
-    .custom-toast {
-        background: rgba(15, 23, 42, 0.95);
-        backdrop-filter: blur(12px);
-        border: 1px solid var(--glass-border);
-        color: white;
-        border-radius: 50px; /* Pill shape for notifications */
-        padding: 0.75rem 1.5rem;
-        box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        margin-bottom: 0.75rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        animation: slideDownFade 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-        pointer-events: auto;
-    }
 
     @keyframes slideDownFade {
         from { transform: translateY(-30px); opacity: 0; }
@@ -239,7 +209,7 @@
 {% block content %}
 <div class="row justify-content-center w-100 m-0">
     <div class="col-lg-6">
-        <div class="card glass-card shadow-2xl border-0 animate__animated animate__fadeInUp">
+        <div class="card glass-card shadow-2xl border-0 reveal-premium">
             <div class="card-header border-glass text-center py-3">
                 <h2 class="h5 mb-0 dynamic-text"><i class="fas fa-shield-virus me-2 text-info"></i>Threat Detection Engine</h2>
                 <p class="xx-small dynamic-muted mb-0 opacity-75 mt-1">From Traditional ML to Generative AI</p>
@@ -303,7 +273,7 @@
                 <div class="card-footer p-3 border-0" style="background: rgba(0,0,0,0.15);">
                     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-muted">
                         <div class="x-small d-flex align-items-center gap-2">
-                            <i class="fas fa-info-circle text-info"></i>
+                            <i class="fas fa-info-circle text-info" data-bs-toggle="tooltip" data-bs-placement="top" title="NSL-KDD is a standard dataset used to benchmark intrusion detection systems. It includes features like duration, protocol_type, service, etc."></i>
                             <span class="dynamic-text opacity-75">Dataset should follow the <strong>NSL-KDD</strong> format.</span>
                         </div>
                         <a href="{{ url_for('static', filename='Dataset/kdd_test.csv') }}" class="btn btn-xs btn-outline-info px-2 py-1 rounded-pill x-small">
@@ -315,8 +285,6 @@
     </div>
 </div>
 
-<!-- Toast Container for Notifications -->
-<div id="toast-container" class="toast-container"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -406,28 +374,6 @@
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     }
 
-    function showToast(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = 'custom-toast';
-        
-        let icon = 'fa-info-circle';
-        if (type === 'success') icon = 'fa-check-circle text-success';
-        if (type === 'error') icon = 'fa-exclamation-circle text-danger';
-        
-        toast.innerHTML = `
-            <i class="fas ${icon}"></i>
-            <span>${message}</span>
-        `;
-        
-        toastContainer.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transform = 'translate(-50%, -30px)'; // Center-preserving exit
-            toast.style.transition = 'all 0.4s ease';
-            setTimeout(() => toast.remove(), 400);
-        }, 4000); // Slightly longer for readability since they are centered
-    }
 
     // Form submission with simulated progress
     const predictionForm = document.getElementById('prediction-form');
@@ -445,7 +391,7 @@
         
         // UI Transition
         submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Initializing...';
+        submitBtn.innerHTML = '<span class="skeleton-box" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle;"></span> Initializing...';
         progressSection.style.display = 'block';
 
         let progress = 0;
@@ -474,5 +420,11 @@
 
         return false;
     };
+
+    // Initialize Tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
 </script>
 {% endblock %}
