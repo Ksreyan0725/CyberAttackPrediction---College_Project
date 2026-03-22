@@ -11,3 +11,7 @@ notebook
 tensorflow
 ipywidgets
 seaborn
+markdown2
+pygments
+nbconvert
+nbformat

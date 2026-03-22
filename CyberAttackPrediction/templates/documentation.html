@@ -1,60 +1,110 @@
 {% extends "base.html" %}
 
-{% block title %}Project Documentation - CyberShield AI{% endblock %}
+{% block title %}Project Explorer - CyberShield AI{% endblock %}
 
 {% block extra_css %}
 <style>
-    .doc-section {
-        margin-bottom: 4rem;
+    .explorer-container {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2rem;
+        position: relative;
     }
+    .file-sidebar {
+        width: 320px;
+        flex-shrink: 0;
+        background: var(--navbar-bg);
+        backdrop-filter: blur(25px);
+        -webkit-backdrop-filter: blur(25px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        padding: 2rem;
+        height: calc(100vh - 140px);
+        position: sticky;
+        top: 100px;
+        overflow-y: auto;
+        box-shadow: var(--premium-shadow);
+    }
+    /* Custom Scrollbar for Sidebar */
+    .file-sidebar::-webkit-scrollbar { width: 4px; }
+    .file-sidebar::-webkit-scrollbar-track { background: transparent; }
+    .file-sidebar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
+
+    .content-viewer {
+        flex-grow: 1;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 32px;
+        padding: 4rem;
+        min-height: 85vh;
+        box-shadow: var(--premium-shadow);
+        overflow-x: auto;
+    }
+
+    /* Premium Markdown Styling (Fixes MD033 while keeping the look) */
+    .rendered-content h1, .rendered-content h2 {
+        color: var(--info-color);
+        font-weight: 700;
+        margin-top: 3rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    .rendered-content h3 {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-top: 2rem;
+    }
+    .rendered-content blockquote {
+        background: rgba(59, 130, 246, 0.05);
+        border-left: 4px solid var(--primary-color);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 2rem 0;
+        font-style: italic;
+    }
+    .rendered-content img {
+        border-radius: 20px;
+        margin: 2rem 0;
+        box-shadow: var(--premium-shadow);
+        border: 1px solid var(--glass-border);
+    }
+    .rendered-content strong { color: var(--primary-color); }
+    
+    .rendered-content ul {
+        list-style-type: none;
+        padding-left: 0.5rem;
+    }
+    .rendered-content li {
+        margin-bottom: 0.8rem;
+        padding-left: 1.5rem;
+        position: relative;
+    }
+    .rendered-content li::before {
+        content: '→';
+        position: absolute;
+        left: 0;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+
+    /* Original Content Styles Restored */
+    .doc-section { margin-bottom: 4rem; }
     .feature-card {
         transition: all 0.3s ease;
         border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.03);
     }
     .feature-card:hover {
         background: var(--glass-bg);
         transform: translateY(-5px);
     }
-    .sticky-toc {
-        position: fixed;
-        left: 3rem;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 280px;
-        z-index: 1000;
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 2rem !important;
-        background: var(--navbar-bg) !important;
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-    }
-    [data-theme="light"] .sticky-toc {
-        background: rgba(255, 255, 255, 0.8) !important;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    .toc-link {
-        display: block;
-        padding: 0.6rem 1rem;
-        color: rgba(255, 255, 255, 0.6);
-        text-decoration: none;
-        border-left: 3px solid transparent;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-    }
-    [data-theme="light"] .toc-link {
-        color: rgba(0, 0, 0, 0.6);
-    }
-    .toc-link:hover, .toc-link.active {
-        color: #3b82f6;
-        border-left-color: #3b82f6;
-        background: rgba(59, 130, 246, 0.1);
-        padding-left: 1.5rem;
-    }
-    [data-theme="light"] .toc-link:hover, [data-theme="light"] .toc-link.active {
-        background: rgba(59, 130, 246, 0.05);
-    }
+    .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
+    .bg-success-light { background: rgba(25, 135, 84, 0.1); }
+    .border-glass { border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; }
+    .accordion-button:not(.collapsed) { background: transparent !important; box-shadow: none !important; color: #3b82f6 !important; }
+    .accordion-button::after { filter: invert(1); scale: 0.8; }
+    [data-theme="light"] .accordion-button::after { filter: none; }
+    
     .code-block {
         background: rgba(0,0,0,0.3);
         padding: 1.5rem;
@@ -66,248 +116,187 @@
         background: #f8fafc;
         border-color: #e2e8f0;
     }
+
+    /* Mobile Responsiveness */
+    @media (max-width: 991.98px) {
+        .explorer-container {
+            flex-direction: column;
+        }
+        .file-sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+            top: 0;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+        .content-viewer {
+            padding: 2rem;
+        }
+        .hero-section h1 { font-size: 2.2rem; }
+    }
+
+    @media (max-width: 575.98px) {
+        .content-viewer {
+            padding: 1.5rem;
+            border-radius: 20px;
+        }
+        .file-tree-item {
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+        }
+    }
+
+    .file-tree-item {
+        display: flex;
+        align-items: center;
+        padding: 0.7rem 1.2rem;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none !important;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.95rem;
+        margin-bottom: 0.4rem;
+        border: 1px solid transparent;
+    }
+    [data-theme="light"] .file-tree-item {
+        color: rgba(0, 0, 0, 0.6);
+    }
+    .file-tree-item:hover {
+        background: rgba(59, 130, 246, 0.08);
+        color: #3b82f6;
+        transform: translateX(5px);
+    }
+    .file-tree-item.active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
+        color: #3b82f6;
+        border-color: rgba(59, 130, 246, 0.2);
+        font-weight: 500;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .folder-label {
+        font-weight: 800;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: var(--primary-color);
+        margin: 2rem 0 0.8rem 0.5rem;
+        opacity: 0.8;
+    }
+    .file-icon { width: 20px; margin-right: 12px; opacity: 0.8; text-align: center; }
+
+    /* Content Styling Improvements */
+    .rendered-content { line-height: 1.8; }
+    .rendered-content h1, .rendered-content h2, .rendered-content h3 {
+        color: var(--primary-color);
+        margin-top: 2.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="hero-section text-center reveal-soft">
-    <div class="container">
-        <h1 class="display-4 fw-bold mb-3 dynamic-text">Project Documentation</h1>
-        <p class="lead opacity-75 dynamic-text">A comprehensive guide to the Cyber Attack Prediction System</p>
+    <div class="container py-4">
+        <h1 class="display-3 fw-bold mb-3 dynamic-text premium-gradient">Project Repository Explorer</h1>
+        <p class="lead opacity-75 dynamic-text mb-4">Deep dive into the source code, notebooks, and structure of CyberShield AI</p>
+        <div class="d-flex justify-content-center">
+            <a href="{{ url_for('documentation') }}" class="btn btn-outline-info px-4 rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i>Back to Overview
+            </a>
+        </div>
     </div>
 </div>
 
-<div class="container py-5 mt-n5">
-    <div class="row g-5">
-        <!-- Sidebar Navigation -->
-        <div class="col-lg-3 d-none d-lg-block">
-            <div class="glass-card sticky-toc">
-                <h4 class="fw-bold mb-4 dynamic-text">On This Page</h4>
-                <nav>
-                    <a href="#overview" class="toc-link">Project Overview</a>
-                    <a href="#security-guard" class="toc-link">The Security Guard Analogy</a>
-                    <a href="#architecture" class="toc-link">System Architecture</a>
-                    <a href="#ml-models" class="toc-link">Machine Learning Models</a>
-                    <a href="#genai" class="toc-link">Generative AI Insights</a>
-                    <a href="#features" class="toc-link">Network Features</a>
-                    <a href="#attacks" class="toc-link">Attack Taxonomy</a>
-                    <a href="#viva" class="toc-link">Viva Preparation</a>
-                </nav>
+<div class="container-fluid px-lg-5">
+    <div class="explorer-container">
+        <!-- Persistent Fixed Sidebar -->
+        <aside class="file-sidebar reveal-left">
+            <div class="d-flex align-items-center mb-4">
+                <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3">
+                    <i class="fas fa-project-diagram text-primary"></i>
+                </div>
+                <h5 class="fw-bold mb-0 dynamic-text">Structure</h5>
             </div>
-        </div>
+            
+            <div class="folder-label">Docs / Governance</div>
+            <a href="{{ url_for('documentation') }}" class="file-tree-item">
+                <i class="fas fa-star file-icon text-warning"></i> Project Overview Guide
+            </a>
+            <a href="{{ url_for('explorer', doc='README.md') }}" class="file-tree-item {% if current_doc == 'README.md' %}active{% endif %}">
+                <i class="fab fa-markdown file-icon text-info"></i> README.md
+            </a>
+            <div class="ms-3">
+                <a href="{{ url_for('explorer', doc='docs/BeReady.md') }}" class="file-tree-item {% if current_doc == 'docs/BeReady.md' %}active{% endif %}">
+                    <i class="fas fa-graduation-cap file-icon text-success"></i> BeReady.md
+                </a>
+                <a href="{{ url_for('explorer', doc='docs/PROJECT_GUIDE.md') }}" class="file-tree-item {% if current_doc == 'docs/PROJECT_GUIDE.md' %}active{% endif %}">
+                    <i class="fas fa-book file-icon text-info"></i> GuideBook.md
+                </a>
+            </div>
 
-        <!-- Main Content -->
-        <div class="col-lg-9 reveal-premium" style="margin-left: auto;">
-            <div class="glass-card p-5 border-0">
+            <div class="folder-label">CyberAttackPrediction /</div>
+            <div class="ms-3">
+                <a href="{{ url_for('explorer', doc='CyberAttackPrediction/Main.py') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/Main.py' %}active{% endif %}">
+                    <i class="fab fa-python file-icon text-primary"></i> Main.py
+                </a>
+                <a href="{{ url_for('explorer', doc='CyberAttackPrediction/train_model.py') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/train_model.py' %}active{% endif %}">
+                    <i class="fas fa-brain file-icon text-danger"></i> train_model.py
+                </a>
                 
-                <!-- Overview -->
-                <section id="overview" class="doc-section">
-                    <h2 class="display-6 fw-bold mb-4 text-info"><i class="fas fa-info-circle me-3"></i>Project Overview</h2>
-                    <p class="fs-5 dynamic-text opacity-90 mb-4">
-                        This project, <strong>"Cyber Attack Prediction: From Traditional ML to Generative AI,"</strong> is designed to protect digital infrastructure by identifying malicious network traffic patterns before they cause damage.
-                    </p>
-                    <div class="row g-4 mt-2">
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-4 bg-primary-light border border-primary border-opacity-25 h-100">
-                                <h5 class="fw-bold text-primary"><i class="fas fa-bullseye me-2"></i>The Problem</h5>
-                                <p class="small mb-0 dynamic-text">Traditional security systems rely on "signatures" (lists of known bad actors). They fail when a new, unknown attack occurs.</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-4 rounded-4 bg-success-light border border-success border-opacity-25 h-100">
-                                <h5 class="fw-bold text-success"><i class="fas fa-lightbulb me-2"></i>The Solution</h5>
-                                <p class="small mb-0 dynamic-text">Our system uses AI to learn <em>behavior</em>. It can spot a hacker even if it has never seen that specific attack before.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Analogy -->
-                <section id="security-guard" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-user-shield me-3"></i>The Security Guard Analogy</h3>
-                    <div class="card bg-dark border-0 overflow-hidden mb-4 shadow-lg">
-                        <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="card-img-top opacity-75" alt="Security Visualization" style="max-height: 300px; object-fit: contain; background: #fff; padding: 20px;">
-                        <div class="card-body p-4">
-                            <p class="mb-0 italic text-white">"Imagine a school gate. A traditional guard only stops people on a black-list. Our AI guard watches how people act—if someone tries to climb a wall, they are stopped immediately."</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Architecture -->
-                <section id="architecture" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-sitemap me-3"></i>System Architecture</h3>
-                    <div class="code-block mb-4">
-                        <div class="text-info mb-2">// Data Flow Journey</div>
-                        <span class="text-white">User Upload</span> ➔ <span class="text-warning">Data Pre-processing</span> ➔ <span class="text-primary">ML Prediction</span> ➔ <span class="text-success">GenAI Explanation</span>
-                    </div>
-                    <p class="dynamic-muted">The system is built using Flask (Backend), Bootstrap 5 (Frontend), and Scikit-Learn (AI Engine). It processes 41 unique features for every single network connection attempt.</p>
-                </section>
-
-                <!-- ML Models -->
-                <section id="ml-models" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-brain me-3"></i>Machine Learning Models</h3>
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <div class="p-4 glass-card feature-card h-100">
-                                <h5 class="fw-bold text-primary">Random Forest</h5>
-                                <p class="small dynamic-muted mb-3">Our primary model. It works like a "Committee of Experts" (Decision Trees) voting on whether a connection is safe or not.</p>
-                                <ul class="small dynamic-muted ps-3">
-                                    <li>100 Decision Trees</li>
-                                    <li>Majority Voting Mechanism</li>
-                                    <li>High Resistance to Overfitting</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-4 glass-card feature-card h-100">
-                                <h5 class="fw-bold text-danger">Deep Learning (DNN)</h5>
-                                <p class="small dynamic-muted mb-3">A complex neural network that finds hidden connections in big data that simpler models might miss.</p>
-                                <ul class="small dynamic-muted ps-3">
-                                    <li>Multi-Layer Perceptron (MLP)</li>
-                                    <li>41-Neuron Input Layer</li>
-                                    <li>Backpropagation Learning</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- GenAI -->
-                <section id="genai" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-magic me-3"></i>Generative AI Insights</h3>
-                    <div class="p-4 rounded-4" style="background: rgba(13, 202, 240, 0.05); border: 1px dashed var(--info-color);">
-                        <p class="mb-0 dynamic-text">Most AI just says "Attack" or "Normal." Our <strong>Generative Insight Engine</strong> takes it a step further. It explains <em>why</em> it thinks there is an attack and gives the administrator a 3-step plan to fix it in plain English.</p>
-                    </div>
-                </section>
-
-                <!-- Network Features -->
-                <section id="features" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-list-ol me-3"></i>Dataset Features (41 Columns)</h3>
-                    <p class="dynamic-muted mb-4">The AI doesn't just "see" an attack; it looks at 41 different clues. Here are the core categories:</p>
-                    <div class="accordion accordion-flush bg-transparent" id="featureAccordion">
-                        <div class="accordion-item bg-transparent border-glass">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#basicFeatures">
-                                    <i class="fas fa-network-wired me-2"></i> Basic Features (The ID Card)
-                                </button>
-                            </h2>
-                            <div id="basicFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
-                                <div class="accordion-body dynamic-muted">
-                                    <ul class="list-unstyled">
-                                        <li><strong>Duration:</strong> Length of the connection (in seconds).</li>
-                                        <li><strong>Protocol_type:</strong> Type of protocol (TCP, UDP, ICMP).</li>
-                                        <li><strong>Service:</strong> Network service on the destination (HTTP, FTP, etc.).</li>
-                                        <li><strong>Flag:</strong> Status of the connection (Normal, Rejected, Error).</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="accordion-item bg-transparent border-glass">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#contentFeatures">
-                                    <i class="fas fa-box-open me-2"></i> Content Features (The Suitcase)
-                                </button>
-                            </h2>
-                            <div id="contentFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
-                                <div class="accordion-body dynamic-muted">
-                                    <ul class="list-unstyled">
-                                        <li><strong>Src_bytes:</strong> Data bytes sent from source to destination.</li>
-                                        <li><strong>Dst_bytes:</strong> Data bytes sent from destination to source.</li>
-                                        <li><strong>Logged_in:</strong> 1 if successfully logged in; 0 otherwise.</li>
-                                        <li><strong>Num_failed_logins:</strong> Number of failed login attempts.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Attack Taxonomy -->
-                <section id="attacks" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-skull-crossbones me-3"></i>Attack Taxonomy</h3>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="p-3 border border-danger border-opacity-25 rounded-3 h-100">
-                                <h6 class="fw-bold text-danger mb-2">DoS (Denial of Service)</h6>
-                                <p class="small dynamic-muted mb-0">Goal: Crashing the system. (e.g., Neptune, Smurf, Pod)</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-3 border border-warning border-opacity-25 rounded-3 h-100">
-                                <h6 class="fw-bold text-warning mb-2">Probing (Reconnaissance)</h6>
-                                <p class="small dynamic-muted mb-0">Goal: Gathering info. (e.g., Satan, IPsweep, Nmap)</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-3 border border-info border-opacity-25 rounded-3 h-100">
-                                <h6 class="fw-bold text-info mb-2">U2R (User to Root)</h6>
-                                <p class="small dynamic-muted mb-0">Goal: Gaining Admin access. (e.g., Buffer Overflow)</p>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="p-3 border border-success border-opacity-25 rounded-3 h-100">
-                                <h6 class="fw-bold text-success mb-2">R2L (Remote to Local)</h6>
-                                <p class="small dynamic-muted mb-0">Goal: Getting into the system. (e.g., Guess Password)</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Viva Preparation -->
-                <section id="viva" class="doc-section">
-                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-graduation-cap me-3"></i>Viva Preparation</h3>
-                    <div class="glass-card p-4">
-                        <div class="mb-4">
-                            <h6 class="fw-bold dynamic-text mb-2">Q: Why use Random Forest?</h6>
-                            <p class="small dynamic-muted">A: It's an ensemble model that uses many decision trees to vote, making it highly accurate and resistant to memorizing noise (overfitting).</p>
-                        </div>
-                        <div class="mb-0">
-                            <h6 class="fw-bold dynamic-text mb-2">Q: What is the significance of the GenAI layer?</h6>
-                            <p class="small dynamic-muted">A: It provides Explainable AI (XAI) by translating complex ML predictions into human-readable advice and action plans.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <div class="text-center mt-5">
-                    <a href="{{ url_for('UserLogin') }}" class="btn btn-primary btn-lg px-5">
-                        Try It Now <i class="fas fa-arrow-right ms-2"></i>
+                <div class="folder-label mt-2">Notebooks</div>
+                <div class="ms-3">
+                    <a href="{{ url_for('explorer', doc='CyberAttackPrediction/ExtensionCyberAttack.ipynb') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/ExtensionCyberAttack.ipynb' %}active{% endif %}">
+                        <i class="fas fa-book-open file-icon text-info"></i> Extension.ipynb
+                    </a>
+                    <a href="{{ url_for('explorer', doc='CyberAttackPrediction/ProposeCyberAttack.ipynb') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/ProposeCyberAttack.ipynb' %}active{% endif %}">
+                        <i class="fas fa-vial file-icon text-warning"></i> Propose.ipynb
                     </a>
                 </div>
-
             </div>
-        </div>
+
+            <div class="folder-label">System</div>
+            <a href="{{ url_for('explorer', doc='CyberAttackPrediction/requirements.txt') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/requirements.txt' %}active{% endif %}">
+                <i class="fas fa-file-invoice file-icon"></i> requirements.txt
+            </a>
+            <a href="{{ url_for('explorer', doc='install_deps.ps1') }}" class="file-tree-item {% if current_doc == 'install_deps.ps1' %}active{% endif %}">
+                <i class="fas fa-terminal file-icon text-primary"></i> install_deps.ps1
+            </a>
+            <a href="{{ url_for('explorer', doc='to do list.txt') }}" class="file-tree-item {% if current_doc == 'to do list.txt' %}active{% endif %}">
+                <i class="fas fa-tasks file-icon"></i> to do list.txt
+            </a>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-viewer reveal-premium">
+            <div class="rendered-content dynamic-text">
+                {% if error %}
+                    <div class="alert alert-danger border-glass glass-bg text-center p-5">
+                        <i class="fas fa-exclamation-circle display-1 mb-4"></i>
+                        <h3>Error Loading Resource</h3>
+                        <p class="opacity-75">{{ error }}</p>
+                        <a href="{{ url_for('documentation') }}" class="btn btn-outline-danger mt-3">Reset Explorer</a>
+                    </div>
+                {% else %}
+                    {% if doc_type == 'code' %}
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-glass">
+                            <h4 class="mb-0 fw-bold"><i class="fas fa-code me-2 text-primary"></i>Source Code Viewer</h4>
+                            <span class="badge bg-primary rounded-pill">Syntax Highlighted</span>
+                        </div>
+                    {% elif doc_type == 'notebook' %}
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-glass">
+                            <h4 class="mb-0 fw-bold"><i class="fas fa-book-open me-2 text-info"></i>Research Notebook</h4>
+                            <span class="badge bg-info rounded-pill">Interactive Format</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="doc-body">
+                        {{ md_content|safe }}
+                    </div>
+                {% endif %}
+            </div>
+        </main>
     </div>
 </div>
-
-<style>
-    .mt-n5 { margin-top: -60px !important; }
-    .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
-    .bg-success-light { background: rgba(25, 135, 84, 0.1); }
-    .border-glass { border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; }
-    .accordion-button:not(.collapsed) { background: transparent !important; box-shadow: none !important; color: #3b82f6 !important; }
-    .accordion-button::after { filter: invert(1); scale: 0.8; }
-    [data-theme="light"] .accordion-button::after { filter: none; }
-    .x-small { font-size: 0.85rem; }
-    .xx-small { font-size: 0.75rem; }
-    .doc-section { scroll-margin-top: 100px; }
-</style>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Highlight active link on scroll
-    window.addEventListener('scroll', event => {
-        let fromTop = window.scrollY + 150;
-        let mainNavLinks = document.querySelectorAll('.toc-link');
-
-        mainNavLinks.forEach(link => {
-            let section = document.querySelector(link.hash);
-            if (section && section.offsetTop <= fromTop && section.offsetTop + section.offsetHeight > fromTop) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
-    });
-</script>
 {% endblock %}

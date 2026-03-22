@@ -13,6 +13,12 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 from train_model import run_training
+import markdown2
+from pygments import highlight
+from pygments.lexers import get_lexer_for_filename
+from pygments.formatters import HtmlFormatter
+import nbformat
+from nbconvert import HTMLExporter
 
 #=================flask code starts here
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
@@ -239,7 +245,54 @@ def open_browser():
 def documentation():
     if 'user' not in session:
         return redirect(url_for('UserLogin'))
-    return render_template('documentation.html')
+    return render_template('project overview.html')
+
+@app.route('/explorer')
+def explorer():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
+        
+    doc_path = request.args.get('doc', 'README.md')
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Root
+    
+    # Simple security check to prevent directory traversal
+    if '..' in doc_path or doc_path.startswith('/'):
+        return render_template('documentation.html', error="Invalid path")
+        
+    full_path = os.path.join(base_dir, doc_path)
+    if not os.path.exists(full_path):
+        return render_template('documentation.html', error=f"File not found: {doc_path}")
+        
+    try:
+        ext = os.path.splitext(doc_path)[1].lower()
+        with open(full_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+            
+        if ext == '.md':
+            html_content = markdown2.markdown(content, extras=["tables", "fenced-code-blocks", "toc", "header-ids"])
+            doc_type = 'markdown'
+        elif ext == '.ipynb':
+            nb = nbformat.reads(content, as_version=4)
+            html_exporter = HTMLExporter()
+            html_exporter.template_name = 'basic' # Simple clean output
+            (html_content, resources) = html_exporter.from_notebook_node(nb)
+            doc_type = 'notebook'
+        elif ext in ['.py', '.bat', '.ps1', '.json', '.html', '.css', '.js']:
+            lexer = get_lexer_for_filename(full_path)
+            formatter = HtmlFormatter(style='monokai', full=False, cssclass="highlight")
+            html_content = highlight(content, lexer, formatter)
+            doc_type = 'code'
+            # Add simple wrapper for code styling if needed
+            html_content = f'<style>{formatter.get_style_defs(".highlight")}</style>{html_content}'
+        else:
+            # Plain text
+            html_content = f'<pre style="white-space: pre-wrap; word-wrap: break-word;">{content}</pre>'
+            doc_type = 'text'
+            
+        return render_template('documentation.html', md_content=html_content, current_doc=doc_path, doc_type=doc_type)
+        
+    except Exception as e:
+        return render_template('documentation.html', error=f"Rendering error: {str(e)}")
 
 @app.route('/Train')
 def train_view():

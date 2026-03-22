@@ -1,0 +1,327 @@
+{% extends "base.html" %}
+
+{% block title %}Project Documentation - CyberShield AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .doc-section {
+        margin-bottom: 4rem;
+    }
+    .feature-card {
+        transition: all 0.3s ease;
+        border: 1px solid var(--glass-border);
+    }
+    .feature-card:hover {
+        background: var(--glass-bg);
+        transform: translateY(-5px);
+    }
+    .sticky-toc {
+        position: fixed;
+        left: 3rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 280px;
+        z-index: 1000;
+        max-height: 80vh;
+        overflow-y: auto;
+        padding: 2rem !important;
+        background: var(--navbar-bg) !important;
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+    }
+    [data-theme="light"] .sticky-toc {
+        background: rgba(255, 255, 255, 0.8) !important;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    .toc-link {
+        display: block;
+        padding: 0.6rem 1rem;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        border-left: 3px solid transparent;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    [data-theme="light"] .toc-link {
+        color: rgba(0, 0, 0, 0.6);
+    }
+    .toc-link:hover, .toc-link.active {
+        color: #3b82f6;
+        border-left-color: #3b82f6;
+        background: rgba(59, 130, 246, 0.1);
+        padding-left: 1.5rem;
+    }
+    [data-theme="light"] .toc-link:hover, [data-theme="light"] .toc-link.active {
+        background: rgba(59, 130, 246, 0.05);
+    }
+    .code-block {
+        background: rgba(0,0,0,0.3);
+        padding: 1.5rem;
+        border-radius: 12px;
+        font-family: 'Courier New', Courier, monospace;
+        border: 1px solid var(--glass-border);
+    }
+    [data-theme="light"] .code-block {
+        background: #f8fafc;
+        border-color: #e2e8f0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center reveal-soft">
+    <div class="container">
+        <h1 class="display-4 fw-bold mb-3 dynamic-text">Project Documentation</h1>
+        <p class="lead opacity-75 dynamic-text mb-4">A comprehensive guide to the Cyber Attack Prediction System</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="#overview" class="btn btn-outline-info px-4 rounded-pill">
+                <i class="fas fa-book-reader me-2"></i>Read Overview
+            </a>
+            <a href="{{ url_for('explorer') }}" class="btn btn-primary px-4 rounded-pill shadow-sm">
+                <i class="fas fa-folder-open me-2"></i>Open Project Explorer
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 mt-n5">
+    <div class="row g-5">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="glass-card sticky-toc">
+                <h4 class="fw-bold mb-3 dynamic-text">Reference</h4>
+                <div class="mb-4">
+                    <a href="{{ url_for('explorer') }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">
+                        <i class="fas fa-folder-open me-2"></i>Documentation Site
+                    </a>
+                </div>
+                <h4 class="fw-bold mb-3 dynamic-text">On This Page</h4>
+                <nav>
+                    <a href="#overview" class="toc-link">Project Overview</a>
+                    <a href="#security-guard" class="toc-link">The Security Guard Analogy</a>
+                    <a href="#architecture" class="toc-link">System Architecture</a>
+                    <a href="#ml-models" class="toc-link">Machine Learning Models</a>
+                    <a href="#genai" class="toc-link">Generative AI Insights</a>
+                    <a href="#features" class="toc-link">Network Features</a>
+                    <a href="#attacks" class="toc-link">Attack Taxonomy</a>
+                    <a href="#viva" class="toc-link">Viva Preparation</a>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-lg-9 reveal-premium" style="margin-left: auto;">
+            <div class="glass-card p-5 border-0">
+                
+                <!-- Overview -->
+                <section id="overview" class="doc-section">
+                    <h2 class="display-6 fw-bold mb-4 text-info"><i class="fas fa-info-circle me-3"></i>Project Overview</h2>
+                    <p class="fs-5 dynamic-text opacity-90 mb-4">
+                        This project, <strong>"Cyber Attack Prediction: From Traditional ML to Generative AI,"</strong> is designed to protect digital infrastructure by identifying malicious network traffic patterns before they cause damage.
+                    </p>
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4 bg-primary-light border border-primary border-opacity-25 h-100">
+                                <h5 class="fw-bold text-primary"><i class="fas fa-bullseye me-2"></i>The Problem</h5>
+                                <p class="small mb-0 dynamic-text">Traditional security systems rely on "signatures" (lists of known bad actors). They fail when a new, unknown attack occurs.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 rounded-4 bg-success-light border border-success border-opacity-25 h-100">
+                                <h5 class="fw-bold text-success"><i class="fas fa-lightbulb me-2"></i>The Solution</h5>
+                                <p class="small mb-0 dynamic-text">Our system uses AI to learn <em>behavior</em>. It can spot a hacker even if it has never seen that specific attack before.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Analogy -->
+                <section id="security-guard" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-user-shield me-3"></i>The Security Guard Analogy</h3>
+                    <div class="card bg-dark border-0 overflow-hidden mb-4 shadow-lg">
+                        <img src="{{ url_for('static', filename='images/tra.jpg') }}" class="card-img-top opacity-75" alt="Security Visualization" style="max-height: 300px; object-fit: contain; background: #fff; padding: 20px;">
+                        <div class="card-body p-4">
+                            <p class="mb-0 italic text-white">"Imagine a school gate. A traditional guard only stops people on a black-list. Our AI guard watches how people act—if someone tries to climb a wall, they are stopped immediately."</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Architecture -->
+                <section id="architecture" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-sitemap me-3"></i>System Architecture</h3>
+                    <div class="code-block mb-4">
+                        <div class="text-info mb-2">// Data Flow Journey</div>
+                        <span class="text-white">User Upload</span> ➔ <span class="text-warning">Data Pre-processing</span> ➔ <span class="text-primary">ML Prediction</span> ➔ <span class="text-success">GenAI Explanation</span>
+                    </div>
+                    <p class="dynamic-muted">The system is built using Flask (Backend), Bootstrap 5 (Frontend), and Scikit-Learn (AI Engine). It processes 41 unique features for every single network connection attempt.</p>
+                </section>
+
+                <!-- ML Models -->
+                <section id="ml-models" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-brain me-3"></i>Machine Learning Models</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card feature-card h-100">
+                                <h5 class="fw-bold text-primary">Random Forest</h5>
+                                <p class="small dynamic-muted mb-3">Our primary model. It works like a "Committee of Experts" (Decision Trees) voting on whether a connection is safe or not.</p>
+                                <ul class="small dynamic-muted ps-3">
+                                    <li>100 Decision Trees</li>
+                                    <li>Majority Voting Mechanism</li>
+                                    <li>High Resistance to Overfitting</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card feature-card h-100">
+                                <h5 class="fw-bold text-danger">Deep Learning (DNN)</h5>
+                                <p class="small dynamic-muted mb-3">A complex neural network that finds hidden connections in big data that simpler models might miss.</p>
+                                <ul class="small dynamic-muted ps-3">
+                                    <li>Multi-Layer Perceptron (MLP)</li>
+                                    <li>41-Neuron Input Layer</li>
+                                    <li>Backpropagation Learning</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- GenAI -->
+                <section id="genai" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-magic me-3"></i>Generative AI Insights</h3>
+                    <div class="p-4 rounded-4" style="background: rgba(13, 202, 240, 0.05); border: 1px dashed var(--info-color);">
+                        <p class="mb-0 dynamic-text">Most AI just says "Attack" or "Normal." Our <strong>Generative Insight Engine</strong> takes it a step further. It explains <em>why</em> it thinks there is an attack and gives the administrator a 3-step plan to fix it in plain English.</p>
+                    </div>
+                </section>
+
+                <!-- Network Features -->
+                <section id="features" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-list-ol me-3"></i>Dataset Features (41 Columns)</h3>
+                    <p class="dynamic-muted mb-4">The AI doesn't just "see" an attack; it looks at 41 different clues. Here are the core categories:</p>
+                    <div class="accordion accordion-flush bg-transparent" id="featureAccordion">
+                        <div class="accordion-item bg-transparent border-glass">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#basicFeatures">
+                                    <i class="fas fa-network-wired me-2"></i> Basic Features (The ID Card)
+                                </button>
+                            </h2>
+                            <div id="basicFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
+                                <div class="accordion-body dynamic-muted">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Duration:</strong> Length of the connection (in seconds).</li>
+                                        <li><strong>Protocol_type:</strong> Type of protocol (TCP, UDP, ICMP).</li>
+                                        <li><strong>Service:</strong> Network service on the destination (HTTP, FTP, etc.).</li>
+                                        <li><strong>Flag:</strong> Status of the connection (Normal, Rejected, Error).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item bg-transparent border-glass">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#contentFeatures">
+                                    <i class="fas fa-box-open me-2"></i> Content Features (The Suitcase)
+                                </button>
+                            </h2>
+                            <div id="contentFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
+                                <div class="accordion-body dynamic-muted">
+                                    <ul class="list-unstyled">
+                                        <li><strong>Src_bytes:</strong> Data bytes sent from source to destination.</li>
+                                        <li><strong>Dst_bytes:</strong> Data bytes sent from destination to source.</li>
+                                        <li><strong>Logged_in:</strong> 1 if successfully logged in; 0 otherwise.</li>
+                                        <li><strong>Num_failed_logins:</strong> Number of failed login attempts.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Attack Taxonomy -->
+                <section id="attacks" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-skull-crossbones me-3"></i>Attack Taxonomy</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="p-3 border border-danger border-opacity-25 rounded-3 h-100">
+                                <h6 class="fw-bold text-danger mb-2">DoS (Denial of Service)</h6>
+                                <p class="small dynamic-muted mb-0">Goal: Crashing the system. (e.g., Neptune, Smurf, Pod)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border border-warning border-opacity-25 rounded-3 h-100">
+                                <h6 class="fw-bold text-warning mb-2">Probing (Reconnaissance)</h6>
+                                <p class="small dynamic-muted mb-0">Goal: Gathering info. (e.g., Satan, IPsweep, Nmap)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border border-info border-opacity-25 rounded-3 h-100">
+                                <h6 class="fw-bold text-info mb-2">U2R (User to Root)</h6>
+                                <p class="small dynamic-muted mb-0">Goal: Gaining Admin access. (e.g., Buffer Overflow)</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 border border-success border-opacity-25 rounded-3 h-100">
+                                <h6 class="fw-bold text-success mb-2">R2L (Remote to Local)</h6>
+                                <p class="small dynamic-muted mb-0">Goal: Getting into the system. (e.g., Guess Password)</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Viva Preparation -->
+                <section id="viva" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-graduation-cap me-3"></i>Viva Preparation</h3>
+                    <div class="glass-card p-4">
+                        <div class="mb-4">
+                            <h6 class="fw-bold dynamic-text mb-2">Q: Why use Random Forest?</h6>
+                            <p class="small dynamic-muted">A: It's an ensemble model that uses many decision trees to vote, making it highly accurate and resistant to memorizing noise (overfitting).</p>
+                        </div>
+                        <div class="mb-0">
+                            <h6 class="fw-bold dynamic-text mb-2">Q: What is the significance of the GenAI layer?</h6>
+                            <p class="small dynamic-muted">A: It provides Explainable AI (XAI) by translating complex ML predictions into human-readable advice and action plans.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="text-center mt-5">
+                    <a href="{{ url_for('UserLogin') }}" class="btn btn-primary btn-lg px-5">
+                        Try It Now <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .mt-n5 { margin-top: -60px !important; }
+    .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
+    .bg-success-light { background: rgba(25, 135, 84, 0.1); }
+    .border-glass { border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; }
+    .accordion-button:not(.collapsed) { background: transparent !important; box-shadow: none !important; color: #3b82f6 !important; }
+    .accordion-button::after { filter: invert(1); scale: 0.8; }
+    [data-theme="light"] .accordion-button::after { filter: none; }
+    .x-small { font-size: 0.85rem; }
+    .xx-small { font-size: 0.75rem; }
+    .doc-section { scroll-margin-top: 100px; }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Highlight active link on scroll
+    window.addEventListener('scroll', event => {
+        let fromTop = window.scrollY + 150;
+        let mainNavLinks = document.querySelectorAll('.toc-link');
+
+        mainNavLinks.forEach(link => {
+            let section = document.querySelector(link.hash);
+            if (section && section.offsetTop <= fromTop && section.offsetTop + section.offsetHeight > fromTop) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

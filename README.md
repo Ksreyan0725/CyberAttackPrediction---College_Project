@@ -28,8 +28,7 @@
 
 ## 🚀 Key Features
 
-| Feature | Description |
-| :--- | :--- |
+| **🚀 Dual-Docs** | Features a two-stage documentation experience: A high-level **Interactive Overview** for beginners and a **Repository Explorer** for technical deep dives. |
 | **💎 Liquid Glass UI** | A premium, responsive interface featuring glassmorphism, translucency, and refractive background animations for a modern feel. |
 | **🧠 Stacking ML** | Uses a multi-model stacking architecture (Random Forest, KNN, MLP) for superior prediction accuracy over single-model systems. |
 | **🔍 XAI (SHAP)** | Explainable AI that visually breaks down *why* a specific network packet was flagged as an attack using SHAP values. |
@@ -81,14 +80,11 @@ This project is built upon the core principles of network defense.
 
 ---
 
-## 📂 Master Documentation Index
-
-Access the specialized guides developed for this project:
-
-- 📖 [**PROJECT_GUIDE.md**](docs/PROJECT_GUIDE.md) — The 2000+ line technical manual and Viva Q&A.
-- 🎓 [**BeReady.md**](docs/BeReady.md) — The interactive BCA syllabus and readiness checklist.
-- 🎨 [**UI_Walkthrough.md**](docs/UI_Refinement_Walkthrough.md) — Documentation of the design system.
-- 📓 [**Extension Research**](CyberAttackPrediction/ExtensionCyberAttack.ipynb) — The Jupyter notebook covering stacking and SHAP.
+- 🌟 [**Documentation Overview**](/documentation) — The primary interactive summary and project guide.
+- 📂 [**Repository Explorer**](/explorer) — Interactive technical browser for all source code and notebooks.
+- 📖 [**Full Project Manual**](docs/PROJECT_GUIDE.md) — Comprehensive 2000+ line technical manual and Viva Q&A.
+- 🎓 [**Academic Readiness**](docs/BeReady.md) — The interactive BCA syllabus and readiness checklist.
+- 🎨 [**Design Walkthrough**](docs/UI_Refinement_Walkthrough.md) — Documentation of the premium design system.
 
 ---
 
@@ -100,12 +96,15 @@ Access the specialized guides developed for this project:
   - 📁 [static](CyberAttackPrediction/static/) (Styles & Images)
     - 📄 [default.css](CyberAttackPrediction/static/default.css) (Colors and Layout)
   - 📁 [templates](CyberAttackPrediction/templates/) (The Webpages)
-    - 📄 [base.html](CyberAttackPrediction/templates/base.html) (The Master Layout)
+    - 📄 [base.html](CyberAttackPrediction/templates/base.html) (The Master Design Layout)
     - [index.html](CyberAttackPrediction/templates/index.html) (Home Page)
-    - [Predict.html](CyberAttackPrediction/templates/Predict.html) (The Upload Page)
-    - [UserLogin.html](CyberAttackPrediction/templates/UserLogin.html) (Split Login Page)
-    - [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results Page)
-    - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Explainers)
+    - [project overview.html](CyberAttackPrediction/templates/project%20overview.html) (Project Overview Landing Page)
+    - [documentation.html](CyberAttackPrediction/templates/documentation.html) (Technical Repository Explorer)
+    - [Predict.html](CyberAttackPrediction/templates/Predict.html) (The Attack Upload & Analysis Page)
+    - [UserLogin.html](CyberAttackPrediction/templates/UserLogin.html) (Modern Split-UI Login Page)
+    - [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results & Explanation Dashboard)
+    - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Human-Readable Explanations)
+    - [Train.html](CyberAttackPrediction/templates/Train.html) (AI Model Training & Management Page)
   - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
   - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
   - 🐍 [**Main.py**](CyberAttackPrediction/Main.py) (Heart of the Project)
