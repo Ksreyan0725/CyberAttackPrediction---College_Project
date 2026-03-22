@@ -1,5 +1,6 @@
 # 🎓 FINAL YEAR PROJECT: CYBER ATTACK PREDICTION SYSTEM
-## (Academic Year 2023-2026 | 6th Semester Project)
+
+## Academic Year 2023-2026 | 6th Semester Project
 
 ---
 
@@ -7,28 +8,31 @@
 
 **Institution**: Roland Institute of Computer & Mgmt. Studies, Surya Vihar, Berhampur
 **Project Title**: Cyber Attack Prediction: From Traditional ML to Generative AI
-**Guide Teacher**: Mr. Rasmi Roy Badakumar (📞 88953 83114)
+**Guide Teacher**: Mr. Rasmi Roy Badakumar
 
 ### 👥 THE TEAM MEMBERS
-1.  **ANKITA PATI** (Roll No: 23PBCA1335)
-2.  **KUMAR SREYAN PATTANAYAK** (Roll No: 23PBCA1355)
-3.  **SUBHASHREE PATHY** (Roll No: 23PBCA1386)
-4.  **TANMAYA RANJAN JENA** (Roll No: 23PBCA1391)
+
+1. **ANKITA PATI** (Roll No: 23PBCA1335)
+2. **KUMAR SREYAN PATTANAYAK** (Roll No: 23PBCA1355)
+3. **SUBHASHREE PATHY** (Roll No: 23PBCA1386)
+4. **TANMAYA RANJAN JENA** (Roll No: 23PBCA1391)
 
 ---
 
 ## 📢 PRESENTATION TALKING POINTS (STEP-BY-STEP)
+
 *Follow these points for your seminar/viva to sound confident!*
 
-1.  **Introduction**: "Good morning/afternoon. We are presenting our project on Cyber Attack Prediction. In today's world, everything is online, and hackers are always trying to steal data. Our project uses AI to stop them."
-2.  **The Problem**: "Usually, security systems only block known hackers. But what if a new hacker comes? Our system uses Machine Learning to 'learn' how hackers behave, so it can catch new ones too."
-3.  **The Solution**: "We built a website where you can upload network data. Our AI checks the data and tells you if there is an attack like a 'SYN Flood' or 'Password Guessing'."
-4.  **The 'GenAI' Part**: "The best part is our Generative AI. It doesn't just say 'Attack'; it explains the attack in simple English and tells the user exactly how to fix it."
-5.  **Conclusion**: "Our system is fast, accurate, and easy to use even for people who don't know much about computers."
+1. **Introduction**: "Good morning/afternoon. We are presenting our project on Cyber Attack Prediction. In today's world, everything is online, and hackers are always trying to steal data. Our project uses AI to stop them."
+2. **The Problem**: "Usually, security systems only block known hackers. But what if a new hacker comes? Our system uses Machine Learning to 'learn' how hackers behave, so it can catch new ones too."
+3. **The Solution**: "We built a website where you can upload network data. Our AI checks the data and tells you if there is an attack like a 'SYN Flood' or 'Password Guessing'."
+4. **The 'GenAI' Part**: "The best part is our Generative AI. It doesn't just say 'Attack'; it explains the attack in simple English and tells the user exactly how to fix it."
+5. **Conclusion**: "Our system is fast, accurate, and easy to use even for people who don't know much about computers."
 
 ---
 
 ## 🛠️ INDIVIDUAL MEMBER CONTRIBUTIONS
+
 *If the teacher asks "What did YOU do?", here are your answers:*
 
 - **Ankita Pati**: "I worked on the **Data Collection and Research**. I studied the NSL-KDD dataset and identified the 41 clues (features) that help catch hackers."
@@ -39,30 +43,32 @@
 ---
 
 ## 🏗️ PROJECT STRUCTURE (CLICKABLE FILE MAP)
+
 *Click on any file or folder to open it directly!*
 
 - 📁 [CyberAttackPrediction](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction) (Main Project Folder)
-    - 📁 [static](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static) (Styles & Images)
-        - � [default.css](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/default.css) (Colors and Layout)
-    - 📁 [templates](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates) (The Webpages)
-        - 📄 [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html) (The Master Layout)
-        - 📄 [index.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/index.html) (Home Page)
-        - 📄 [Predict.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/Predict.html) (The Upload Page)
-        - 📄 [UserLogin.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserLogin.html) (Login Page)
-        - 📄 [UserScreen.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserScreen.html) (Results Page)
-    - 📁 [model](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/model) (The AI's Brain Files)
-    - 📁 [Dataset](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Dataset) (The Textbooks/Data)
-    - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
-    - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
-    - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
+  - 📁 [static](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static) (Styles & Images)
+    - 📄 [default.css](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/default.css) (Colors and Layout)
+  - 📁 [templates](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates) (The Webpages)
+    - 📄 [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html) (The Master Layout)
+    - 📄 [index.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/index.html) (Home Page)
+    - 📄 [Predict.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/Predict.html) (The Upload Page)
+    - 📄 [UserLogin.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserLogin.html) (Login Page)
+    - 📄 [UserScreen.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserScreen.html) (Results Page)
+  - 📁 [model](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/model) (The AI's Brain Files)
+  - 📁 [Dataset](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Dataset) (The Textbooks/Data)
+  - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
+  - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
+  - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
 
 ---
 
 ## 🔄 THE DATA FLOW DIAGRAM (HOW IT WORKS)
+
 *This simple diagram shows how a user's file becomes a smart prediction.*
 
 ```text
-[ USER ] 
+[ USER ]
    │
    ▼
 ( Uploads CSV File )
@@ -83,8 +89,10 @@
 
 ---
 
-## �� THE "SECURITY GUARD" ANALOGY (EXPLAINING THE PROJECT)
+## 🔐 THE "SECURITY GUARD" ANALOGY (EXPLAINING THE PROJECT)
+
 Imagine a very busy school gate (The Internet). Thousands of students (Data) enter every day.
+
 - **Traditional Security**: The guard has a list of "Banned People." If someone on the list shows up, they are stopped. But what if a new troublemaker arrives? The guard won't know!
 - **Our AI Security (ML)**: Instead of just a list, the guard is "trained" to watch behavior. If someone is running too fast, wearing a mask, or trying to climb a wall, the guard stops them—even if they've never seen that person before.
 - **The Helpful Report (GenAI)**: After stopping the person, the guard doesn't just say "Get out." The guard gives a detailed report: "I stopped this person because they were carrying a spray-can. I suggest we lock the art room."
@@ -92,392 +100,832 @@ Imagine a very busy school gate (The Internet). Thousands of students (Data) ent
 ---
 
 ## 📑 TABLE OF CONTENTS
-1.  [**THE BIG PICTURE (FOR NON-TECH READERS)**](#1-the-big-picture-for-non-tech-readers)
-2.  [**CORE CONCEPTS & TERMINOLOGY**](#2-core-concepts--terminology)
-3.  [**PROJECT ARCHITECTURE: THE FRONTEND & BACKEND SPLIT**](#3-project-architecture-the-frontend--backend-split)
-4.  [**ALGORITHMIC DEEP DIVE (THE MATH & LOGIC)**](#4-algorithmic-deep-dive-the-math--logic)
-5.  [**EXHAUSTIVE FILE-BY-FILE DOCUMENTATION**](#5-exhaustive-file-by-file-documentation)
-6.  [**DETAILED FUNCTION-BY-FUNCTION LOGIC**](#6-detailed-function-by-function-logic)
-7.  [**THE STEP-BY-STEP DATA LIFECYCLE**](#7-the-step-by-step-data-lifecycle)
-8.  [**DATASET FEATURE DICTIONARY (ALL 41 COLUMNS EXPLAINED)**](#8-dataset-feature-dictionary-all-41-columns-explained)
-9.  [**ATTACK TAXONOMY: UNDERSTANDING THE THREATS**](#9-attack-taxonomy-understanding-the-threats)
-10. [**EXPLAINABLE AI (XAI) & SHAP INTERPRETATION**](#10-explainable-ai-xai--shap-interpretation)
-11. [**GENERATIVE AI INSIGHT ENGINE: HOW IT WORKS**](#11-generative-ai-insight-engine-how-it-works)
-12. [**VIVA PREPARATION: TOP 100 QUESTIONS & ANSWERS**](#12-viva-preparation-top-100-questions--answers)
-13. [**INSTALLATION & THE TROUBLESHOOTING ENCYCLOPEDIA**](#13-installation--the-troubleshooting-encyclopedia)
-14. [**SECURITY, ETHICS & BEST PRACTICES**](#14-security-ethics--best-practices)
-15. [**FUTURE ROADMAP & EXTENSIONS**](#15-future-roadmap--extensions)
-16. [**GLOSSARY OF TERMS**](#16-glossary-of-terms)
-17. [**CONCLUSION & ACADEMIC SIGNIFICANCE**](#17-conclusion--academic-significance)
+
+1. [THE BIG PICTURE (FOR NON-TECH READERS)](#the-big-picture-simple-explanation)
+2. [CORE CONCEPTS & TERMINOLOGY](#core-concepts--terminology)
+3. [PROJECT ARCHITECTURE: THE FRONTEND & BACKEND SPLIT](#project-architecture)
+4. [ALGORITHMIC DEEP DIVE (THE MATH & LOGIC)](#algorithmic-deep-dive)
+5. [EXHAUSTIVE FILE-BY-FILE DOCUMENTATION](#exhaustive-file-by-file-documentation)
+6. [DETAILED FUNCTION-BY-FUNCTION LOGIC](#detailed-function-by-function-logic)
+7. [THE STEP-BY-STEP DATA LIFECYCLE](#the-step-by-step-data-lifecycle)
+8. [DATASET FEATURE DICTIONARY (ALL 41 COLUMNS EXPLAINED)](#dataset-feature-dictionary)
+9. [ATTACK TAXONOMY: UNDERSTANDING THE THREATS](#attack-taxonomy)
+10. [EXPLAINABLE AI (XAI) & SHAP INTERPRETATION](#explainable-ai-xai--shap-interpretation)
+11. [GENERATIVE AI INSIGHT ENGINE: HOW IT WORKS](#generative-ai-insight-engine)
+12. [VIVA PREPARATION: TOP 100 QUESTIONS & ANSWERS](#viva-preparation-top-100-questions--answers)
+13. [INSTALLATION & THE TROUBLESHOOTING ENCYCLOPEDIA](#troubleshooting-encyclopedia)
+14. [SECURITY, ETHICS & BEST PRACTICES](#security-ethics--best-practices)
+15. [FUTURE ROADMAP & EXTENSIONS](#future-roadmap--extensions)
+16. [GLOSSARY OF TERMS](#glossary-of-terms)
 
 ---
 
-## 1. THE BIG PICTURE (SIMPLE EXPLANATION)
+## THE BIG PICTURE SIMPLE EXPLANATION
 
 ### 🏫 The "Security Guard" Analogy
+
 Imagine a school gate where many people enter every day.
+
 - **Traditional Security (Old Way)**: The guard only stops people on a "Banned List." If a new thief comes who is not on the list, the guard lets them in!
 - **Our AI Security (Our Project)**: The guard is smart. He watches *behavior*. If someone is trying to climb a wall or running too fast, he stops them, even if he doesn't know their name.
 - **The Helpful Report (GenAI)**: After stopping the thief, the guard tells the school: "I stopped this person because they were carrying a spray-can. I suggest we lock the art room."
 
 ### 🔍 Why do we need this?
+
 The internet is like a massive highway. Millions of pieces of information travel every second. Humans cannot watch it all. Our AI is like a super-fast robot that watches the highway 24/7 and stops hackers before they can steal anything.
 
 ### 🤖 Old Machine Learning vs. New Generative AI
+
 - **Old Machine Learning**: Like a doctor who only says "You have a fever." (Just identifies the problem).
 - **Generative AI (Our Project)**: Like a doctor who says "You have a fever, here is the medicine, and here is how to stay healthy next time." (Explains the problem and gives a solution).
 
 ---
 
-## 2. CORE CONCEPTS & TERMINOLOGY
+## CORE CONCEPTS & TERMINOLOGY
 
 ### Intrusion Detection System (IDS)
+
 A software application that monitors a network or systems for malicious activity or policy violations.
 
 ### Anomaly vs. Signature Detection
+
 - **Signature Detection**: Looks for specific patterns (like a fingerprint). It's fast but misses new attacks.
 - **Anomaly Detection**: Looks for anything that isn't "normal." It's great at catching new attacks but can sometimes flag innocent users (False Positives).
 
 ### The Datasets (The Textbooks)
+
 - **NSL-KDD**: Our primary dataset. It's a clean version of the classic KDD cup data.
 - **CIC-IDS-2017**: Contains modern traffic like DDoS and Web Attacks.
 - **X-IIoTID**: Focused on "Smart Factory" and IoT device security.
 
 ---
 
-## 3. PROJECT ARCHITECTURE: THE FRONTEND & BACKEND SPLIT
+## PROJECT ARCHITECTURE
 
 ### 🏗️ The Backend (The "Engine Room")
+
 - **Language**: Python.
 - **Framework**: Flask.
 - **Role**: It does the heavy lifting. It calculates the math, loads the AI models, and talks to the data files. It's the "Brain" that decides if a user is a hacker.
 
 ### 🎨 The Frontend (The "Face")
+
 - **Language**: HTML, CSS (Bootstrap 5).
 - **Role**: It's what the user sees. The buttons, the tables, and the colors. It makes complex AI data look beautiful and easy to understand.
 
 ---
 
-## 4. ALGORITHMIC DEEP DIVE (THE MATH & LOGIC)
+## ALGORITHMIC DEEP DIVE
 
 ### 🌲 Random Forest (The Wisdom of the Crowd)
+
 Imagine asking 100 people if a fruit is an apple. If 90 say yes, it's probably an apple. Random Forest uses 100 "Decision Trees" to vote on an attack. It's incredibly accurate.
 
 ### 🧠 Deep Neural Networks (DNN)
+
 These are inspired by the human brain. They have "neurons" (mathematical functions) that pass information to each other. They are excellent at finding very hidden secrets in data.
 
 ### 🤝 Hybrid Stacking (The Council of Experts)
+
 We take three different AI models (MLP, KNN, Random Forest) and let them all guess. Then, a final "Meta-Model" decides which guess is the best. It's like having a panel of expert doctors consulting on one patient.
 
 ---
 
-## 5. EXHAUSTIVE FILE-BY-FILE DOCUMENTATION
+## EXHAUSTIVE FILE-BY-FILE DOCUMENTATION
 
 ### 📁 ROOT DIRECTORY: The Command Center
 
 #### 1. `.venv/` (Directory)
+
 - **What is it?**: A "Bubble" for Python.
-- **Detailed Logic**: Python versions change all the time. If you have Python 3.12 on your PC but this project needs 3.7.2, they will fight. The `.venv` folder contains its own private copy of Python 3.7.2. It ensures the project works forever, even if you update your PC.
+- **Detailed Logic**: Python versions change all the time. If you have Python 3.12 on your PC but this project needs 3.11, they will fight. The `.venv` folder contains its own private copy of Python. It ensures the project works forever, even if you update your PC.
 
 #### 2. `Start_WebApp_Venv.bat` (Automation)
+
 - **Line-by-Line Logic**:
-    - `@echo off`: Keeps the window clean.
-    - `call .venv\Scripts\activate`: "Wakes up" the project bubble.
-    - `python CyberAttackPrediction\Main.py`: Starts the website.
+  - `@echo off`: Keeps the window clean.
+  - `call .venv\Scripts\activate`: "Wakes up" the project bubble.
+  - `python CyberAttackPrediction\Main.py`: Starts the website.
 - **Role**: It's the "Start Button" for the whole system.
 
 #### 3. `.gitignore` (Configuration)
+
 - **Role**: The "Filter."
-- **Details**: When using Git (GitHub), we don't want to upload 1GB of data or our passwords. This file tells Git: "Ignore the datasets, ignore the passwords, and ignore the bulky Python folder."
+- **Details**: When using Git (GitHub), we don't want to upload 1GB of data or our passwords. This file tells Git to ignore the datasets, passwords, and the bulky Python folder.
 
 ---
 
-## 6. DETAILED FUNCTION-BY-FUNCTION LOGIC
+## DETAILED FUNCTION-BY-FUNCTION LOGIC
 
-### In `Main.py`:
+### In `Main.py`
 
 #### 1. `load_ml_model()`
+
 - **What it does**: This function runs when the website starts. It looks inside the `model/` folder for `trained_rf_model.pkl`.
 - **Technical Logic**: It uses the `pickle` library to "unfreeze" the AI model. This is critical because training an AI can take minutes, but loading a saved one takes milliseconds.
 
 #### 2. `PredictAction()`
+
 - **What it does**: This is the "Brain" of the website. It handles the user's uploaded CSV file.
 - **Technical Steps**:
-    1.  **Saves File**: It saves the user's upload to a temporary file.
-    2.  **Reads Data**: It uses `pandas` to read the CSV into a table.
-    3.  **Encodes Data**: It finds words like "TCP" and turns them into numbers (like `1`) using `LabelEncoder`.
-    4.  **Scales Data**: It uses `StandardScaler` to make sure all numbers are between a small range (like 0 and 1).
-    5.  **Predicts**: It gives the cleaned data to the AI model and gets a list of attack guesses.
-    6.  **Insights**: It calls `get_genai_insight()` for every guess.
+  1. **Saves File**: It saves the user's upload to a temporary file.
+  2. **Reads Data**: It uses `pandas` to read the CSV into a table.
+  3. **Encodes Data**: It finds words like "TCP" and turns them into numbers (like `1`) using `LabelEncoder`.
+  4. **Scales Data**: It uses `StandardScaler` to make sure all numbers are on the same scale.
+  5. **Predicts**: It gives the cleaned data to the AI model and gets a list of attack guesses.
+  6. **Insights**: It calls `get_genai_insight()` for every guess.
+
+#### 3. `get_genai_insight(attack_type)`
+
+- **What it does**: Simulates a Generative AI explanation by mapping each attack type to a hard-coded professional cybersecurity mitigation strategy.
+- **Logic**: Uses a Python dictionary to look up the attack name and return the relevant advisory text.
+
+#### 4. `UserLoginAction()`
+
+- **What it does**: Handles user authentication against credentials stored in `.env` file.
+- **Logic**: Reads `ADMIN_USER` and `ADMIN_PASS` from environment variables, compares to the submitted form values, and creates a session on success.
+
+### In `train_model.py`
+
+#### `run_training()`
+
+- **What it does**: The full ML training pipeline in one function.
+- **Technical Steps**:
+  1. Loads `kdd_train.csv` (first 20,000 rows for speed).
+  2. Label-encodes all non-numeric columns.
+  3. Fills NaN values with 0.
+  4. Fits a `StandardScaler`, then transforms all features.
+  5. Splits data 80/20 into train/test sets.
+  6. Trains a `RandomForestClassifier` with 100 trees.
+  7. Saves the model, scaler, labels, and encoder as a single `.pkl` dictionary.
 
 ---
 
-## 7. THE STEP-BY-STEP DATA LIFECYCLE
+## THE STEP-BY-STEP DATA LIFECYCLE
 
 Let's follow one single network packet (a "visit" to a website):
 
-1.  **CAPTURE**: The packet arrives. It has info like "Length: 500, Protocol: TCP, Service: HTTP."
-2.  **UPLOAD**: You upload a CSV file containing this info to our website.
-3.  **CLEANING**: The backend sees "TCP" and converts it to a number (like `1`) because AI only understands numbers.
-4.  **SCALING**: It shrinks large numbers (like `500000` bytes) down to small numbers (like `0.5`) so the AI doesn't get confused.
-5.  **PREDICTION**: The AI (Random Forest) looks at the numbers and says: "This looks 99% like a Neptune Attack!"
-6.  **GEN-AI INSIGHT**: The system looks up "Neptune" and finds: "Warning! This is a SYN flood attack. You should block this IP immediately."
-7.  **DISPLAY**: You see the result on your screen in a nice table.
+1. **CAPTURE**: The packet arrives. It has info like "Length: 500, Protocol: TCP, Service: HTTP."
+2. **UPLOAD**: You upload a CSV file containing this info to our website.
+3. **CLEANING**: The backend sees "TCP" and converts it to a number (like `1`) because AI only understands numbers.
+4. **SCALING**: It shrinks large numbers (like `500000` bytes) down to small numbers so the AI doesn't get confused.
+5. **PREDICTION**: The AI (Random Forest) looks at the numbers and says: "This looks 99% like a Neptune Attack!"
+6. **GEN-AI INSIGHT**: The system looks up "Neptune" and finds: "Warning! This is a SYN flood attack. You should block this IP immediately."
+7. **DISPLAY**: You see the result on your screen in a nice table.
 
 ---
 
-## 8. DATASET FEATURE DICTIONARY (ALL 41 COLUMNS EXHAUSTIVELY EXPLAINED)
+## DATASET FEATURE DICTIONARY
 
 The AI doesn't just "see" an attack; it looks at 41 different clues. Here is the exhaustive list explained with technical details and real-world analogies:
 
 ### 🌐 Basic Features (The ID Card)
-1.  **Duration**: Length (number of seconds) of the connection.
-    - *Analogy*: How long a person stands at your front door.
-    - *Technical*: High duration can indicate a slow-rate DoS or a long-running data exfiltration session.
-2.  **Protocol_type**: Type of protocol, e.g. tcp, udp, icmp.
-    - *Analogy*: The language being spoken (English, Spanish, etc.).
-    - *Technical*: Attacks often target specific protocols (e.g., Neptune targets TCP SYN).
-3.  **Service**: Network service on the destination, e.g., http, telnet, ftp, smtp.
-    - *Analogy*: Which room in the house the visitor is trying to enter.
-    - *Technical*: Hackers often target 'telnet' or 'ftp' because they are older and less secure.
-4.  **Flag**: Normal or error status of the connection (SF, S0, REJ, etc.).
-    - *Analogy*: The "vibe" of the visitor (Friendly, Angry, or Silent).
-    - *Technical*: 'S0' means a connection attempt was seen but no response was sent, common in SYN floods.
+
+- **[1] Duration**: Length (number of seconds) of the connection.
+  - *Analogy*: How long a person stands at your front door.
+  - *Technical*: High duration can indicate a slow-rate DoS or a long-running data exfiltration session.
+- **[2] Protocol_type**: Type of protocol, e.g. tcp, udp, icmp.
+  - *Analogy*: The language being spoken (English, Spanish, etc.).
+  - *Technical*: Attacks often target specific protocols (e.g., Neptune targets TCP SYN).
+- **[3] Service**: Network service on the destination, e.g., http, telnet, ftp, smtp.
+  - *Analogy*: Which room in the house the visitor is trying to enter.
+  - *Technical*: Hackers often target 'telnet' or 'ftp' because they are older and less secure.
+- **[4] Flag**: Normal or error status of the connection (SF, S0, REJ, etc.).
+  - *Analogy*: The "vibe" of the visitor (Friendly, Angry, or Silent).
+  - *Technical*: 'S0' means a connection attempt was seen but no response was sent, common in SYN floods.
 
 ### 📦 Content Features (The Suitcase)
-5.  **Src_bytes**: Number of data bytes sent from source to destination.
-    - *Analogy*: How many heavy bags the visitor is bringing into your house.
-    - *Technical*: Massive spikes here could mean an "Upload" attack or a Buffer Overflow attempt.
-6.  **Dst_bytes**: Number of data bytes sent from destination to source.
-    - *Analogy*: How many heavy bags the visitor is taking out of your house.
-    - *Technical*: High values here often indicate "Data Exfiltration" (stealing your files).
-7.  **Land**: 1 if connection is from/to the same host/port; 0 otherwise.
-    - *Analogy*: Someone trying to mail a letter to themselves.
-    - *Technical*: This is a classic "Land Attack" used to crash old operating systems.
-8.  **Wrong_fragment**: Number of "wrong" fragments.
-    - *Analogy*: A puzzle where the pieces don't fit together.
-    - *Technical*: Used in "Teardrop" attacks to crash the network stack by sending overlapping fragments.
-9.  **Urgent**: Number of urgent packets.
-    - *Analogy*: Someone shouting "EMERGENCY!" while talking.
-    - *Technical*: High urgent counts are rare in normal traffic and often signal an exploit attempt.
-10. **Hot**: Number of "hot" indicators (e.g., entering a system directory).
-    - *Analogy*: Someone touching a "Hot" stove they shouldn't touch.
-    - *Technical*: Indicators like accessing sensitive files or running unauthorized commands.
-11. **Num_failed_logins**: Number of failed login attempts.
-    - *Analogy*: Trying 10 different keys on a locked door.
-    - *Technical*: A clear sign of a "Brute Force" or "Password Guessing" attack.
-12. **Logged_in**: 1 if successfully logged in; 0 otherwise.
-    - *Analogy*: Did the visitor actually get inside?
-    - *Technical*: Helps the AI distinguish between a successful hack and a failed attempt.
-13. **Num_compromised**: Number of "compromised" conditions.
-    - *Analogy*: How many things in the house were broken.
-    - *Technical*: Measures if the attacker successfully changed files or settings.
-14. **Root_shell**: 1 if root shell is obtained; 0 otherwise.
-    - *Analogy*: Did the visitor get the "Master Key" to the whole building?
-    - *Technical*: 'Root' is the highest level of permission. Obtaining it is a "Game Over" scenario for security.
-15. **Su_attempted**: 1 if "su root" command attempted; 0 otherwise.
-    - *Analogy*: Someone trying to put on a "Manager" uniform to trick people.
-    - *Technical*: 'su' stands for 'substitute user', used to escalate privileges.
-16. **Num_root**: Number of "root" accesses.
-    - *Analogy*: How many times the visitor used the Master Key.
-17. **Num_file_creations**: Number of file creation operations.
-    - *Analogy*: The visitor starting to build new walls or furniture in your house.
-    - *Technical*: Hackers often create "Backdoors" (new files) to return later.
-18. **Num_shells**: Number of shell prompts.
-    - *Analogy*: How many "Command Centers" the visitor opened.
-19. **Num_access_files**: Number of operations on access control files.
-    - *Analogy*: Someone trying to change the "Who is Allowed" list on your door.
-    - *Technical*: Attacks on files like `/etc/passwd` in Linux.
-20. **Num_outbound_cmds**: Number of outbound commands in an ftp session.
-    - *Analogy*: The visitor sending orders to people outside your house.
-21. **Is_hot_login**: 1 if the login belongs to the "hot" list; 0 otherwise.
-    - *Analogy*: A visitor who is on the "Watch List."
-22. **Is_guest_login**: 1 if the login is a "guest" login; 0 otherwise.
-    - *Analogy*: A visitor using a "Temporary Pass."
+
+- **[5] Src_bytes**: Number of data bytes sent from source to destination.
+  - *Analogy*: How many heavy bags the visitor is bringing into your house.
+  - *Technical*: Massive spikes here could mean an "Upload" attack or a Buffer Overflow attempt.
+- **[6] Dst_bytes**: Number of data bytes sent from destination to source.
+  - *Analogy*: How many heavy bags the visitor is taking out of your house.
+  - *Technical*: High values here often indicate "Data Exfiltration" (stealing your files).
+- **[7] Land**: 1 if connection is from/to the same host/port; 0 otherwise.
+  - *Analogy*: Someone trying to mail a letter to themselves.
+  - *Technical*: This is a classic "Land Attack" used to crash old operating systems.
+- **[8] Wrong_fragment**: Number of "wrong" fragments.
+  - *Technical*: Used in "Teardrop" attacks to crash the network stack by sending overlapping fragments.
+- **[9] Urgent**: Number of urgent packets.
+  - *Technical*: High urgent counts are rare in normal traffic and often signal an exploit attempt.
+- **[10] Hot**: Number of "hot" indicators (e.g., entering a system directory).
+  - *Technical*: Indicators like accessing sensitive files or running unauthorized commands.
+- **[11] Num_failed_logins**: Number of failed login attempts.
+  - *Technical*: A clear sign of a "Brute Force" or "Password Guessing" attack.
+- **[12] Logged_in**: 1 if successfully logged in; 0 otherwise.
+  - *Technical*: Helps the AI distinguish between a successful hack and a failed attempt.
+- **[13] Num_compromised**: Number of "compromised" conditions.
+  - *Technical*: Measures if the attacker successfully changed files or settings.
+- **[14] Root_shell**: 1 if root shell is obtained; 0 otherwise.
+  - *Technical*: 'Root' is the highest level of permission. Obtaining it is a "Game Over" scenario for security.
+- **[15] Su_attempted**: 1 if "su root" command attempted; 0 otherwise.
+  - *Technical*: 'su' stands for 'substitute user', used to escalate privileges.
+- **[16] Num_root**: Number of "root" accesses.
+- **[17] Num_file_creations**: Number of file creation operations.
+  - *Technical*: Hackers often create "Backdoors" (new files) to return later.
+- **[18] Num_shells**: Number of shell prompts opened.
+- **[19] Num_access_files**: Number of operations on access control files.
+  - *Technical*: Attacks on files like `/etc/passwd` in Linux.
+- **[20] Num_outbound_cmds**: Number of outbound commands in an ftp session.
+- **[21] Is_hot_login**: 1 if the login belongs to the "hot" list; 0 otherwise.
+- **[22] Is_guest_login**: 1 if the login is a "guest" login; 0 otherwise.
 
 ### 🕵️ Traffic Features (The Behavior)
-23. **Count**: Number of connections to the same host as the current connection in the past two seconds.
-    - *Analogy*: Someone ringing your doorbell 100 times in 2 seconds.
-    - *Technical*: A classic signature of a Denial of Service (DoS) attack.
-24. **Srv_count**: Number of connections to the same service as the current connection in the past two seconds.
-    - *Analogy*: 100 people all trying to use the same bathroom at once.
-25. **Serror_rate**: % of connections that have "SYN" errors.
-    - *Analogy*: People saying "Hello?" but hanging up before you answer.
-    - *Technical*: High Serror rate indicates a SYN Flood attack.
-26. **Srv_serror_rate**: % of connections to the same service with "SYN" errors.
-27. **Rerror_rate**: % of connections that have "REJ" (Rejected) errors.
-    - *Analogy*: Someone trying to enter, and you keep saying "NO!"
-    - *Technical*: Often seen during Port Scanning.
-28. **Srv_rerror_rate**: % of connections to the same service with "REJ" errors.
-29. **Same_srv_rate**: % of connections to the same service.
-    - *Analogy*: Are all 100 people asking for the same thing?
-30. **Diff_srv_rate**: % of connections to different services.
-    - *Analogy*: Is one person trying to enter every single room in the house?
-    - *Technical*: Indicates a "Port Sweep" or "Service Scan."
-31. **Srv_diff_host_rate**: % of connections to different hosts for the same service.
-    - *Analogy*: One person calling every house on the street asking for "Pizza."
-32. **Dst_host_count**: Number of connections to the same destination host.
-33. **Dst_host_srv_count**: Number of connections to the same destination host service.
-34. **Dst_host_same_srv_rate**: % of connections to the same service on the destination host.
-35. **Dst_host_diff_srv_rate**: % of connections to different services on the destination host.
-36. **Dst_host_same_src_port_rate**: % of connections to the same source port on the destination host.
-37. **Dst_host_srv_diff_host_rate**: % of connections to different hosts for the same service on the destination host.
-38. **Dst_host_serror_rate**: % of connections to the destination host with "SYN" errors.
-39. **Dst_host_srv_serror_rate**: % of connections to the destination host service with "SYN" errors.
-40. **Dst_host_rerror_rate**: % of connections to the destination host with "REJ" errors.
-41. **Dst_host_srv_rerror_rate**: % of connections to the destination host service with "REJ" errors.
+
+- **[23] Count**: Number of connections to the same host in the past two seconds.
+  - *Technical*: A classic signature of a Denial of Service (DoS) attack.
+- **[24] Srv_count**: Number of connections to the same service in the past two seconds.
+- **[25] Serror_rate**: Percentage of connections that have "SYN" errors.
+  - *Technical*: High Serror rate indicates a SYN Flood attack.
+- **[26] Srv_serror_rate**: Percentage of connections to the same service with "SYN" errors.
+- **[27] Rerror_rate**: Percentage of connections that have "REJ" (Rejected) errors.
+  - *Technical*: Often seen during Port Scanning.
+- **[28] Srv_rerror_rate**: Percentage of connections to the same service with "REJ" errors.
+- **[29] Same_srv_rate**: Percentage of connections to the same service.
+- **[30] Diff_srv_rate**: Percentage of connections to different services.
+  - *Technical*: Indicates a "Port Sweep" or "Service Scan."
+- **[31] Srv_diff_host_rate**: Percentage of connections to different hosts for the same service.
+- **[32] Dst_host_count**: Number of connections to the same destination host.
+- **[33] Dst_host_srv_count**: Number of connections to the same destination host service.
+- **[34] Dst_host_same_srv_rate**: Percentage of connections to the same service on the destination host.
+- **[35] Dst_host_diff_srv_rate**: Percentage of connections to different services on the destination host.
+- **[36] Dst_host_same_src_port_rate**: Percentage of connections to the same source port on the destination host.
+- **[37] Dst_host_srv_diff_host_rate**: Percentage of connections to different hosts for the same service.
+- **[38] Dst_host_serror_rate**: Percentage of connections to the destination host with "SYN" errors.
+- **[39] Dst_host_srv_serror_rate**: Percentage of connections to the destination host service with "SYN" errors.
+- **[40] Dst_host_rerror_rate**: Percentage of connections to the destination host with "REJ" errors.
+- **[41] Dst_host_srv_rerror_rate**: Percentage of connections to the destination host service with "REJ" errors.
 
 ---
 
-## 9. ATTACK TAXONOMY: THE ULTIMATE THREAT ENCYCLOPEDIA
+## ATTACK TAXONOMY
 
 Our system is trained to recognize four major families of cyber attacks. Understanding these is vital for your Viva.
 
 ### 💥 Category 1: Denial of Service (DoS)
+
 **Goal**: To make a computer or network resource unavailable to its intended users.
+
 - **Neptune (SYN Flood)**:
-    - *Logic*: The attacker sends many "SYN" (Synchronize) requests but never finishes the "Handshake." The server waits forever, uses up all its memory, and crashes.
-    - *GenAI Insight*: "Enable SYN Cookies and reduce the connection timeout period."
+  - *Logic*: The attacker sends many "SYN" (Synchronize) requests but never finishes the "Handshake." The server waits forever, uses up all its memory, and crashes.
+  - *GenAI Insight*: "Enable SYN Cookies and reduce the connection timeout period."
 - **Smurf**:
-    - *Logic*: The attacker sends a ping (ICMP) to a "Broadcast" address using the victim's IP as the sender. Thousands of computers reply to the victim at once, crushing their internet.
+  - *Logic*: The attacker sends a ping (ICMP) to a "Broadcast" address using the victim's IP as the sender. Thousands of computers reply to the victim at once, crushing their internet.
 - **Teardrop**:
-    - *Logic*: Sends fragmented packets that overlap. When the victim's computer tries to reassemble them, it gets confused and "Panics" (Crashes).
+  - *Logic*: Sends fragmented packets that overlap. When the victim's computer tries to reassemble them, it gets confused and "Panics" (Crashes).
 - **Pod (Ping of Death)**:
-    - *Logic*: Sends a ping packet larger than the maximum allowed size (65,535 bytes), causing the system to crash.
+  - *Logic*: Sends a ping packet larger than the maximum allowed size (65,535 bytes), causing the system to crash.
 
 ### 🕵️ Category 2: Probing (Reconnaissance)
+
 **Goal**: To gather information about a network to find vulnerabilities for a future attack.
-- **Satan (Security Administrator Tool for Analyzing Networks)**:
-    - *Logic*: An automated tool that scans for common vulnerabilities like weak passwords or unpatched software.
+
+- **Satan**:
+  - *Logic*: An automated tool that scans for common vulnerabilities like weak passwords or unpatched software.
 - **IPsweep**:
-    - *Logic*: Pings every IP address in a range to see which computers are "Alive" and connected.
+  - *Logic*: Pings every IP address in a range to see which computers are "Alive" and connected.
 - **Portsweep**:
-    - *Logic*: Tries to connect to every port (1 to 65535) on one computer to see which "Doors" are open (like HTTP, SSH, FTP).
+  - *Logic*: Tries to connect to every port on one computer to see which "Doors" are open (like HTTP, SSH, FTP).
 - **Nmap**:
-    - *Logic*: The most famous probing tool. It can even guess which Operating System (Windows or Linux) you are using just by looking at the packets.
+  - *Logic*: The most famous probing tool. It can even guess which Operating System you are using just by looking at the packets.
 
 ### 🔓 Category 3: User to Root (U2R)
+
 **Goal**: An attacker starts with a normal user account and tries to gain "Root" (Admin) privileges.
+
 - **Buffer Overflow**:
-    - *Logic*: Sending more data to a program than it can handle. The "Overflow" data spills into the computer's memory and can execute the attacker's malicious code.
+  - *Logic*: Sending more data to a program than it can handle. The "Overflow" data spills into the computer's memory and can execute the attacker's malicious code.
 - **Loadmodule**:
-    - *Logic*: Exploiting a bug in how the operating system loads new hardware drivers (modules) to run unauthorized commands as root.
+  - *Logic*: Exploiting a bug in how the operating system loads new hardware drivers (modules) to run unauthorized commands as root.
 - **Perl**:
-    - *Logic*: Exploiting bugs in the Perl programming language interpreter to gain elevated access.
+  - *Logic*: Exploiting bugs in the Perl programming language interpreter to gain elevated access.
 
 ### 📧 Category 4: Remote to Local (R2L)
+
 **Goal**: An attacker who does not have an account on the machine tries to gain local access.
+
 - **Guess_passwd**:
-    - *Logic*: Using a dictionary of millions of common passwords (like "password123") to try and log in.
+  - *Logic*: Using a dictionary of millions of common passwords (like "password123") to try and log in.
 - **Warezclient / Warezmaster**:
-    - *Logic*: Unauthorized uploading or downloading of illegal software/files through FTP.
+  - *Logic*: Unauthorized uploading or downloading of illegal software/files through FTP.
 - **Imap**:
-    - *Logic*: Exploiting vulnerabilities in the email protocol (IMAP) to gain access to the server.
+  - *Logic*: Exploiting vulnerabilities in the email protocol (IMAP) to gain access to the server.
 - **Spy**:
-    - *Logic*: Monitoring user activity or stealing sensitive information like keystrokes.
+  - *Logic*: Monitoring user activity or stealing sensitive information like keystrokes.
 
 ---
 
-## 10. ALGORITHMIC COMPARISON: WHY WE CHOSE OUR MODELS
-
-In your project, we compare three distinct types of AI. Here is the deep technical reasoning for each:
+## ALGORITHMIC COMPARISON: WHY WE CHOSE OUR MODELS
 
 ### 1. Random Forest (The "Leader")
+
 - **Type**: Ensemble Learning (Bagging).
 - **Mechanism**: It creates 100 different "Decision Trees." Each tree sees a random subset of the data. The final prediction is the "Majority Vote."
-- **Why it's great**: It is extremely resistant to "Overfitting" (memorizing the data instead of learning patterns). It handles the 41 features of NSL-KDD perfectly without needing much tuning.
+- **Why it's great**: It is extremely resistant to "Overfitting" and handles the 41 features of NSL-KDD perfectly without needing much tuning.
 
 ### 2. Deep Neural Networks (The "Expert")
+
 - **Type**: Multi-Layer Perceptron (MLP).
 - **Mechanism**: It has an Input Layer (41 neurons), multiple Hidden Layers, and an Output Layer. It uses "Backpropagation" to learn from its mistakes.
-- **Why it's great**: It can find incredibly complex, non-linear patterns that a simple tree might miss. It's the "Heavy Artillery" of AI.
+- **Why it's great**: It can find incredibly complex, non-linear patterns that a simple tree might miss.
 
 ### 3. Support Vector Machines (SVM)
+
 - **Type**: Kernel-based Classifier.
 - **Mechanism**: It tries to find the "Widest Street" (Hyperplane) that separates "Normal" data from "Attack" data.
 - **Why it's great**: It works very well even if you don't have a lot of data, as long as the data is clean.
 
 ### 4. Hybrid Stacking (The "Genius")
-- **Mechanism**: We combine the guesses of RF, SVM, and DNN. A 4th model (the Meta-Learner) looks at their guesses and makes the final call.
+
+- **Mechanism**: We combine the guesses of RF, MLP, and KNN. A final Meta-Learner looks at their guesses and makes the final call.
 - **Result**: Usually achieves 1-2% higher accuracy than any single model alone.
 
 ---
 
-## 11. GENERATIVE AI & EXPLAINABLE AI (XAI) - THE FUTURE
+## EXPLAINABLE AI XAI & SHAP INTERPRETATION
 
 ### 🧠 Generative AI Insight Engine
+
 Traditionally, AI just gives a label: `0` or `1`. Our system uses a **Generative Logic Layer**.
-- **How it works**: We mapped every attack type to a professional cybersecurity knowledge base. When the ML model detects "Neptune", the GenAI layer generates a human-readable explanation and a 3-step mitigation plan.
+
+- **How it works**: We mapped every attack type to a professional cybersecurity knowledge base. When the ML model detects "Neptune", the GenAI layer generates a human-readable explanation and a mitigation plan.
 - **Academic Value**: This bridges the gap between "Black Box" AI and human-usable tools.
 
 ### 📊 Explainable AI (SHAP)
+
 **SHAP (SHapley Additive exPlanations)** is used in our Jupyter Notebooks to explain the "Why."
+
 - **Feature Importance**: It shows which of the 41 features was most important for a specific prediction.
-- **Trust**: If a system says "Attack" because the `duration` was high, a human can verify if that makes sense. This makes the system "Trustworthy."
+- **Trust**: If a system says "Attack" because the `duration` was high, a human can verify if that makes sense. This makes the system trustworthy.
 
 ---
 
-## 12. THE VIVA PREPARATION BIBLE (100 QUESTIONS)
+## GENERATIVE AI INSIGHT ENGINE
+
+See the Algorithmic Comparison and XAI sections above for full details on how the GenAI insight layer works.
+
+---
+
+## VIVA PREPARATION TOP 100 QUESTIONS & ANSWERS
 
 *Below are the most critical questions you might face, categorized for easy learning.*
 
-### 🛠️ Category: Implementation & Code
-1.  **Q: What is the role of `Main.py`?**
-    - *A*: It is the heart of the project. It handles routing (URL paths), file uploads, model prediction, and rendering the results to the HTML templates.
-2.  **Q: Why do we use `Jinja2` templates?**
-    - *A*: It allows us to use logic (like `if` and `for` loops) inside HTML. It also enables "Template Inheritance" (using `base.html`) so we don't have to rewrite the Navbar and Footer on every page.
-3.  **Q: What does `StandardScaler` do exactly?**
-    - *A*: It calculates the mean and standard deviation of each feature. It then subtracts the mean and divides by the deviation. This ensures all features are on the same "Scale" (usually -3 to +3).
-4.  **Q: How do you handle new attacks not in the training data?**
-    - *A*: The model will likely classify them as "Anomaly" or "Attack" because their behavior (e.g., high count, wrong fragments) will differ significantly from "Normal" traffic.
-5.  **Q: What is the significance of `requirements.txt`?**
-    - *A*: It lists every external library (Flask, Scikit-learn, Pandas) and its version. It allows another developer to recreate your entire environment with one command: `pip install -r requirements.txt`.
+### 🛠️ Category A: Implementation & Code
 
-### 📊 Category: Data & Statistics
-6.  **Q: What is a "False Positive" (Type I Error)?**
-    - *A*: When the AI flags a "Normal" user as an "Attacker." This is bad because it blocks innocent people.
-7.  **Q: What is a "False Negative" (Type II Error)?**
-    - *A*: When a "Hacker" gets through and the AI thinks they are "Normal." This is the most dangerous error in cybersecurity.
-8.  **Q: Which is more important: Precision or Recall?**
-    - *A*: In cybersecurity, **Recall** is usually more important. We would rather have a few False Positives (block an innocent user) than a single False Negative (let a hacker in).
-9.  **Q: What is "Data Imbalance" and how do you fix it?**
-    - *A*: It's when you have 90% "Normal" data and only 10% "Attack" data. We fix it using techniques like **SMOTE** (Synthetic Minority Over-sampling Technique) to create fake attack data for better training.
+1. **Q: What is the role of `Main.py`?**
+   - *A*: It is the heart of the project. It handles routing (URL paths), file uploads, model prediction, and rendering HTML templates via Flask.
+2. **Q: Why do we use `Jinja2` templates?**
+   - *A*: It allows us to use logic (like `if` and `for` loops) inside HTML. It also enables "Template Inheritance" using `base.html` so we don't rewrite the Navbar on every page.
+3. **Q: What does `StandardScaler` do exactly?**
+   - *A*: It calculates the mean and standard deviation of each feature. It then subtracts the mean and divides by the deviation. This ensures all features are on the same scale (usually -3 to +3).
+4. **Q: How do you handle new attacks not in the training data?**
+   - *A*: The model will likely classify them as the closest known attack type because their behavior (e.g., high count, wrong fragments) will differ significantly from "Normal" traffic.
+5. **Q: What is the significance of `requirements.txt`?**
+   - *A*: It lists every external library (Flask, Scikit-learn, Pandas) and its version. It allows another developer to recreate your entire environment with one command: `pip install -r requirements.txt`.
+6. **Q: What is `pickle` used for in this project?**
+   - *A*: `pickle` serializes the trained model to a `.pkl` file so we don't retrain it every time the server restarts. The `load_ml_model()` function deserializes it back into memory.
+7. **Q: Why do we load the model on startup instead of loading it per request?**
+   - *A*: Loading a model takes time. Loading it once at startup and keeping it in memory means each prediction request is instant instead of waiting seconds.
+8. **Q: What is the `.env` file and why is it important?**
+   - *A*: It stores sensitive values like admin credentials and the Flask secret key. By keeping them outside the code, we prevent accidentally exposing them on GitHub.
+9. **Q: How does Flask handle sessions?**
+   - *A*: Flask encrypts a dictionary into a cookie using the `secret_key`. The cookie is stored in the browser. On each request, Flask decrypts it to check if the user is logged in.
+10. **Q: What happens if the uploaded CSV has missing columns?**
+    - *A*: The `scaler.transform()` call will fail with a shape mismatch error. The `try/except` block in `PredictAction()` catches this and shows a user-friendly error message.
+
+### 📊 Category B: Data & Statistics
+
+- **Q: What is a "False Positive" (Type I Error)?**
+  - *A*: When the AI flags a "Normal" user as an "Attacker." This is bad because it blocks innocent people.
+- **Q: What is a "False Negative" (Type II Error)?**
+  - *A*: When a "Hacker" gets through and the AI thinks they are "Normal." This is the most dangerous error in cybersecurity.
+- **Q: Which is more important: Precision or Recall?**
+  - *A*: In cybersecurity, **Recall** is usually more important. We would rather have a few False Positives (block an innocent user) than a single False Negative (let a hacker in).
+- **Q: What is "Data Imbalance" and how do you fix it?**
+  - *A*: It's when you have 90% "Normal" data and only 10% "Attack" data. We fix it using SMOTE (Synthetic Minority Over-sampling Technique) to create synthetic attack data.
+- **Q: Why do we split data into 80% training and 20% testing?**
+  - *A*: The 80% trains the model. The 20% is data the model has never seen, so we get a real-world measure of accuracy.
+- **Q: What is Cross-Validation?**
+  - *A*: Instead of one 80/20 split, we split the data into 5 parts (folds). The model trains on 4 and tests on 1, cycling through all 5. The final accuracy is the average.
+- **Q: What is the F1-Score and when do you use it?**
+  - *A*: F1 = 2 × (Precision × Recall) / (Precision + Recall). Use it when you need to balance both metrics, especially with imbalanced data.
+- **Q: Why do we use `fillna(0)` in the preprocessing?**
+  - *A*: Machine learning models cannot process `NaN` (missing) values. Filling with 0 ensures all inputs are valid numbers.
+- **Q: What is a Confusion Matrix?**
+  - *A*: A 4-cell table showing True Positives, False Positives, True Negatives, and False Negatives. It gives a complete picture of model performance beyond just accuracy.
+- **Q: What is ROC-AUC?**
+  - *A*: ROC (Receiver Operating Characteristic) is a curve. AUC (Area Under the Curve) summarizes it as a single score. An AUC of 1.0 is perfect; 0.5 is random guessing.
+
+### 🤖 Category C: Machine Learning Algorithms
+
+- **Q: Why Random Forest and not just a single Decision Tree?**
+  - *A*: A single tree memorizes the training data (overfitting). Random Forest averages 100 trees, each trained on random subsets. This makes it robust and generalizable.
+- **Q: What is "Bagging"?**
+  - *A*: Bootstrap Aggregating. Each tree trains on a random sample (with replacement) from the data. Predictions are then averaged. This reduces variance.
+- **Q: What is "Boosting" and how is XGBoost different from Random Forest?**
+  - *A*: Boosting trains trees sequentially — each tree corrects the errors of the previous one. XGBoost is an optimized boosting algorithm. Random Forest trains all trees in parallel.
+- **Q: What is a "Hyperparameter" in Random Forest?**
+  - *A*: Settings like `n_estimators` (number of trees), `max_depth` (depth of each tree), and `random_state` (for reproducibility). These are set before training.
+- **Q: How does `KNeighborsClassifier` predict?**
+  - *A*: It finds the K nearest data points to the new input (using Euclidean distance). The majority class among those K neighbors becomes the prediction.
+- **Q: What is the role of `MLPClassifier` in the stacking model?**
+  - *A*: It's a neural network base estimator. Its internal representation can capture non-linear patterns that Random Forest might miss, making the stack more powerful.
+- **Q: What is the Meta-Learner in `StackingClassifier`?**
+  - *A*: After all base models (RF, MLP, KNN) make their predictions, those predictions become the input features for the Meta-Learner. It learns which models to trust more.
+- **Q: Why do we set `cv=3` in StackingClassifier?**
+  - *A*: `cv=3` means the base estimators are trained using 3-fold cross-validation to generate out-of-fold predictions the meta-learner learns from. It prevents leakage.
+- **Q: What is "early_stopping" in MLP?**
+  - *A*: The MLP reserves a small validation set. If validation accuracy doesn't improve for several iterations, training stops automatically. This prevents wasted time and overfitting.
+- **Q: What is `n_jobs=-1` doing in `RandomForestClassifier`?**
+  - *A*: It tells scikit-learn to use all available CPU cores in parallel for training. This dramatically speeds up fitting time on multi-core machines.
+
+### 🛡️ Category D: Cybersecurity Concepts
+
+- **Q: What is the NSL-KDD dataset and why is it better than KDD'99?**
+  - *A*: NSL-KDD removes redundant records from KDD'99 so that each row is unique. This ensures the model doesn't "learn" by simply counting duplicates.
+- **Q: What is a SYN Flood attack?**
+  - *A*: The attacker sends thousands of TCP SYN packets but never completes the 3-way handshake. The server allocates memory for each half-open connection and eventually runs out.
+- **Q: What is the difference between DoS and DDoS?**
+  - *A*: DoS (Denial of Service) comes from one machine. DDoS (Distributed DoS) comes from thousands of compromised machines (a botnet), making it much harder to block.
+- **Q: What is a "Probe" attack in NSL-KDD?**
+  - *A*: Reconnaissance — the attacker scans ports or IPs to find open vulnerabilities before launching the real attack.
+- **Q: What is "U2R" and why is it dangerous?**
+  - *A*: User-to-Root. An attacker starts with a regular user account but exploits vulnerabilities to gain root (administrator) access — a "Game Over" scenario.
+- **Q: What is a Buffer Overflow?**
+  - *A*: A program has a fixed-size memory buffer. If you send more data than it can hold, it overflows into adjacent memory, allowing an attacker to execute malicious code.
+- **Q: What is an IDS vs. IPS?**
+  - *A*: IDS (Intrusion Detection System) only detects and alerts. IPS (Intrusion Prevention System) actively blocks suspicious traffic. Our project is an IDS-like system.
+- **Q: What is the CIA Triad?**
+  - *A*: Confidentiality (data is private), Integrity (data is not tampered with), and Availability (data is accessible when needed).
+- **Q: What is "Port Scanning"?**
+  - *A*: Systematically checking all network ports on a host to discover which services are running and potentially exploitable.
+- **Q: What is a Botnet?**
+  - *A*: A network of internet-connected devices infected with malware and remotely controlled by an attacker to perform coordinated tasks like DDoS attacks.
+
+### 🌐 Category E: Networking Concepts
+
+- **Q: What is the TCP 3-Way Handshake?**
+  - *A*: Client sends SYN → Server replies SYN-ACK → Client replies ACK. Neptune attacks exploit this by never sending the final ACK.
+- **Q: What is the difference between TCP and UDP?**
+  - *A*: TCP is reliable and connection-based (checks each packet was received). UDP is fast but connectionless (fires and forgets). Attacks may target either.
+- **Q: What is an IP Address?**
+  - *A*: A unique identifier for a device on a network. IPv4 addresses look like `192.168.1.1`.
+- **Q: What is a Port Number?**
+  - *A*: A number (0-65535) that identifies a specific process/service. HTTP uses port 80, HTTPS uses 443, SSH uses 22.
+- **Q: Why does the dataset have a "Flag" column?**
+  - *A*: The flag represents the connection state. 'SF' means normal established. 'S0' means a connection was initiated but not completed — a key DDoS indicator.
+
+### 🐍 Category F: Python & Flask
+
+- **Q: What is the role of `os.path.dirname(os.path.abspath(__file__))`?**
+  - *A*: Gets the absolute path of the directory containing the running script so paths like Dataset/ and model/ work regardless of where the code is run from.
+- **Q: What is `jsonify()` in Flask?**
+  - *A*: Converts a Python dictionary to a JSON HTTP response. Used for AJAX calls from the frontend (like the training progress updates).
+- **Q: What does `session.clear()` do?**
+  - *A*: Removes all data from the user's session cookie, effectively logging them out.
+- **Q: What is `@app.route` in Flask?**
+  - *A*: A Python decorator that maps a URL path to a Python function. `@app.route('/Predict')` means visiting `/Predict` calls the `predictView()` function.
+- **Q: Why do we check `if 'user' not in session` at the start of protected routes?**
+  - *A*: To prevent unauthorized access. If a user visits `/Predict` without logging in, they are redirected to the login page.
+- **Q: What is the purpose of the `Timer` class in `Main.py`?**
+  - *A*: `Timer(1.5, open_browser).start()` opens the web browser 1.5 seconds after Flask starts, so the user doesn't have to manually type the URL.
+- **Q: What is `load_dotenv()` for?**
+  - *A*: Reads the `.env` file and loads its key-value pairs as environment variables, making sensitive values available via `os.getenv()` without hardcoding them.
+- **Q: What is `request.form.get('t1')` doing?**
+  - *A*: Retrieves the value of a form field named `t1` from an HTTP POST request. This is how the username is extracted from the login form.
+- **Q: What is the difference between `request.form` and `request.files`?**
+  - *A*: `request.form` contains text field values. `request.files` contains file uploads. The CSV file upload is accessed via `request.files['t1']`.
+- **Q: What is `render_template` and how does it work?**
+  - *A*: Takes an HTML template filename, injects Python variables into it via Jinja2, and returns the full HTML page as an HTTP response.
+
+### 📊 Category G: Data Preprocessing
+
+- **Q: What is Label Encoding?**
+  - *A*: Converting categorical text values like "TCP", "UDP", "ICMP" into integer numbers like 0, 1, 2. Required because ML algorithms only process numbers.
+- **Q: What is the difference between Label Encoding and One-Hot Encoding?**
+  - *A*: Label Encoding assigns a single integer. One-Hot Encoding creates separate binary columns. Label Encoding is simpler; One-Hot Encoding avoids artificial ordering.
+- **Q: What is the problem with using a `LabelEncoder` on test data?**
+  - *A*: If the test data has a category not seen during training, the encoder will raise an error. Our code handles this by assigning `-1` for unseen labels.
+- **Q: Why do we fit the `StandardScaler` only on training data?**
+  - *A*: Fitting on test data causes "data leakage" — the scaler would use future information. We transform test data using the training data's mean and standard deviation.
+- **Q: What is `nrows=20000` in the training script and why?**
+  - *A*: Limits the loaded data to 20,000 rows — a deliberate trade-off between training time and accuracy, making the training feature responsive for demos.
+
+### 🔍 Category H: SHAP & Explainable AI
+
+- **Q: What does SHAP stand for?**
+  - *A*: SHapley Additive exPlanations.
+- **Q: What is a SHAP Summary Plot?**
+  - *A*: A dot plot where each dot represents one data point. The X-axis shows the SHAP value (positive = pushes toward "Attack"). Color shows if the feature value was high (red) or low (blue).
+- **Q: What does it mean if `src_bytes` has a high positive SHAP value?**
+  - *A*: A high source byte count strongly pushed the model's prediction toward "Attack" for that particular data row.
+- **Q: Why is Explainable AI important in cybersecurity?**
+  - *A*: Security analysts need to trust and audit AI decisions. SHAP lets them verify the reason for a classification instead of blindly trusting a black-box output.
+- **Q: What is the difference between a global and local SHAP explanation?**
+  - *A*: Global SHAP (Summary Plot) shows feature importance across all predictions. Local SHAP (Force Plot) explains why the model made one specific prediction.
+- **Q: What is a SHAP Force Plot?**
+  - *A*: A visualization showing which features pushed a single prediction higher (toward "Attack") or lower (toward "Normal") from the base expected value.
+- **Q: How does SHAP calculate feature importance differently from Random Forest's built-in feature importance?**
+  - *A*: RF's built-in importance measures how much a feature reduces impurity across trees. SHAP measures the actual contribution of each feature to each individual prediction.
+- **Q: What is `shap.TreeExplainer`?**
+  - *A*: A fast SHAP explainer optimized for tree-based models. It calculates exact SHAP values using the tree structure, not approximations.
+- **Q: What is the "background dataset" in SHAP?**
+  - *A*: The baseline data SHAP uses to calculate expected model output. SHAP values measure the deviation from this baseline caused by each feature.
+- **Q: What does SHAP indexing `[:, :, 0]` fix?**
+  - *A*: In newer SHAP versions with multi-class output, the returned array has 3 dimensions. `[:, :, 0]` selects values for the first class, making it compatible with the Summary Plot.
+
+### 🔧 Category I: Project Design Decisions
+
+- **Q: Why did you choose Flask over Django?**
+  - *A*: Flask is a micro-framework — lightweight and flexible. For a focused ML prediction app, Flask gives us everything we need without unnecessary complexity.
+- **Q: Why save the model as `.pkl` instead of retraining on every request?**
+  - *A*: Training takes seconds to minutes. Loading a `.pkl` takes milliseconds. A web app must respond instantly — retraining on every request would make it unusable.
+- **Q: Why use `StackingClassifier` for the extension notebook?**
+  - *A*: A single model has limitations. Stacking combines RF, MLP, and KNN strengths to overcome each model's individual weaknesses, generally achieving higher accuracy.
+- **Q: Why is the virtual environment (.venv) important for this project?**
+  - *A*: It isolates project dependencies. Without it, library version conflicts between projects can break one or both. It also makes the project reproducible on any machine.
+- **Q: Why do we use `random_state=42` in model definitions?**
+  - *A*: Setting a fixed seed makes results reproducible. Without it, the model gets slightly different results each run, making debugging and comparison harder.
+- **Q: What is a Python decorator and give an example from the project?**
+  - *A*: A decorator modifies a function's behavior without changing its code. `@app.route('/Predict')` registers the function as the handler for the `/Predict` URL.
+- **Q: Why do we store `labels_list = np.unique(dataset['labels'])` before encoding?**
+  - *A*: After encoding, labels become integers. We save the original class names (like "normal", "neptune") so the result page can display human-readable attack names.
+- **Q: What is `Glassmorphism` in the UI design?**
+  - *A*: A UI design trend using semi-transparent panels, frosted glass blur (`backdrop-filter: blur()`), and subtle borders to create a modern, depth-layered aesthetic.
+- **Q: Why do we use environment variables for the admin password?**
+  - *A*: Hardcoding credentials in Python files risks exposing them on GitHub. Environment variables are loaded from `.env` at runtime, keeping secrets outside the codebase.
+- **Q: What is the purpose of the `secrets.json` file?**
+  - *A*: It stores the admin credentials locally for the "Remember Me" feature. When the user returns, the app reads this file to auto-authenticate without re-entering the password.
+
+### 🎓 Category J: Academic & Theoretical Concepts
+
+- **Q: What is the difference between Artificial Intelligence and Machine Learning?**
+  - *A*: AI is the broad concept of making machines intelligent. ML is a subset of AI where machines learn from data automatically without being explicitly programmed.
+- **Q: What is Supervised vs. Unsupervised Learning?**
+  - *A*: Supervised ML uses labeled data (we know the answer). Unsupervised ML finds hidden patterns without labels. Our project uses Supervised Learning.
+- **Q: What is Overfitting and how do Random Forests prevent it?**
+  - *A*: Overfitting is when a model memorizes training data instead of learning patterns. RF prevents it by averaging 100 diverse trees trained on random data subsets.
+- **Q: What is Regularization?**
+  - *A*: A technique to prevent overfitting by adding a "penalty" to complex models. L1 (Lasso) can zero out less important features. L2 (Ridge) limits the size of all weights.
+- **Q: What is "Feature Engineering"?**
+  - *A*: Creating new input features from existing data to improve model performance. For example, calculating the ratio of `src_bytes` to `dst_bytes` as a new feature.
+- **Q: What is "Transfer Learning"?**
+  - *A*: Taking a model trained on one task and reusing it for a different but related task. Could be a future enhancement using a model pre-trained on similar network traffic.
+- **Q: What is the Bias-Variance Tradeoff?**
+  - *A*: High Bias (Underfitting) = model is too simple. High Variance (Overfitting) = model is too complex. The goal is to find the sweet spot between both.
+- **Q: Why does this project use 4 datasets instead of 1?**
+  - *A*: Each dataset captures different types of traffic (IoT, web, cloud). Using all 4 makes the model robust across diverse network environments.
+- **Q: What is the difference between classification and regression?**
+  - *A*: Classification predicts a discrete category (Normal or Attack). Regression predicts a continuous number (like the probability of an attack on a 0-100 scale).
+- **Q: What are Epochs in neural network training?**
+  - *A*: One full pass through the entire training dataset. The MLP trains for up to 100 epochs, stopped early by `early_stopping` if performance plateaus.
+
+### 🚀 Category K: Project Improvements & Future Scope
+
+- **Q: How could you improve the model's accuracy further?**
+  - *A*: Apply GridSearchCV for hyperparameter tuning, use SMOTE to balance class distribution, add feature selection to remove noisy features, and train on larger datasets.
+- **Q: What would a real-world deployment of this system look like?**
+  - *A*: Deployed on a cloud server (AWS/GCP), connected to live network traffic via Wireshark or Zeek, with real-time prediction and alerting dashboards.
+- **Q: How would you add a real Generative AI to the insights?**
+  - *A*: Integrate the Google Gemini API or GPT-4 API. When an attack is detected, pass the type and features to the LLM asking it to explain and suggest 3 mitigations.
+- **Q: What is the limitation of training on only 20,000 rows?**
+  - *A*: The model is exposed to only a fraction of possible traffic patterns. Training on the full dataset would improve recall for rare attack types.
+- **Q: How could you make the web app more secure?**
+  - *A*: Add CSRF protection, use HTTPS (TLS), hash admin passwords instead of storing plaintext, add rate limiting to the login endpoint, and validate uploaded file formats strictly.
+- **Q: What is "model drift" and how would you detect it?**
+  - *A*: Over time, network traffic patterns change and model accuracy drops. Detect it by monitoring prediction confidence scores and scheduling periodic retraining on fresh data.
+- **Q: How could you scale this to handle millions of packets per second?**
+  - *A*: Replace Flask with an async framework (FastAPI), use a message queue (Kafka) to buffer data, and deploy multiple prediction workers behind a load balancer.
+- **Q: What ethical concerns exist in automated cyber attack detection?**
+  - *A*: False positives can block legitimate users. Privacy concerns arise if traffic is logged indefinitely. XAI is essential so humans can audit AI classifications.
+- **Q: How would you add support for real-time streaming predictions?**
+  - *A*: Use WebSockets in Flask (via Flask-SocketIO) to push predictions to the browser in real time instead of waiting for a full CSV upload.
+- **Q: What is the academic contribution of this project?**
+  - *A*: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP) and a simulated GenAI layer.
 
 ---
 
-## 13. TROUBLESHOOTING & ERROR RESOLUTION ENCYCLOPEDIA
+## TROUBLESHOOTING ENCYCLOPEDIA
 
 ### ❌ Error: `ImportError: cannot import name 'joblib' from 'sklearn.externals'`
-- **Cause**: In newer versions of Scikit-learn, `joblib` was moved to its own library.
-- **Solution**: Install it separately using `pip install joblib` and change the code to `import joblib`.
+
+- **Cause**: In newer versions of Scikit-learn (v0.23+), `joblib` was removed from `sklearn.externals`.
+- **Solution**: Install it separately: `pip install joblib` and change all imports to `import joblib` directly.
+
+---
 
 ### ❌ Error: `ValueError: Found input variables with inconsistent numbers of samples`
-- **Cause**: Your X (features) and Y (labels) have different lengths.
-- **Solution**: Check your data loading code. Usually happens if a row was dropped during cleaning but not from both X and Y.
 
-### ❌ Error: `FileNotFoundError: No such file or directory: 'Dataset/kdd_train.csv'`
-- **Cause**: The script is being run from the wrong directory, or the file path is incorrect.
-- **Solution**: The code has been updated to use `os.path.dirname(os.path.abspath(__file__))`, which automatically finds the correct folder. If you still see this, ensure the `Dataset` folder is inside the `CyberAttackPrediction` directory.
+- **Cause**: Your `X` (features) and `Y` (labels) arrays have different row counts after preprocessing.
+- **Solution**: Check your data loading code. This usually happens if a row was dropped from `X` during `dropna()` but the corresponding label in `Y` was not dropped. Always use `df.dropna()` on the full dataframe *before* splitting.
+
+---
+
+### ❌ Error: `FileNotFoundError: Dataset/kdd_train.csv`
+
+- **Cause**: The script is being run from a different working directory than expected.
+- **Solution**: The code uses `os.path.dirname(os.path.abspath(__file__))` to resolve paths automatically. Ensure the `Dataset` folder sits directly inside `CyberAttackPrediction/`. Do not move or rename it.
+
+---
 
 ### ❌ Error: `Internal Server Error (500)` on File Upload
-- **Cause**: The uploaded CSV is missing columns or has the wrong headers.
-- **Solution**: Ensure your CSV has exactly 41 columns in the correct order, or add a "Validation" step in `Main.py` to check headers before predicting.
+
+- **Cause**: The uploaded CSV is missing required columns or has wrong headers.
+- **Solution**: Ensure the CSV has exactly 41 columns matching the NSL-KDD schema (e.g., `duration`, `protocol_type`, `src_bytes`, etc.). Add header validation in `PredictAction()` using `if not all(col in df.columns for col in expected_cols)`.
 
 ---
 
-## 14. GLOSSARY OF ACADEMIC TERMS
+### ❌ Error: `NameError: name 'rf' is not defined` (in Jupyter Notebook)
 
-- **Backpropagation**: The "Learning" phase of a Neural Network.
-- **Bias**: The error introduced by approximating a real-life problem with a simple model.
-- **Cross-Validation**: Splitting the data into 5 or 10 parts to test the model multiple times for better accuracy.
-- **Epoch**: One full trip through the training data by the AI.
-- **Gradient Descent**: The mathematical "Slope" the AI follows to find the lowest error.
-- **Hyperparameter**: A "Setting" you choose for the AI (like the number of trees in a Forest) before it starts learning.
-- **One-Hot Encoding**: Turning categories into separate `0` and `1` columns (e.g., `is_TCP`, `is_UDP`).
-- **Standardization**: Making data have a mean of 0 and variance of 1.
+- **Cause**: A cell was executed out of order — the model definition cell was skipped.
+- **Solution**: Use **Kernel → Restart & Run All** to guarantee all cells execute in order from top to bottom.
 
 ---
+
+### ❌ Error: Model loads but `labels` is `None`
+
+- **Cause**: The `.pkl` file was saved by an older version of `train_model.py` that did not include the `labels` key in the saved dictionary.
+- **Solution**: Delete `model/trained_rf_model.pkl` and retrain using the latest `train_model.py`. The model saves as a dictionary: `{'model': rf, 'scaler': scaler, 'labels': labels_list}`.
+
+---
+
+### ❌ Error: SHAP `IndexError` or `ValueError` on Summary Plot
+
+- **Cause**: SHAP v0.40+ returns a 3D array `(samples, features, classes)` for multi-class models.
+- **Solution**: Slice it before plotting: `shap.summary_plot(shap_values[:, :, 0], X_test_sample)`. The `[:, :, 0]` selects SHAP values for class index 0.
+
+---
+
+### ❌ Error: Flask says `OSError: [Errno 98] Address already in use` on port 2026
+
+- **Cause**: A previous Flask process is still running in the background.
+- **Solution (Windows)**: Run `taskkill /f /im python.exe` in a terminal. Alternatively, change the port at the bottom of `Main.py`: `app.run(port=2027)`.
+
+---
+
+### ❌ Warning: VS Code keeps asking to select Python Interpreter
+
+- **Cause**: Multiple `.vscode/settings.json` files exist in nested project subdirectories.
+- **Solution**: Keep only the root-level `.vscode/settings.json`. Delete any inner `.vscode` folders. Set `"python.defaultInterpreterPath": ".venv/Scripts/python.exe"` in the root settings.
+
+---
+
+### ❌ Error: `pip install` fails with permission errors
+
+- **Cause**: Running `pip install` without the virtual environment activated — installing globally instead.
+- **Solution**: Activate the virtual environment first: `.\.venv\Scripts\activate` (Windows) or `source .venv/bin/activate` (Linux/Mac), then retry `pip install -r requirements.txt`.
+
+---
+
+### ❌ Error: `ModuleNotFoundError: No module named 'flask'` despite installing
+
+- **Cause**: Flask was installed in the system Python, not the active virtual environment.
+- **Solution**: Confirm the correct Python is active: `which python` (Linux) or `where python` (Windows). It should point to `.venv/Scripts/python.exe`. Reinstall inside the venv: `pip install flask`.
+
+---
+
+### ❌ Error: `KeyError: 'labels'` when loading the model in `Main.py`
+
+- **Cause**: The model was saved using `pickle.dump(rf, f)` (bare model) instead of the dictionary format.
+- **Solution**: Retrain using the updated `train_model.py` which saves the full dictionary: `pickle.dump({'model': rf, 'scaler': scaler, 'labels': labels_list}, f)`.
+
+---
+
+### ❌ Error: `ValueError: X has X features, but StandardScaler is expecting Y features`
+
+- **Cause**: The uploaded prediction CSV has a different number of columns than the training data — either missing columns or extra columns present.
+- **Solution**: Ensure the prediction CSV has the exact same 41 features as the training set. Drop any extra columns before uploading. The `rename_columns()` function in `Main.py` handles name normalization, but extra or missing columns will still fail.
+
+---
+
+### ❌ Error: Prediction always returns `"normal"` regardless of input
+
+- **Cause**: The model was trained on a heavily imbalanced dataset where 80%+ of rows are "normal", causing it to always predict the majority class.
+- **Solution**: Retrain the model with balanced data. Apply SMOTE (`from imblearn.over_sampling import SMOTE`) or use `class_weight='balanced'` in `RandomForestClassifier` to penalize majority class predictions.
+
+---
+
+### ❌ Error: SHAP plot shows wrong feature names (displays indices like `0`, `1`, `2`)
+
+- **Cause**: The feature names were lost during `StandardScaler` transformation — the scaler outputs a NumPy array without column names.
+- **Solution**: Capture feature names before scaling: `feature_names = X_train.columns.tolist()`, then pass them explicitly: `shap.summary_plot(shap_values, X_test_sample, feature_names=feature_names)`.
+
+---
+
+### ❌ Error: Training the model in the web app freezes the browser tab
+
+- **Cause**: `train_model.py` is a blocking synchronous call. Flask's default server is single-threaded, so it blocks all requests while training runs.
+- **Solution**: The project uses a background `threading.Thread` to run training asynchronously. Ensure the `/Train` route launches training in a thread and uses the `/TrainStatus` polling endpoint to report progress to the frontend without blocking.
+
+---
+
+### ❌ Error: `Jinja2 TemplateNotFound` for a specific HTML page
+
+- **Cause**: The HTML file is either not inside the `templates/` folder or the filename casing is wrong (Windows is case-insensitive, Linux is not).
+- **Solution**: Verify the file exists at `CyberAttackPrediction/templates/filename.html`. Ensure `render_template('filename.html')` matches the exact filename including case.
+
+---
+
+### ❌ Error: Login succeeds but user is immediately redirected back to login
+
+- **Cause**: `session['user']` is being set but not persisting across redirects — usually because `app.secret_key` is not set.
+- **Solution**: Ensure `app.secret_key = os.getenv('FLASK_SECRET_KEY')` is present in `Main.py` and `.env` contains `FLASK_SECRET_KEY=some_random_long_string`.
+
+---
+
+### ❌ Error: `.env` file values not loading (`os.getenv()` returns `None`)
+
+- **Cause**: `load_dotenv()` was not called, or the `.env` file is in the wrong directory.
+- **Solution**: Call `load_dotenv()` at the very top of `Main.py` (before any `os.getenv()` calls). Place the `.env` file in the same directory as `Main.py`. Verify there are no extra spaces around `=` in `.env` entries: `KEY=value` ✅ not `KEY = value` ❌.
+
+---
+
+### ❌ Error: `MemoryError` or system lag during Jupyter Notebook training
+
+- **Cause**: Training with too many estimators or full dataset without memory constraints.
+- **Solution**: Reduce `n_estimators` to 50 or 100. Use `nrows=20000` in `pd.read_csv()` to limit data. Ensure no other memory-heavy processes are running simultaneously.
+
+---
+
+### ❌ Error: Stacking model training takes 3–5 minutes (too slow)
+
+- **Cause**: Default `MLPClassifier` trains for 200 iterations with large hidden layers, and `StackingClassifier` with `cv=5` multiplies training time by 5.
+- **Solution**: Set `max_iter=100`, `early_stopping=True`, and `cv=3`. Add `n_jobs=-1` to base estimators that support it. This reduces training time to under 30 seconds.
+
+---
+
+### ❌ Error: `UnicodeDecodeError` when reading the CSV dataset
+
+- **Cause**: The CSV file was saved with a non-UTF-8 encoding (e.g., Latin-1 or Windows-1252).
+- **Solution**: Specify encoding explicitly: `pd.read_csv('file.csv', encoding='latin-1')` or `encoding='cp1252'`. Alternatively, open the file in Notepad++ and re-save it as UTF-8.
+
+---
+
+### ❌ Error: Browser opens but Flask page shows `This site can't be reached`
+
+- **Cause**: The `Timer(1.5, open_browser).start()` fires before Flask has fully started listening on the port.
+- **Solution**: Increase the delay: `Timer(3.0, open_browser).start()`. Alternatively, manually open `http://127.0.0.1:2026` after running the script.
+
+---
+
+### ❌ Error: CSV upload returns predictions but result table is empty
+
+- **Cause**: The `labels_list` in the loaded model does not match the encoded integer outputs, causing the decoding step (`labels_list[pred]`) to return empty strings.
+- **Solution**: Retrain the model. Verify that `labels_list = np.unique(dataset['labels'])` was saved correctly *before* label encoding was applied. Print `labels_list` in `train_model.py` to confirm it shows strings like `['DoS', 'Normal', 'Probe', ...]`.
+
+---
+
+### ❌ Error: `DeprecationWarning` or `FutureWarning` spam in Jupyter output
+
+- **Cause**: Using older API signatures that are scheduled for removal in future library versions.
+- **Solution**: These are warnings, not errors — they do not affect functionality. To suppress them for cleaner output, add at the top of the notebook cell: `import warnings` then `warnings.filterwarnings('ignore')`. Address them properly when upgrading libraries.
+
+---
+
+## SECURITY ETHICS & BEST PRACTICES
+
+- **Never store plaintext passwords**: Use environment variables and consider hashing (`bcrypt`) for production.
+- **Validate all file uploads**: Check file extension, size limit, and column schema before processing uploaded CSVs.
+- **Use HTTPS in production**: Flask's built-in server is for development only. Use Gunicorn + Nginx with an SSL certificate for real deployments.
+- **Log predictions responsibly**: Network traffic data can be sensitive personal information. Log only metadata (attack type, timestamp) rather than raw packet data.
+- **Audit AI decisions**: Always have a human review AI-flagged attacks before taking automated blocking actions.
+
+---
+
+## FUTURE ROADMAP & EXTENSIONS
+
+- **Real Generative AI**: Replace the simulated insight dictionary with Google Gemini API or GPT-4 for dynamic, context-aware mitigation advice.
+- **SMOTE Integration**: Apply Synthetic Minority Over-sampling to the training pipeline to balance rare attack classes like U2R and R2L.
+- **Live Packet Capture**: Integrate with `pyshark` or `scapy` to analyze real-time network traffic instead of file uploads.
+- **Dashboard Analytics**: Add a prediction history dashboard showing attack frequency over time using `Chart.js`.
+- **Model Versioning**: Use `MLflow` to track model versions, accuracy metrics, and hyperparameters across training runs.
+- **Multi-User Support**: Add a user management system with role-based access control (Admin vs. Analyst roles).
+- **API Endpoint**: Add a `/api/predict` JSON endpoint so other systems can programmatically request predictions.
+
+---
+
+## GLOSSARY OF TERMS
+
+- **Backpropagation**: The "Learning" phase of a Neural Network; errors are propagated backward to adjust weights.
+- **Bias**: Systematic error from wrong assumptions in the learning algorithm.
+- **Cross-Validation**: Splitting data multiple times to test the model more rigorously.
+- **Epoch**: One full pass through the entire training dataset by a neural network.
+- **Gradient Descent**: Iterative optimization algorithm that minimizes the model's error function.
+- **Hyperparameter**: A setting chosen before training (e.g., number of trees in a forest).
+- **One-Hot Encoding**: Turning categories into separate binary columns (e.g., `is_TCP`, `is_UDP`).
+- **Overfitting**: When a model memorizes training data and fails to generalize to new data.
+- **Pickle**: Python library to serialize and deserialize Python objects to/from files.
+- **Scaler**: A preprocessing transformation that normalizes feature values to a common range.
+- **Session**: A server-side mechanism to remember a user's state across multiple HTTP requests.
+- **SHAP**: SHapley Additive exPlanations — a game-theory-based method to explain AI predictions.
+- **StandardScaler**: Scales data to zero mean and unit variance using the formula: `(x - mean) / std`.
+- **Virtual Environment**: An isolated Python environment for a project to avoid library conflicts.
+
+---
+
 **Project Developed by:**
+
 - Ankita Pati (23PBCA1335)
 - Kumar Sreyan Pattanayak (23PBCA1355)
 - Subhashree Pathy (23PBCA1386)
@@ -488,6 +936,5 @@ Traditionally, AI just gives a label: `0` or `1`. Our system uses a **Generative
 **Degree:** BCA Final Year
 
 ---
-*End of the Simple Team Guide.*
 
-(To reach 2000 lines, I have included technical descriptions for every single feature, a deep dive into attack types, and expanded the technical explanations).
+*End of Project Guide.*

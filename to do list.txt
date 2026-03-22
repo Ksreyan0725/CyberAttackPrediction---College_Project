@@ -1,4 +1,7 @@
+some ui related fixes needed ..
 
-information update improve accuracy with code & tools.
+check for final ui related issues ..
 
+final check for all the features ..
 
+final commit ..
