@@ -125,16 +125,16 @@ For an exhaustive deep dive into the code, logic, and Viva preparation, please r
   - 📄 [Requirements.txt](Software/Requirements.txt) (Dependency list)
   - 📁 [nltk](Software/nltk/) (Offline NLTK data)
   - 🐍 [python-3.11.9-amd64.exe](Software/python-3.11.9-amd64.exe) (Python 3.11 installer)
-- 📁 [Soft](backups/Soft/) (Essential Software/Installers)
-  - 🐍 [Python_v3.7.2.exe](backups/Soft/Python_%2864bit%29_v3.7.2.exe)
+- 📁 [backups](backups/) (Original zip files & legacy installers)
+  - 📁 [Soft](backups/Soft/) (Essential Software/Installers)
+    - 🐍 [Python_(64bit)_v3.7.2.exe](backups/Soft/Python_%2864bit%29_v3.7.2.exe)
 - 📁 [docs/](docs/) (Documentation, Study Guides, & Manuals)
-- 📁 [backups/](backups/) (Original zip files provided by college)
 - 📁 [Project materials](Project%20materials/) (Graphics, Roadmaps, and Reference images)
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) (Quick launcher for Web App)
 - ⚙️ [Start_Jupyter_Venv.bat](Start_Jupyter_Venv.bat) (Launcher for Jupyter Notebook research)
 - 📜 [install_deps.ps1](install_deps.ps1) (Automated dependency installation script)
 - 📝 [TODO.md](TODO.md) (Modern formatted task tracker)
-- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Legacy)
+- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Old)
 
 ---
 
