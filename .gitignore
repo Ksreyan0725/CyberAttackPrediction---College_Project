@@ -36,6 +36,7 @@ TODO.md
 
 # End of .gitignore
 CyberAttackPrediction/scripts/
+CyberAttackPrediction/_vscode_backup
 
 # Backups & Legacy Data
 backups/**/*
