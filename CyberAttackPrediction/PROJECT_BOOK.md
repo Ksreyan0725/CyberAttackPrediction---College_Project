@@ -278,3 +278,54 @@ This exhaustive list covers every technical corner of your project for quick ref
 | 123 | **Multicollinearity** | When two features are too similar, confusing the model. |
 | 124 | **Dimensionality Reduction** | Reducing the number of features (e.g., via PCA). |
 | 125 | **Feature Selection** | Manually picking the best features for the model. |
+| 126 | **PBKDF2-SHA256** | The hashing algorithm used for secure password storage. |
+| 127 | **Salting** | Adding random data to passwords before hashing to prevent rainbow table attacks. |
+| 128 | **Admin Bypass** | A development-safe 'Ultimate Admin' account for master access. |
+
+---
+
+## 9. Advanced Security & Authentication System
+
+To ensure production-grade security, the application transitioned from a hardcoded single-user system to a robust multi-user platform.
+
+### Key Security Implementations
+
+1. **Password Hashing (Werkzeug Security)**:
+    - **Mechanism**: Passwords are never stored in plain text. Instead, we use `generate_password_hash` with the **pbkdf2:sha256** method.
+    - **Security**: This prevents attackers from reading passwords even if they gain access to the `users.json` database.
+2. **Persistent User Database (`users.json`)**:
+    - Stores user credentials in a JSON format.
+    - **Self-Healing**: If the file is deleted, the system automatically recreates it and seeds the default admin account from the legacy `.env` configuration.
+3. **Ultimate Admin Bypass**:
+    - **Credentials**: `admin` / `admin`.
+    - **Purpose**: Provides a master "overrule" account that bypasses standard database checks.
+    - **Visual Indicator**: When logged in as the ultimate admin, a **MASTER** badge appears in the navigation bar.
+4. **Session Management**:
+    - Uses Flask's encrypted signed cookies (`secret_key`).
+    - Includes inactivity protection and secure logout mechanisms.
+    - **Inactivity Timeout**: Set to 1 hour of idle time.
+5. **Local "Quick Access" Storage**:
+    - The `saved_creds.json` file hashes local sessions to enable one-click access while keeping the filesystem secure.
+
+---
+
+## 10. Conceptual Roadmap (The AI Journey)
+
+The **CyberAttackPrediction** project is designed as a learning bridge from traditional statistical computing to modern Generative AI.
+
+1. **Level 1: Statistical Foundations (Python & Jupyter)**:
+    - Leveraging Jupyter Notebooks for rapid experimentation.
+    - Using Python's `Pandas` and `NumPy` to clean and normalize 41 network features.
+2. **Level 2: Traditional Machine Learning (Random Forest)**:
+    - Implementing ensemble learning to handle high-dimensional network data.
+    - Achieving 98%+ accuracy on the NSL-KDD dataset using majority voting.
+3. **Level 3: Deep Learning Deep-Dive (Neural Networks)**:
+    - Using Multi-Layer Perceptrons (MLP) to model non-linear attack patterns.
+    - Understanding Backpropagation and Activation Functions (ReLU) for complex threats.
+4. **Level 4: The Generative Layer (Explainable AI)**:
+    - Integrating a Large Language Model (LLM) mindset to translate AI decisions into human-readable security reports.
+    - Providing "Contextual Mitigations" and action plans instead of just binary alerts.
+
+---
+
+*End of Project Book.*

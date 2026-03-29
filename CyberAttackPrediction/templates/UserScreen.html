@@ -38,6 +38,7 @@
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
 
+    /* Enhanced Table Styles for Legibility & Transparency */
     .table-container {
         /* Remove internal scroll for "full visibility" */
         max-height: none; 
@@ -45,46 +46,118 @@
         border-radius: 12px;
         background: var(--glass-bg);
         transition: all 0.3s ease;
+        padding: 1px;
+        border: 1px solid var(--glass-border) !important;
     }
-    
-    /* Fullscreen specific styles */
-    .table-container:fullscreen {
-        background: var(--bg-main) !important;
-        padding: 20px;
-        overflow-y: auto;
-        width: 100vw;
-        height: 100vh;
-    }
-    
-    .table-container:-webkit-full-screen {
-        background: var(--bg-main) !important;
-        padding: 20px;
+
+    .table {
+        margin-bottom: 0;
+        color: var(--text-main) !important;
+        background-color: transparent !important; /* Force overall transparency */
+        border-collapse: separate;
+        border-spacing: 0;
     }
 
     .table thead th {
         position: sticky;
         top: 0;
-        background: var(--navbar-bg);
-        backdrop-filter: blur(10px);
-        color: var(--text-main);
+        background: var(--navbar-bg) !important;
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        color: var(--text-main) !important;
         z-index: 10;
         border-bottom: 2px solid var(--primary-color) !important;
-        font-size: 0.85rem;
+        border-top: none !important;
+        font-size: 0.8rem;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        padding: 1.25rem 1rem !important;
+    }
+
+    .table td {
+        padding: 1.25rem 1rem !important;
+        vertical-align: middle;
+        border-color: var(--glass-border) !important;
+        color: var(--text-main) !important;
+        background-color: transparent !important; /* Force cell transparency */
+    }
+
+    .table tr {
+        background-color: transparent !important; /* Force row transparency */
+        transition: background-color 0.2s ease;
+    }
+
+    /* Theme-aware striping (Only apply to the row, not the background) */
+    [data-theme="light"] .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0, 0, 0, 0.03) !important;
+    }
+    
+    [data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+
+    /* Hover effect that works with the theme */
+    .table-hover tbody tr:hover {
+        background-color: var(--accent-bg) !important;
+    }
+
+    /* Code tag refinement - ensure high contrast */
+    code.dynamic-text {
+        background: rgba(var(--primary-rgb), 0.1) !important;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-family: 'Fira Code', 'Courier New', monospace;
+        font-size: 0.85rem;
+        border: 1px solid rgba(var(--primary-rgb), 0.2) !important;
+        display: inline-block;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    [data-theme="light"] code.dynamic-text {
+        color: #0f172a !important; /* Darkest slate for light mode */
+        background: rgba(0, 0, 0, 0.04) !important;
+        border-color: rgba(0, 0, 0, 0.1) !important;
+    }
+
+    [data-theme="dark"] code.dynamic-text {
+        color: #f8fafc !important; /* Brightest slate for dark mode */
     }
 
     .xx-small { font-size: 0.65rem; }
     .x-small { font-size: 0.75rem; }
     
-    /* Fullscreen toggle button styles */
+    /* Fullscreen toggle button styles with high visibility */
     .btn-fullscreen {
-        transition: all 0.3s ease;
-        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(var(--primary-rgb), 0.3) !important;
+        background: var(--glass-bg);
+        color: var(--text-main) !important;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
     }
+    
+    .btn-fullscreen i {
+        color: var(--primary-color);
+        transition: transform 0.3s ease;
+    }
+
     .btn-fullscreen:hover {
-        background: var(--primary-light);
-        transform: scale(1.05);
+        background: var(--primary-color) !important;
+        color: white !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .btn-fullscreen:hover i {
+        color: white;
+        transform: scale(1.2);
+    }
+
+    /* Extra visibility for dark mode */
+    [data-theme="dark"] .btn-fullscreen {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2) !important;
+        color: #f8fafc !important;
     }
     
     .sticky-insights {
@@ -159,7 +232,7 @@
                                         <span class="xx-small dynamic-text">Normal Activity</span>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-danger rounded-circle p-1"><i class="fas fa-exclamation xx-small"></i></span>
+                                        <span class="badge bg-danger rounded-circle p-1 shadow-sm" style="box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);"><i class="fas fa-skull-crossbones xx-small"></i></span>
                                         <span class="xx-small dynamic-text">Malicious Intent</span>
                                     </div>
                                 </div>
@@ -170,17 +243,21 @@
                                 <h6 class="fw-bold dynamic-text mb-3 x-small"><i class="fas fa-history me-2 text-muted"></i>Recent History</h6>
                                 <div class="d-flex flex-column gap-3">
                                     <div class="d-flex gap-2 position-relative">
-                                        <div class="flex-shrink-0 mt-1"><i class="fas fa-circle text-info" style="font-size: 8px;"></i></div>
+                                        <div class="flex-shrink-0 mt-1">
+                                            <i class="fas fa-circle text-danger" style="font-size: 10px; filter: drop-shadow(0 0 3px rgba(239,68,68,0.6));"></i>
+                                        </div>
                                         <div>
                                             <div class="xx-small fw-bold dynamic-text">Attack Detected</div>
-                                            <div class="xx-small dynamic-muted">Just now | 42 records</div>
+                                            <div class="xx-small dynamic-muted opacity-75">Just now | 42 records</div>
                                         </div>
                                     </div>
                                     <div class="d-flex gap-2">
-                                        <div class="flex-shrink-0 mt-1"><i class="fas fa-circle text-success" style="font-size: 8px;"></i></div>
+                                        <div class="flex-shrink-0 mt-1">
+                                            <i class="fas fa-circle text-success" style="font-size: 10px; filter: drop-shadow(0 0 3px rgba(16,185,129,0.6));"></i>
+                                        </div>
                                         <div>
                                             <div class="xx-small fw-bold dynamic-text">Clean Scan</div>
-                                            <div class="xx-small dynamic-muted">2 hours ago | 12 records</div>
+                                            <div class="xx-small dynamic-muted opacity-75">2 hours ago | 12 records</div>
                                         </div>
                                     </div>
                                 </div>
@@ -204,8 +281,8 @@
                 {% endif %}
             </div>
             
-            <div class="card-footer border-glass p-2 bg-dark-subtle bg-opacity-10 text-center">
-                <span class="xx-small dynamic-muted opacity-50"><i class="fas fa-shield-alt me-1"></i> CyberShield AI Sentinel | Secure Analysis Protocol Active</span>
+            <div class="card-footer border-glass p-2 bg-dark-subtle bg-opacity-20 text-center" style="backdrop-filter: blur(5px);">
+                <span class="xx-small dynamic-muted opacity-75 fw-medium"><i class="fas fa-shield-alt me-1 text-info"></i> CyberShield AI Sentinel | Secure Analysis Protocol Active</span>
             </div>
         </div>
     </div>

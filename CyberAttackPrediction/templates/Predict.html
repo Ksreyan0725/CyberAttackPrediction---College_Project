@@ -38,7 +38,7 @@
     .xx-small { font-size: 0.65rem; }
     .x-small { font-size: 0.75rem; }
         .upload-box {
-        background: rgba(255, 255, 255, 0.03);
+        background: var(--accent-bg);
         border: 2px dashed rgba(13, 202, 240, 0.4);
         border-radius: 20px;
         padding: 2.5rem 1.5rem; /* Reduced padding */
@@ -108,7 +108,7 @@
     }
 
     [data-theme="light"] .upload-box {
-        background: #ffffff;
+        background: rgba(0, 0, 0, 0.02);
         border-color: rgba(0, 0, 0, 0.1);
     }
 
@@ -184,7 +184,7 @@
 
     .progress-outer {
         height: 8px;
-        background: rgba(255, 255, 255, 0.05);
+        background: var(--accent-bg);
         border-radius: 100px;
         overflow: hidden;
         border: 1px solid var(--glass-border);
@@ -223,29 +223,27 @@
                     <form name="f1" method="post" action="/PredictAction" enctype="multipart/form-data" id="prediction-form">
                         <div class="form-group-spacing mb-3">
                             <div class="upload-box py-3" id="drop-zone">
-                                <input type="file" name="t1" id="file-input" class="d-none" accept=".csv" required>
+                                <input type="file" name="t1" id="file-input" class="d-none" accept=".csv">
                                 <div id="upload-prompt">
-                                    <i class="fas fa-cloud-upload-alt h1 text-info mb-2"></i>
-                                    <h5 class="fw-bold dynamic-text">Drop your file here</h5>
-                                    <p class="dynamic-muted opacity-60 small">or click to browse your computer</p>
-                                    <span class="badge bg-dark-subtle text-info px-2 py-1 mt-1 border border-info border-opacity-25 x-small">CSV Only</span>
+                                    <div class="upload-icon-container mb-2 text-center text-info">
+                                        <i class="fas fa-cloud-upload-alt h1 mb-2"></i>
+                                    </div>
+                                    <h5 class="fw-bold dynamic-text text-center">Drop your dataset here</h5>
+                                    <p class="xx-small dynamic-muted opacity-50 text-center">or click to browse your computer</p>
+                                    <div class="text-center mt-2">
+                                        <span class="badge bg-dark-subtle text-info px-2 py-1 border border-info border-opacity-25 xx-small">NSL-KDD CSV ONLY</span>
+                                    </div>
                                 </div>
-                                
-                                <div id="file-details-container" class="file-info-display p-3 mt-0">
-                                    <div class="file-info-header">
-                                        <div class="file-icon h4 mb-0">
-                                            <i class="fas fa-file-csv"></i>
+                                <div id="file-details-container" style="display: none;" class="animate__animated animate__pulse">
+                                    <div class="p-3 rounded-3 text-center" style="background: rgba(59, 130, 246, 0.05); border: 1px dashed var(--info-color);">
+                                        <i class="fas fa-file-csv text-info h2 mb-2"></i>
+                                        <div id="selected-file-name" class="dynamic-text small fw-bold d-block"></div>
+                                        <span id="selected-file-size" class="xx-small dynamic-muted"></span>
+                                        <div class="mt-2 text-center">
+                                            <button type="button" class="btn btn-xs btn-outline-danger px-3 py-1 rounded-pill" id="remove-file">
+                                                <i class="fas fa-trash-alt me-1"></i>Remove
+                                            </button>
                                         </div>
-                                        <div class="file-details">
-                                            <div id="selected-file-name" class="file-name-text small">filename.csv</div>
-                                            <div class="d-flex align-items-center gap-2 mt-1">
-                                                <span id="selected-file-size" class="file-meta x-small">0 KB</span>
-                                                <span class="upload-status-badge x-small">Ready</span>
-                                            </div>
-                                        </div>
-                                        <button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" id="remove-file" title="Remove file">
-                                            <i class="fas fa-times"></i>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -270,7 +268,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="card-footer p-3 border-0" style="background: rgba(0,0,0,0.15);">
+                <div class="card-footer p-3 border-0" style="background: var(--footer-accent);">
                     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-muted">
                         <div class="x-small d-flex align-items-center gap-2">
                             <i class="fas fa-info-circle text-info" data-bs-toggle="tooltip" data-bs-placement="top" title="NSL-KDD is a standard dataset used to benchmark intrusion detection systems. It includes features like duration, protocol_type, service, etc."></i>

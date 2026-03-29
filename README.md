@@ -32,7 +32,7 @@
 | **💎 Liquid Glass UI** | A premium, responsive interface featuring glassmorphism, translucency, and refractive background animations for a modern feel. |
 | **🧠 Stacking ML** | Uses a multi-model stacking architecture (Random Forest, KNN, MLP) for superior prediction accuracy over single-model systems. |
 | **🔍 XAI (SHAP)** | Explainable AI that visually breaks down *why* a specific network packet was flagged as an attack using SHAP values. |
-| **🛡️ Smart Defense** | Implements inactivity-based logout, secure session handling, and `.env` based credential management. |
+| **🛡️ Secure Auth** | Integrated **Hashed Multi-User Authentication** using PBKDF2 with SHA256. Features account management, signup capabilities, and ultimate admin bypass. |
 | **🤖 GenAI Insights** | Transforms complex technical results into clear, actionable advice for security administrators. |
 
 ---

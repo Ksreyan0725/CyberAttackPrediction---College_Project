@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - CyberShield AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+    }
+    
+    body {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-gradient);
+        background-attachment: fixed;
+    }
+
+    main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+    }
+
+    .blob {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: var(--primary-color);
+        filter: blur(80px);
+        border-radius: 50%;
+        z-index: -1;
+        opacity: 0.15;
+        animation: float 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+    }
+
+    .blob-1 { top: -10%; left: -10%; background: #3b82f6; }
+    .blob-2 { bottom: -10%; right: -10%; background: #8b5cf6; animation-delay: -10s; }
+
+    @keyframes float {
+        0% { transform: translate(0, 0) scale(1); }
+        100% { transform: translate(100px, 50px) scale(1.1); }
+    }
+
+    .login-wrapper {
+        width: 100%;
+        max-width: 900px;
+        background: transparent;
+        display: flex;
+        flex-direction: row;
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .info-panel {
+        flex: 1.2;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        backdrop-filter: blur(20px);
+        padding: 1.75rem 2.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border: 1px solid var(--glass-border);
+        border-right: none;
+        border-radius: 30px 0 0 30px;
+        box-shadow: -20px 25px 50px -12px rgba(0, 0, 0, 0.3);
+    }
+
+    .brand-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        background: linear-gradient(to right, var(--text-main), var(--primary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .form-panel {
+        flex: 1;
+        padding: 1.75rem 2.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        border-radius: 0 30px 30px 0 !important;
+        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-control {
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--input-text) !important;
+        border-radius: 12px;
+        padding: 0.6rem 0.8rem;
+    }
+
+    .input-group-text {
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        border-right: none;
+        color: var(--primary-color);
+        border-radius: 12px 0 0 12px;
+    }
+
+    .form-control { border-radius: 0 12px 12px 0; }
+
+    @media (max-width: 900px) {
+        .login-wrapper { flex-direction: column; max-width: 500px; }
+        .info-panel { border-right: none; border-bottom: 1px solid var(--glass-border); border-radius: 30px 30px 0 0; }
+        .form-panel { border-radius: 0 0 30px 30px !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="login-wrapper">
+        <div class="info-panel">
+            <div class="brand-section">
+                <div class="brand-logo bg-transparent border-0 p-0 mb-3" style="width: 70px; height: 70px; margin: 0 auto;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100">
+                        <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none" stroke="var(--primary-color)" stroke-width="4" stroke-linejoin="round"/>
+                        <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
+                        <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+                    </svg>
+                </div>
+                <h1 class="brand-title">Join CyberShield AI</h1>
+                <p class="dynamic-muted small">Create your account to start predicting and monitoring cyber attacks with generative AI insights.</p>
+            </div>
+        </div>
+
+        <div class="form-panel liquid-glass">
+            <div class="text-center mb-4">
+                <h4 class="dynamic-text fw-bold">Create Account</h4>
+                <p class="xx-small dynamic-muted">Fill in your details to get started</p>
+            </div>
+
+            <form action="/SignupAction" method="post" onsubmit="return validateSignup(this);">
+                <div class="mb-3">
+                    <label class="form-label fw-bold dynamic-muted xx-small mb-1">USERNAME</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user-plus"></i></span>
+                        <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold dynamic-muted xx-small mb-1">PASSWORD</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        <input type="password" class="form-control" name="password" id="p1" placeholder="••••••••" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label fw-bold dynamic-muted xx-small mb-1">CONFIRM PASSWORD</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-check-double"></i></span>
+                        <input type="password" class="form-control" name="confirm_password" id="p2" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary shadow-sm">
+                        <i class="fas fa-user-check me-2"></i>Register Now
+                    </button>
+                    <div class="text-center mt-3">
+                        <p class="xx-small dynamic-muted">Already have an account? <a href="/UserLogin" class="text-primary fw-bold text-decoration-none">Login here</a></p>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function validateSignup(form) {
+        if (form.password.value !== form.confirm_password.value) {
+            showToast("Passwords do not match!", "error");
+            return false;
+        }
+        if (form.password.value.length < 6) {
+            showToast("Password must be at least 6 characters", "warning");
+            return false;
+        }
+        return true;
+    }
+</script>
+{% endblock %}

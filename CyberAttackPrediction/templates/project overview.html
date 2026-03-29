@@ -103,6 +103,7 @@
                     <a href="#architecture" class="toc-link">System Architecture</a>
                     <a href="#ml-models" class="toc-link">Machine Learning Models</a>
                     <a href="#genai" class="toc-link">Generative AI Insights</a>
+                    <a href="#advanced-security" class="toc-link">Advanced Security</a>
                     <a href="#features" class="toc-link">Network Features</a>
                     <a href="#attacks" class="toc-link">Attack Taxonomy</a>
                     <a href="#viva" class="toc-link">Viva Preparation</a>
@@ -194,6 +195,26 @@
                     </div>
                 </section>
 
+                <!-- Advanced Security -->
+                <section id="advanced-security" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-user-lock me-3"></i>Advanced Multi-User Security</h3>
+                    <p class="dynamic-muted mb-4">The system features a production-grade authentication layer to protect administrative functions and user data.</p>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card h-100">
+                                <h5 class="fw-bold text-primary"><i class="fas fa-key me-2"></i>Password Hashing</h5>
+                                <p class="small dynamic-muted">Uses <strong>PBKDF2 with SHA256</strong> to hash passwords. Even if the database is exposed, original passwords remain unreadable and secure.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-4 glass-card h-100">
+                                <h5 class="fw-bold text-warning"><i class="fas fa-crown me-2"></i>Ultimate Admin Bypass</h5>
+                                <p class="small dynamic-muted">A hardcoded <code>admin</code> account providing master access, indicated by a special <strong>MASTER</strong> badge in the interface.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Network Features -->
                 <section id="features" class="doc-section">
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-list-ol me-3"></i>Dataset Features (41 Columns)</h3>
@@ -270,14 +291,115 @@
                 <!-- Viva Preparation -->
                 <section id="viva" class="doc-section">
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-graduation-cap me-3"></i>Viva Preparation</h3>
-                    <div class="glass-card p-4">
-                        <div class="mb-4">
-                            <h6 class="fw-bold dynamic-text mb-2">Q: Why use Random Forest?</h6>
-                            <p class="small dynamic-muted">A: It's an ensemble model that uses many decision trees to vote, making it highly accurate and resistant to memorizing noise (overfitting).</p>
+                    
+                    <!-- Tabbed Categorization -->
+                    <ul class="nav nav-pills mb-4 gap-2 justify-content-center" id="vivaTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active small px-4 rounded-pill" id="gen-tab" data-bs-toggle="pill" data-bs-target="#viva-gen" type="button" role="tab">General</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link small px-4 rounded-pill" id="ml-tab" data-bs-toggle="pill" data-bs-target="#viva-ml" type="button" role="tab">Machine Learning</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link small px-4 rounded-pill" id="dl-tab" data-bs-toggle="pill" data-bs-target="#viva-dl" type="button" role="tab">Deep Learning</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link small px-4 rounded-pill" id="ai-tab" data-bs-toggle="pill" data-bs-target="#viva-ai" type="button" role="tab">AI & GenAI</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link small px-4 rounded-pill" id="py-tab" data-bs-toggle="pill" data-bs-target="#viva-py" type="button" role="tab">Python & Jupyter</button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content border-0 p-0" id="vivaTabContent">
+                        <!-- General -->
+                        <div class="tab-pane fade show active" id="viva-gen" role="tabpanel">
+                            <div class="glass-card p-4">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: How is user data secured in this application?</h6>
+                                    <p class="small dynamic-muted">A: We use salted PBKDF2 hashing for passwords and a hashed session caching system for local quick access, ensuring the 'admin' account is always secure.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What is the significance of the GenAI layer?</h6>
+                                    <p class="small dynamic-muted">A: It provides Explainable AI (XAI) by translating complex ML predictions into human-readable advice and action plans.</p>
+                                </div>
+                                <div class="mb-0">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What is the academic contribution of this project?</h6>
+                                    <p class="small dynamic-muted">A: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP).</p>
+                                </div>
+                            </div>
                         </div>
-                        <div class="mb-0">
-                            <h6 class="fw-bold dynamic-text mb-2">Q: What is the significance of the GenAI layer?</h6>
-                            <p class="small dynamic-muted">A: It provides Explainable AI (XAI) by translating complex ML predictions into human-readable advice and action plans.</p>
+
+                        <!-- Machine Learning -->
+                        <div class="tab-pane fade" id="viva-ml" role="tabpanel">
+                            <div class="glass-card p-4 border-primary border-opacity-25">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: Why use Random Forest?</h6>
+                                    <p class="small dynamic-muted">A: It's an ensemble model that uses many decision trees to vote, making it highly accurate and resistant to memorizing noise (overfitting).</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: What is Overfitting vs. Underfitting?</h6>
+                                    <p class="small dynamic-muted">A: Overfitting is when a model memorizes the training data too well but fails on new data. Underfitting is when the model is too simple to learn the underlying patterns.</p>
+                                </div>
+                                <div class="mb-0">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: How do you measure model success?</h6>
+                                    <p class="small dynamic-muted">A: Beyond accuracy, we look at <strong>Precision</strong> (how many flags was correct) and <strong>Recall</strong> (how many total attacks we caught). Recall is critical in security.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Deep Learning -->
+                        <div class="tab-pane fade" id="viva-dl" role="tabpanel">
+                            <div class="glass-card p-4 border-danger border-opacity-25">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: Why call it "Deep" Learning?</h6>
+                                    <p class="small dynamic-muted">A: "Deep" refers to the hidden layers between input and output. More layers allow the network to learn more complex feature representations.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is the role of the Activation Function?</h6>
+                                    <p class="small dynamic-muted">A: Functions like <strong>ReLU</strong> or <strong>Sigmoid</strong> introduce non-linearity, allowing the network to solve problems that aren't just simple straight lines.</p>
+                                </div>
+                                <div class="mb-0">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is Backpropagation?</h6>
+                                    <p class="small dynamic-muted">A: The "learning engine." It calculates errors at the end and sends them backward to adjust the weights of every neuron to minimize future mistakes.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI & GenAI -->
+                        <div class="tab-pane fade" id="viva-ai" role="tabpanel">
+                            <div class="glass-card p-4 border-info border-opacity-25">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: What is "Prompt Engineering"?</h6>
+                                    <p class="small dynamic-muted">A: The art of crafting specific text inputs to guide a Generative AI model toward an accurate or desired output style (e.g., security-focused reports).</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: What are AI Hallucinations?</h6>
+                                    <p class="small dynamic-muted">A: When a model generates text that sounds confident but is factually incorrect. We mitigate this by using restricted context and specific knowledge bases.</p>
+                                </div>
+                                <div class="mb-0">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: RAG vs. Fine-Tuning?</h6>
+                                    <p class="small dynamic-muted">A: <strong>Fine-tuning</strong> retrains the model on new data. <strong>RAG</strong> gives the model external documents to "read" during the conversation without retraining.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Python & Jupyter -->
+                        <div class="tab-pane fade" id="viva-py" role="tabpanel">
+                            <div class="glass-card p-4 border-warning border-opacity-25">
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: Difference between .py and .ipynb?</h6>
+                                    <p class="small dynamic-muted">A: <code>.py</code> is a linear script. <code>.ipynb</code> is a stateful notebook allowing inline charts, interactive code blocks, and rich documentation.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: What is the "Kernel" in Jupyter?</h6>
+                                    <p class="small dynamic-muted">A: The background process that actually executes the code cells. Restarting it clears the environment memory.</p>
+                                </div>
+                                <div class="mb-0">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: Why use Virtual Environments?</h6>
+                                    <p class="small dynamic-muted">A: To isolate project libraries and versions, preventing conflicts between different AI projects on the same computer.</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>

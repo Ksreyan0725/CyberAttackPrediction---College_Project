@@ -27,7 +27,7 @@
     }
     
     .log-container {
-        background: rgba(0, 0, 0, 0.2);
+        background: var(--footer-accent);
         border-radius: 12px;
         padding: 1rem;
         font-family: 'Courier New', Courier, monospace;
@@ -61,6 +61,10 @@
         font-weight: 800;
         color: var(--primary-color);
         text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+
+    [data-theme="light"] .accuracy-value {
+        text-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
     }
 </style>
 {% endblock %}
@@ -152,86 +156,136 @@
 
 {% block extra_js %}
 <script>
-    document.getElementById('startTrainingBtn').addEventListener('click', async function() {
-        const btn = this;
-        const statusBadge = document.getElementById('trainingStatus');
+    document.addEventListener('DOMContentLoaded', function() {
         const logWindow = document.getElementById('logWindow');
         const resultsArea = document.getElementById('resultsArea');
-        
-        // UI Reset
-        btn.disabled = true;
-        btn.innerHTML = '<span class="skeleton-box bg-white opacity-50 me-2" style="width: 20px;"></span><span class="skeleton-box bg-white opacity-50" style="width: 100px;"></span>';
-        statusBadge.className = 'status-badge status-running';
-        statusBadge.innerHTML = '<i class="fas fa-sync fa-spin me-1 small"></i> Training in Progress';
-        resultsArea.style.display = 'none';
-        logWindow.innerHTML = '';
+        const statusBadge = document.getElementById('trainingStatus');
+        const startBtn = document.getElementById('startTrainingBtn');
 
-        // Added global toast 
-        if(typeof showToast === 'function') {
-            showToast('Training process initialized. Please wait...', 'info');
+        // --- GLOBAL SCROLL TRACKER ---
+        function restoreTrainState() {
+            const cachedLogs = localStorage.getItem('train-logs');
+            const cachedAccuracy = localStorage.getItem('train-accuracy');
+            const cachedClasses = localStorage.getItem('train-classes');
+            const cachedStatus = localStorage.getItem('train-status');
+
+            if (cachedLogs && logWindow) {
+                logWindow.innerHTML = cachedLogs;
+                logWindow.scrollTop = logWindow.scrollHeight;
+            }
+            if (cachedAccuracy && resultsArea) {
+                document.getElementById('finalAccuracy').textContent = cachedAccuracy;
+                resultsArea.style.display = 'block';
+            }
+            if (cachedClasses && document.getElementById('classListing')) {
+                document.getElementById('classListing').innerHTML = cachedClasses;
+            }
+            if (cachedStatus && statusBadge) {
+                try {
+                    const status = JSON.parse(cachedStatus);
+                    statusBadge.className = status.className;
+                    statusBadge.innerHTML = status.inner;
+                } catch(e) {}
+            }
         }
 
         function addLog(msg, type = 'info') {
+            if (!logWindow) return;
             const entry = document.createElement('div');
             entry.className = 'log-entry dynamic-muted reveal-premium';
             entry.innerHTML = `<span class="text-primary fw-bold">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
             logWindow.appendChild(entry);
             logWindow.scrollTop = logWindow.scrollHeight;
+            
+            // Cache current logs
+            localStorage.setItem('train-logs', logWindow.innerHTML);
         }
 
-        addLog("Initializing training environment...");
-        addLog("Loading NSL-KDD dataset (20,000 samples)...");
-        
-        try {
-            // Simulated delay for UI experience
-            await new Promise(r => setTimeout(r, 1000));
-            addLog("Executing Label Encoding and Feature Scaling...");
-            
-            const response = await fetch("{{ url_for('TrainAction') }}", {
-                method: 'POST'
+        // Restore on load
+        restoreTrainState();
+
+        if (startBtn) {
+            startBtn.addEventListener('click', async function() {
+                // Confirmation for re-training
+                const isRetrain = startBtn.textContent.includes('Re-Train');
+                if (isRetrain && !confirm('Are you sure you want to re-train the model? This will overwrite the current active model.')) {
+                    return;
+                }
+
+                showToast('Starting model training sequence...', 'info');
+                
+                // Clear cache for fresh run
+                localStorage.removeItem('train-logs');
+                localStorage.removeItem('train-accuracy');
+                localStorage.removeItem('train-classes');
+                localStorage.removeItem('train-status');
+                
+                startBtn.disabled = true;
+                resultsArea.style.display = 'none';
+                logWindow.innerHTML = '';
+                
+                statusBadge.className = 'status-badge status-running';
+                statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin me-1 small"></i> Training...';
+
+                addLog("Initializing training environment...");
+                addLog("Loading NSL-KDD dataset (20,000 samples)...");
+                
+                try {
+                    const response = await fetch("{{ url_for('TrainAction') }}", {
+                        method: 'POST'
+                    });
+                    
+                    if (!response.ok) throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+                    
+                    const data = await response.json();
+                    
+                    if (data.status === 'success') {
+                        showToast('Model training completed successfully!', 'success');
+                        addLog("Processing dataset features...");
+                        await new Promise(r => setTimeout(r, 800));
+                        addLog("Fitting Random Forest Classifier...");
+                        await new Promise(r => setTimeout(r, 1200));
+                        addLog(`Success! Accuracy achieved: ${data.accuracy}%`, 'success');
+                        
+                        const finalAcc = data.accuracy + '%';
+                        document.getElementById('finalAccuracy').textContent = finalAcc;
+                        localStorage.setItem('train-accuracy', finalAcc);
+
+                        const classListing = document.getElementById('classListing');
+                        classListing.innerHTML = '';
+                        data.classes.forEach(cls => {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill me-2 mb-2';
+                            badge.textContent = cls.toUpperCase();
+                            classListing.appendChild(badge);
+                        });
+                        localStorage.setItem('train-classes', classListing.innerHTML);
+                        
+                        resultsArea.style.display = 'block';
+                        statusBadge.className = 'status-badge status-success';
+                        statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
+                        
+                        localStorage.setItem('train-status', JSON.stringify({
+                            className: statusBadge.className,
+                            inner: statusBadge.innerHTML
+                        }));
+                    } else {
+                        showToast(`Training aborted: ${data.message}`, 'error');
+                        addLog(`Error: ${data.message}`, 'error');
+                        statusBadge.className = 'status-badge status-idle';
+                        statusBadge.innerHTML = '<i class="fas fa-times-circle me-1 small"></i> Training Failed';
+                    }
+                } catch (error) {
+                    showToast(`Network failure: ${error.message}`, 'error');
+                    addLog(`Network error: ${error.message}`, 'error');
+                    statusBadge.className = 'status-badge status-idle';
+                    statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1 small"></i> Error';
+                } finally {
+                    startBtn.disabled = false;
+                }
             });
-            
-            const data = await response.json();
-            
-            if (data.status === 'success') {
-                addLog("Splitting data into 80% Train / 20% Test sets...");
-                await new Promise(r => setTimeout(r, 800));
-                addLog("Fitting Random Forest Classifier (100 estimators)...");
-                await new Promise(r => setTimeout(r, 1200));
-                addLog("Calculating validation metrics...");
-                addLog(`Success! Accuracy achieved: ${data.accuracy}%`, 'success');
-                addLog("Serializing model and metadata to trained_rf_model.pkl...");
-                
-                // Update Results UI
-                document.getElementById('finalAccuracy').textContent = data.accuracy + '%';
-                const classListing = document.getElementById('classListing');
-                classListing.innerHTML = '';
-                data.classes.forEach(cls => {
-                    const badge = document.createElement('span');
-                    badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill';
-                    badge.textContent = cls.toUpperCase();
-                    classListing.appendChild(badge);
-                });
-                
-                resultsArea.style.display = 'block';
-                statusBadge.className = 'status-badge status-success';
-                statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
-            } else {
-                addLog(`Error: ${data.message}`, 'error');
-                statusBadge.className = 'status-badge status-idle';
-                statusBadge.textContent = 'Training Failed';
-            }
-        } catch (error) {
-            addLog(`Network error: ${error.message}`, 'error');
-            statusBadge.className = 'status-badge status-idle';
-            statusBadge.textContent = 'Network Error';
-        } finally {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fas fa-redo me-2"></i> Re-Train Model';
         }
     });
 
-    // Auto-scroll simulation for a "lived-in" feel
-    const logWindow = document.getElementById('logWindow');
 </script>
 {% endblock %}

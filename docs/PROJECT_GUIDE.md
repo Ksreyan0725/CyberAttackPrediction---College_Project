@@ -242,8 +242,12 @@ We take three different AI models (MLP, KNN, Random Forest) and let them all gue
 
 #### 4. `UserLoginAction()`
 
-- **What it does**: Handles user authentication against credentials stored in `.env` file.
-- **Logic**: Reads `ADMIN_USER` and `ADMIN_PASS` from environment variables, compares to the submitted form values, and creates a session on success.
+- **What it does**: Handles multi-user authentication with password hashing protection.
+- **Logic**:
+  1. **Ultimate Bypass**: Checks if credentials match the hardcoded `admin`/`admin` master account first.
+  2. **Database Check**: If not the master admin, it searches the `users.json` database.
+  3. **Hash Verification**: Uses `check_password_hash()` to compare the submitted password against the stored PBKDF2 hash.
+  4. **Session**: Creates an encrypted session and sets a 'MASTER' flag if the ultimate admin is used.
 
 ### In `train_model.py`
 
@@ -487,12 +491,12 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
    - *A*: `pickle` serializes the trained model to a `.pkl` file so we don't retrain it every time the server restarts. The `load_ml_model()` function deserializes it back into memory.
 7. **Q: Why do we load the model on startup instead of loading it per request?**
    - *A*: Loading a model takes time. Loading it once at startup and keeping it in memory means each prediction request is instant instead of waiting seconds.
-8. **Q: What is the `.env` file and why is it important?**
-   - *A*: It stores sensitive values like admin credentials and the Flask secret key. By keeping them outside the code, we prevent accidentally exposing them on GitHub.
-9. **Q: How does Flask handle sessions?**
-   - *A*: Flask encrypts a dictionary into a cookie using the `secret_key`. The cookie is stored in the browser. On each request, Flask decrypts it to check if the user is logged in.
-10. **Q: What happens if the uploaded CSV has missing columns?**
-    - *A*: The `scaler.transform()` call will fail with a shape mismatch error. The `try/except` block in `PredictAction()` catches this and shows a user-friendly error message.
+8. **Q: Why do we use hashed passwords instead of environment variables now?**
+   - *A*: Storing passwords in `.env` is better than hardcoding, but they are still plain text. By using `werkzeug.security` hashes in `users.json`, we ensure that even if a hacker steals the database, they cannot see the actual passwords.
+9. **Q: What is the purpose of the `saved_creds.json` file?**
+   - *A*: It stores a hashed 'Quick Access' token. When you click 'Quick Access' on the login page, the app verifies this token against your local machine to log you in instantly without typing.
+10. **Q: What is the purpose of the `secrets.json` file?**
+    - *A*: It stores the admin credentials locally for the "Remember Me" feature. When the user returns, the app reads this file to auto-authenticate without re-entering the password.
 
 ### 📊 Category B: Data & Statistics
 
@@ -691,8 +695,8 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
   - *A*: Integrate the Google Gemini API or GPT-4 API. When an attack is detected, pass the type and features to the LLM asking it to explain and suggest 3 mitigations.
 - **Q: What is the limitation of training on only 20,000 rows?**
   - *A*: The model is exposed to only a fraction of possible traffic patterns. Training on the full dataset would improve recall for rare attack types.
-- **Q: How could you make the web app more secure?**
-  - *A*: Add CSRF protection, use HTTPS (TLS), hash admin passwords instead of storing plaintext, add rate limiting to the login endpoint, and validate uploaded file formats strictly.
+- **Q: How could you make the web app more secure? (Already Implemented!)**
+  - *A*: We have already implemented several advanced layers: **Password Hashing** (PBKDF2), **Multi-user support** via a protected JSON database, and **Session flags** for administrative privileges. Future scope includes CSRF protection and rate-limiting.
 - **Q: What is "model drift" and how would you detect it?**
   - *A*: Over time, network traffic patterns change and model accuracy drops. Detect it by monitoring prediction confidence scores and scheduling periodic retraining on fresh data.
 - **Q: How could you scale this to handle millions of packets per second?**
@@ -703,6 +707,50 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
   - *A*: Use WebSockets in Flask (via Flask-SocketIO) to push predictions to the browser in real time instead of waiting for a full CSV upload.
 - **Q: What is the academic contribution of this project?**
   - *A*: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP) and a simulated GenAI layer.
+
+### CATEGORY L: JUPYTER & NOTEBOOK ENVIRONMENTS
+
+- **Q: What is the primary difference between a `.py` script and a `.ipynb` notebook?**
+  - *A*: A `.py` file is a plain text file executed linearly. A `.ipynb` (JSON format) allows "literate programming," mixing code, rich text (Markdown), and inline visualizations. It is stateful, meaning you can run cells out of order.
+- **Q: What is a "Kernel" in the context of Jupyter?**
+  - *A*: The Kernel is the execution engine (usually Python) that runs the code in the background. If you restart the kernel, all variables and memory are cleared, providing a "clean slate."
+- **Q: What are "Magic Commands" like `%matplotlib inline` or `%%time`?**
+  - *A*: Line magics (`%`) and Cell magics (`%%`) are special Jupyter-specific syntax. They allow you to time executions, configure plots, or interact with the operating system without standard Python code.
+- **Q: Why are "Checkpoints" important?**
+  - *A*: Jupyter saves periodic checkpoints to prevent data loss if the browser or system crashes, allowing you to revert to a previous autosaved state.
+
+### CATEGORY M: ARTIFICIAL INTELLIGENCE & GENERATIVE MODELS
+
+- **Q: What is the difference between "Narrow AI" (ANI) and "General AI" (AGI)?**
+  - *A*: Narrow AI (like this project) is designed for a specific task (attack prediction). General AI (AGI) would have the human-like ability to understand and learn any intellectual task a human can.
+- **Q: What is "Prompt Engineering" in the context of LLMs like Gemini or GPT-4?**
+  - *A*: It is the practice of crafting specific, high-quality text inputs to guide a Generative AI model toward an accurate or desired output style (e.g., "Summarize this network log as a security expert").
+- **Q: What are "Hallucinations" in Generative AI?**
+  - *A*: This is when a model generates text that sounds confident but is factually incorrect or nonsensical, often due to patterns in training data that don't match reality.
+- **Q: How does RAG (Retrieval-Augmented Generation) differ from Fine-Tuning?**
+  - *A*: Fine-tuning updates the model's actual weights using new data. RAG provides the model with external documents (at inference time) as context, allowing it to "read" new information without retraining.
+
+### CATEGORY N: DEEP LEARNING & NEURAL NETWORKS
+
+- **Q: Why is it called "Deep" Learning?**
+  - *A*: "Deep" refers to the number of hidden layers in a Neural Network. While a shallow network has 1–2 layers, a Deep Network may have hundreds.
+- **Q: What is the role of an "Activation Function" (like ReLU or Sigmoid)?**
+  - *A*: It introduces "non-linearity" into the network. Without it, the network would just be a giant linear equation, incapable of learning complex patterns like images or non-linear security threats.
+- **Q: What is the "Vanishing Gradient" problem?**
+  - *A*: During training (Backpropagation), gradients get smaller as they move toward the early layers. If they "vanish" to zero, the network stops learning. ReLU helps solve this compared to older Sigmoid functions.
+- **Q: What is the difference between Weights and Biases?**
+  - *A*: Weights determine the *strength* of a connection between neurons. Biases allow the activation function to be shifted (offset) to better fit the data. `Output = (Weights * Input) + Bias`.
+
+### CATEGORY O: PYTHON FOR AI ENGINEERING
+
+- **Q: What is the "Global Interpreter Lock" (GIL)?**
+  - *A*: A mutex that allows only one thread to execute Python bytecode at a time. This simplifies memory management but can limit true multi-core parallel processing in CPU-bound tasks.
+- **Q: What is a "List Comprehension" and why use it?**
+  - *A*: A concise way to create lists (`[x for x in data if x > 0]`). It is often faster and more readable than standard `for` loops.
+- **Q: Difference between `is` and `==`?**
+  - *A*: `==` checks for **equality** (do they have the same value?). `is` checks for **identity** (are they the exact same object in memory?).
+- **Q: What is the purpose of `pip` vs `conda`?**
+  - *A*: `pip` is the standard Python package manager. `conda` is a cross-language environment and package manager (common in Data Science) that handles binary dependencies more robustly for libraries like NumPy.
 
 ---
 

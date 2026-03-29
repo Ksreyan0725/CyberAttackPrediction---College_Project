@@ -43,18 +43,22 @@
         // Global Premium Toast System
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
+
             const toast = document.createElement('div');
             toast.className = `premium-toast toast-${type}`;
             
             let icon = 'info-circle';
             if (type === 'success') icon = 'check-circle';
-            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'error' || type === 'danger') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
 
             toast.innerHTML = `
-                <div class="toast-icon"><i class="fas fa-${icon}"></i></div>
+                <div class="toast-icon text-white"><i class="fas fa-${icon}"></i></div>
                 <div class="toast-body">
                     <div class="small fw-bold dynamic-text">${message}</div>
                 </div>
+                <button type="button" class="btn-close btn-close-white ms-2 small" style="font-size: 0.6rem;" onclick="this.parentElement.remove()"></button>
             `;
 
             container.appendChild(toast);
@@ -67,15 +71,23 @@
 
             // Auto hide
             setTimeout(() => {
-                toast.classList.add('hide');
-                setTimeout(() => {
-                    toast.remove();
-                }, 500);
-            }, 4000);
+                if (toast.parentElement) {
+                    toast.classList.add('hide');
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 500);
+                }
+            }, 5000);
         }
 
-        // Override console errors or specific alerts if needed
-        // For now, intentional calls only
+        // --- Automatic Flask Flash Integration ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashMessages = document.querySelectorAll('.flash-message-data');
+            flashMessages.forEach(el => {
+                showToast(el.dataset.message, el.dataset.category);
+                el.remove(); // Clean up
+            });
+        });
     </script>
 
     <style>
@@ -91,7 +103,7 @@
             /* Theme Variables (Default Dark - Neutralized) */
             --bg-gradient: linear-gradient(135deg, #050505 0%, #151515 100%);
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
+            --text-muted: #cbd5e1; /* Increased contrast for dark mode muted text */
             --navbar-bg: rgba(5, 5, 5, 0.7);
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
@@ -100,6 +112,8 @@
             --input-bg: rgba(255, 255, 255, 0.05);
             --input-text: #ffffff;
             --hero-bg: transparent;
+            --accent-bg: rgba(255, 255, 255, 0.05);
+            --footer-accent: rgba(0, 0, 0, 0.2);
         }
 
         [data-theme="light"] {
@@ -114,6 +128,8 @@
             --input-bg: #ffffff;
             --input-text: #0f172a;
             --hero-bg: #ffffff;
+            --accent-bg: rgba(0, 0, 0, 0.04);
+            --footer-accent: rgba(0, 0, 0, 0.06);
         }
 
         html,
@@ -342,9 +358,9 @@
 
         [data-theme="light"] .liquid-glass {
             --glass-rgb: 255, 255, 255;
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.05) !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+            border: 1px solid rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.08) !important;
         }
 
         [data-theme="dark"] .liquid-glass {
@@ -447,6 +463,9 @@
             padding: 0.6rem 1.5rem;
             font-weight: 600;
             transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-primary {
@@ -620,6 +639,16 @@
     data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
     data-logout-url="{{ url_for('Logout') }}">
 
+    <div id="flash-data" style="display: none;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message-data" data-category="{{ category }}" data-message="{{ message }}"></div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
@@ -662,14 +691,24 @@
                     </li>
                     {% endif %}
                     <li class="nav-item dropdown ms-lg-3">
-                        <a class="nav-link dropdown-toggle fw-bold" href="#" id="userDropdown" role="button"
+                        <a class="nav-link dropdown-toggle fw-bold d-flex align-items-center" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false"
                             style="color: var(--primary-color) !important;">
                             <i class="fas fa-user-circle me-1"></i> {{ session.get('user') }}
+                            {% if session.get('is_ultimate') %}
+                            <span class="badge rounded-pill bg-danger border border-light ms-2 p-1 px-2" style="font-size: 0.5rem; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);">MASTER</span>
+                            {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end glass-card border-glass p-2"
                             aria-labelledby="userDropdown"
-                            style="background: var(--glass-bg); backdrop-filter: blur(10px);">
+                            style="background: var(--glass-bg); backdrop-filter: blur(20px);">
+                            <li>
+                                <a class="dropdown-item nav-link rounded-3 px-3 mb-1"
+                                    href="{{ url_for('Account') }}">
+                                    <i class="fas fa-cog me-1"></i> Account Settings
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider opacity-25"></li>
                             <li>
                                 <a class="dropdown-item nav-link nav-logout rounded-3 px-3"
                                     href="{{ url_for('Logout') }}">
@@ -679,6 +718,10 @@
                         </ul>
                     </li>
                     {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('Signup') }}"><i class="fas fa-user-plus me-1"></i>
+                            Sign Up</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1"></i>
                             Login</a>
@@ -834,17 +877,8 @@
         const logoutUrl = body.getAttribute('data-logout-url');
 
         if (isLoggedIn && logoutUrl) {
-            // 1. Smart Reload Logout (Secures Result Page only)
-            window.addEventListener('load', function () {
-                const navEntries = performance.getEntriesByType("navigation");
-                if (navEntries.length > 0 && navEntries[0].type === "reload") {
-                    // SECURE: Logout if results page is reloaded (to protect data)
-                    if (pageType === 'result') {
-                        window.location.href = logoutUrl;
-                    }
-                    // Browsing (input) reloads are SAFE
-                }
-            });
+            // SECURE: Results now persist on reload as per user preference.
+            // (Previous forced logout on refresh removed)
 
             // 2. Inactivity (Idle) Logout - 1 Hour
             let idleTimeout;
@@ -890,14 +924,69 @@
             }, delay);
         }
 
-        // Clear App Data Action
-        document.getElementById('clearAppData').addEventListener('click', function () {
-            if (confirm('Are you sure you want to clear all local application data and refresh?')) {
-                localStorage.clear();
-                sessionStorage.clear();
-                location.reload();
+        // --- GLOBAL SCROLL TRACKER (Page-Specific) ---
+        const getScrollKey = (postfix) => `${window.location.pathname}-${postfix}`;
+        
+        function saveScrollPositions() {
+            const main = document.querySelector('main');
+            const log = document.getElementById('logWindow');
+            const table = document.querySelector('.table-container');
+
+            // Save window scroll
+            localStorage.setItem(getScrollKey('window-scroll'), window.scrollY);
+            
+            // Save component scrolls (if they exist)
+            if (main) localStorage.setItem(getScrollKey('main-scroll'), main.scrollTop);
+            if (log) localStorage.setItem(getScrollKey('log-scroll'), log.scrollTop);
+            if (table) localStorage.setItem(getScrollKey('table-scroll'), table.scrollTop);
+        }
+
+        function restoreScrollPositions() {
+            const main = document.querySelector('main');
+            const log = document.getElementById('logWindow');
+            const table = document.querySelector('.table-container');
+
+            // Restore window scroll
+            const winPos = localStorage.getItem(getScrollKey('window-scroll'));
+            if (winPos) {
+                window.scrollTo({ top: parseInt(winPos, 10), behavior: 'instant' });
             }
+
+            // Restore component scrolls
+            if (main) {
+                const pos = localStorage.getItem(getScrollKey('main-scroll'));
+                if (pos) main.scrollTop = pos;
+            }
+            if (log) {
+                const pos = localStorage.getItem(getScrollKey('log-scroll'));
+                if (pos) log.scrollTop = pos;
+            }
+            if (table) {
+                const pos = localStorage.getItem(getScrollKey('table-scroll'));
+                if (pos) table.scrollTop = pos;
+            }
+        }
+
+        // Save on navigate/unload
+        window.addEventListener('beforeunload', saveScrollPositions);
+        
+        // Restore on load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(restoreScrollPositions, 100); // Slight delay for dynamic content
         });
+
+        // Clear App Data Action
+        const clearBtn = document.getElementById('clearAppData');
+        if (clearBtn) {
+            clearBtn.addEventListener('click', function () {
+                if (confirm('Are you sure you want to clear all local application data and active results?')) {
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    // Navigate to a reset route or just reload (user can hard refresh too)
+                    window.location.href = "{{ url_for('index') }}?reset=true";
+                }
+            });
+        }
 
         // Initialize all Bootstrap tooltips globally
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))

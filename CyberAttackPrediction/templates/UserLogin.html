@@ -291,18 +291,12 @@
         <!-- Standard Login Form -->
         <div id="standardLoginArea" class="{% if has_saved %}d-none{% endif %} reveal-premium anim-delay-200">
             <div class="text-center mb-4">
-                <h4 class="dynamic-text fw-bold">Administrator Login</h4>
-                <p class="xx-small dynamic-muted">Enter your credentials to manage the platform</p>
+                <h4 class="dynamic-text fw-bold">User Login</h4>
+                <p class="xx-small dynamic-muted">Enter your credentials to access the platform</p>
             </div>
 
             {% if msg %}
-            <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    const message = "{{ msg|safe }}";
-                    const type = message.toLowerCase().includes('success') ? 'success' : (message.toLowerCase().includes('invalid') ? 'error' : 'info');
-                    showToast(message, type);
-                });
-            </script>
+            <!-- Deprecated individual msg handling. Flashes are now global. -->
             {% endif %}
 
             <form name="f1" method="post" action="/UserLoginAction" onsubmit="return validateForm(this);">
@@ -331,10 +325,13 @@
                     </label>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary shadow-sm">
-                        <i class="fas fa-sign-in-alt me-2"></i>Authenticate
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary shadow-sm py-2">
+                        <i class="fas fa-lock-open me-2"></i>Authenticate
                     </button>
+                    <div class="text-center mt-3">
+                        <p class="xx-small dynamic-muted">Don't have an account? <a href="/Signup" class="text-primary fw-bold text-decoration-none">Sign up here</a></p>
+                    </div>
                 </div>
             </form>
         </div>

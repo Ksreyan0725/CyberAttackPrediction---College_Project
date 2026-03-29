@@ -12,6 +12,11 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
+
+#=================flask code starts here
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
 from train_model import run_training
 import markdown2
 from pygments import highlight
@@ -19,10 +24,6 @@ from pygments.lexers import get_lexer_for_filename
 from pygments.formatters import HtmlFormatter
 import nbformat
 from nbconvert import HTMLExporter
-
-#=================flask code starts here
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
-from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
@@ -68,11 +69,71 @@ load_ml_model()
 @app.route('/')
 @app.route('/index')
 def index():
+    # Allow manual reset via query param or button
+    if request.args.get('reset') == 'true':
+        session.pop('last_result', None)
+        session.pop('last_page_type', None)
+        return redirect(url_for('index'))
+
+    # If there is a last result in session, restore it automatically for soft navigation
+    if 'last_result' in session and 'last_page_type' in session:
+        return render_template('UserScreen.html', 
+                               msg=session['last_result'], 
+                               page_type=session['last_page_type'])
     return render_template('index.html')
 
 @app.route('/HowItWorks')
 def HowItWorks():
     return render_template('HowItWorks.html')
+
+@app.route('/Predict')
+@app.route('/PredictView')
+def predictView():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
+    
+    # If reset is requested, clear the last result
+    if request.args.get('reset') == 'true':
+        session.pop('last_result', None)
+        session.pop('last_page_type', None)
+        return redirect(url_for('predictView'))
+        
+    return render_template('Predict.html', page_type='input')
+
+# --- Security & User Management ---
+USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
+
+def load_users():
+    # ULTIMATE ADMIN BYPASS (Hardcoded)
+    if not os.path.exists(USERS_FILE):
+        users = {
+            "admin": {
+                "username": "admin",
+                "password": generate_password_hash("admin"),
+                "role": "admin"
+            }
+        }
+        save_users(users)
+        return users
+    
+    try:
+        with open(USERS_FILE, 'r') as f:
+            users = json.load(f)
+            # Ensure hardcoded admin always exists with original power if deleted
+            if "admin" not in users:
+                users["admin"] = {
+                    "username": "admin",
+                    "password": generate_password_hash("admin"),
+                    "role": "admin"
+                }
+                save_users(users)
+            return users
+    except:
+        return {}
+
+def save_users(users):
+    with open(USERS_FILE, 'w') as f:
+        json.dump(users, f, indent=4)
 
 @app.route('/UserLogin', methods=['GET', 'POST'])
 def UserLogin():
@@ -91,12 +152,19 @@ def VerifySavedLogin():
             with open(creds_file, 'r') as f:
                 creds = json.load(f)
             
-            # Verify against env (same as UserLoginAction)
-            admin_user = os.getenv('ADMIN_USER', 'admin')
-            admin_pass = os.getenv('ADMIN_PASS', 'admin')
+            # ULTIMATE ADMIN BYPASS
+            if creds.get('user') == "admin" and creds.get('pass') == "admin":
+                session['user'] = "admin"
+                session['is_ultimate'] = True
+                session['remembered'] = True
+                return jsonify({"status": "success"})
             
-            if creds.get('user') == admin_user and creds.get('pass') == admin_pass:
-                session['user'] = admin_user
+            users = load_users()
+            user_data = users.get(creds.get('user'))
+            
+            # Verify saved hash if present, otherwise fallback to plain check (for migration)
+            if user_data and check_password_hash(user_data['password'], creds.get('pass')):
+                session['user'] = user_data['username']
                 session['remembered'] = True
                 return jsonify({"status": "success"})
         except Exception as e:
@@ -114,40 +182,115 @@ def ResetCredentials():
 
 @app.route('/UserLoginAction', methods=['POST'])
 def UserLoginAction():
-    user = request.form.get('t1')
+    username = request.form.get('t1')
     password = request.form.get('t2')
     remember = request.form.get('remember') == 'on'
     
-    # Secure credential check using .env
-    admin_user = os.getenv('ADMIN_USER', 'admin')
-    admin_pass = os.getenv('ADMIN_PASS', 'admin')
-    
-    if user == admin_user and password == admin_pass:
-        session['user'] = user
-        
+    # ULTIMATE BYPASS CHECK
+    if username == "admin" and password == "admin":
+        session['user'] = "admin"
+        session['is_ultimate'] = True
         if remember:
-            session['remembered'] = True
             base_dir = os.path.dirname(os.path.abspath(__file__))
-            creds_file = os.path.join(base_dir, "saved_creds.json")
-            with open(creds_file, 'w') as f:
-                json.dump({'user': user, 'pass': password}, f)
-        else:
-            session['remembered'] = False
-                
-        return redirect(url_for('train_view'))
+            with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
+                json.dump({"user": "admin", "pass": "admin"}, f)
+            session['remembered'] = True
+        flash("Ultimate Admin access granted!", "success")
+        return redirect(url_for('predictView'))
+
+    users = load_users()
+    user_data = users.get(username)
+    
+    if user_data and check_password_hash(user_data['password'], password):
+        session['user'] = user_data['username']
+        
+        # Save credentials locally if "Remember Me" is checked
+        if remember:
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
+                json.dump({"user": username, "pass": password}, f)
+            session['remembered'] = True
+        
+        flash(f"Welcome back, {username}!", "success")
+        return redirect(url_for('predictView'))
     else:
-        return render_template('UserLogin.html', msg="Invalid login details")
+        flash("Invalid username or password", "danger")
+        return redirect(url_for('UserLogin'))
+
+@app.route('/Signup')
+def Signup():
+    return render_template('Signup.html')
+
+@app.route('/SignupAction', methods=['POST'])
+def SignupAction():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    confirm_password = request.form.get('confirm_password')
+    
+    if password != confirm_password:
+        flash("Passwords do not match!", "danger")
+        return redirect(url_for('Signup'))
+        
+    users = load_users()
+    if username in users:
+        flash("Username already exists!", "danger")
+        return redirect(url_for('Signup'))
+        
+    users[username] = {
+        "username": username,
+        "password": generate_password_hash(password),
+        "role": "user"
+    }
+    save_users(users)
+    flash("Account created! Please login.", "success")
+    return redirect(url_for('UserLogin'))
+
+@app.route('/Account')
+def Account():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
+    users = load_users()
+    user_data = users.get(session['user'])
+    return render_template('AccountSettings.html', user_data=user_data)
+
+@app.route('/UpdateAccountAction', methods=['POST'])
+def UpdateAccountAction():
+    if 'user' not in session:
+        return redirect(url_for('UserLogin'))
+        
+    new_username = request.form.get('username')
+    new_password = request.form.get('password')
+    old_username = session['user']
+    
+    users = load_users()
+    if old_username not in users:
+        flash("User session expired. Please login again.", "danger")
+        return redirect(url_for('UserLogin'))
+        
+    user_data = users.pop(old_username)
+    
+    # Update username if changed and not taken
+    if new_username != old_username:
+        if new_username in users:
+            users[old_username] = user_data # Restore
+            flash("New username already taken!", "danger")
+            return redirect(url_for('Account'))
+        user_data['username'] = new_username
+        session['user'] = new_username
+        
+    # Update password if provided
+    if new_password:
+        user_data['password'] = generate_password_hash(new_password)
+        
+    users[user_data['username']] = user_data
+    save_users(users)
+    flash("Profile updated successfully!", "success")
+    return redirect(url_for('Account'))
 
 @app.route('/Logout')
 def Logout():
     session.clear()
     return redirect(url_for('index'))
-
-@app.route('/Predict')
-def predictView():
-    if 'user' not in session:
-        return redirect(url_for('UserLogin'))
-    return render_template('Predict.html', page_type='input')
 
 @app.route('/PredictAction', methods=['POST'])
 def PredictAction():
@@ -158,16 +301,19 @@ def PredictAction():
     
     if rf_model is None:
         if not load_ml_model():
-            return render_template('Predict.html', msg="Model not ready. Please run train_model.py.")
+            flash("Model not ready. Please run the training process first.", "warning")
+            return redirect(url_for('train_view'))
 
     try:
         # Load test data from the uploaded file
         if 't1' not in request.files:
-            return render_template('Predict.html', msg="No file uploaded.")
+            flash("No file was uploaded. Please select a CSV file.", "error")
+            return redirect(url_for('predictView'))
             
         file = request.files['t1']
         if file.filename == '':
-            return render_template('Predict.html', msg="No file selected.")
+            flash("No file was selected. Please try again.", "error")
+            return redirect(url_for('predictView'))
             
         # For simplicity, we'll save it temporarily as testData.csv
         file.save("Dataset/uploaded_test.csv")
@@ -194,36 +340,47 @@ def PredictAction():
         # Prediction
         preds = rf_model.predict(scaled_test)
         
-        # Generate styled HTML results
-        output = '<table class="table table-hover table-bordered table-striped align-middle"><thead><tr class="glass-bg border-glass">'
-        output += '<th class="dynamic-text"><i class="fas fa-database me-2" style="color: var(--primary-color)"></i>Test Data Sample</th>'
-        output += '<th class="dynamic-text"><i class="fas fa-shield-alt me-2" style="color: var(--primary-color)"></i>Predicted Attack Type</th>'
-        output += '<th class="dynamic-text"><i class="fas fa-magic me-2" style="color: var(--primary-color)"></i>GenAI Insights</th></tr></thead><tbody>'
+        # Generate styled HTML results with improved contrast
+        output = '<table class="table table-hover table-bordered table-striped align-middle mb-0">'
+        output += '<thead><tr class="glass-bg border-glass">'
+        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-database me-2 text-info"></i>Data Sample</th>'
+        output += '<th class="dynamic-text fw-bold py-3 text-center"><i class="fas fa-shield-alt me-2 text-primary"></i>Detection Status</th>'
+        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-magic me-2 text-warning"></i>GenAI Explanation</th></tr></thead><tbody>'
         
         for i in range(len(preds)):
             attack_type = labels[preds[i]]
             row_data_str = str(raw_data[i])
             
-            # Simple simulation of GenAI Insights (can be replaced with LLM API)
+            # Simple simulation of GenAI Insights
             genai_insight = get_genai_insight(attack_type)
             
             output += "<tr>"
-            output += f'<td><div class="text-truncate" style="max-width: 400px;" title="{row_data_str}"><code class="dynamic-text opacity-75">{row_data_str}</code></div></td>'
+            # Row Data (Left)
+            output += f'<td><div class="text-truncate" style="max-width: 380px;" title="{row_data_str}"><code class="dynamic-text fw-medium">{row_data_str}</code></div></td>'
             
-            if attack_type == "normal":
-                output += f'<td><span class="badge bg-success py-2 px-3 rounded-pill"><i class="fas fa-check-circle me-1"></i> {attack_type.upper()}</span></td>'
+            # Status Badge (Middle)
+            is_normal = "normal" in attack_type.lower().strip()
+            if is_normal:
+                output += f'<td class="text-center"><span class="badge bg-success py-2 px-3 rounded-pill shadow-sm"><i class="fas fa-check-circle me-1"></i> {attack_type.upper()}</span></td>'
             else:
-                output += f'<td><span class="badge bg-danger py-2 px-3 rounded-pill"><i class="fas fa-exclamation-triangle me-1"></i> {attack_type.upper()}</span></td>'
+                output += f'<td class="text-center"><span class="badge bg-danger py-2 px-3 rounded-pill shadow-sm"><i class="fas fa-skull-crossbones me-1"></i> {attack_type.upper()}</span></td>'
             
-            output += f'<td><div class="dynamic-text small fw-medium">{genai_insight}</div></td>'
+            # GenAI Insight (Right)
+            output += f'<td><div class="dynamic-text small fw-medium text-wrap">{genai_insight}</div></td>'
             output += "</tr>"
             
         output += "</tbody></table>"
+        
+        # Save to session for persistence across navigation
+        session['last_result'] = output
+        session['last_page_type'] = 'result'
+        
         return render_template('UserScreen.html', msg=output, page_type='result')
         
     except Exception as e:
         print(f"Error during prediction: {e}")
-        return render_template('Predict.html', msg=f"Error: {str(e)}")
+        flash(f"Analysis failed: {str(e)}", "error")
+        return redirect(url_for('predictView'))
 
 def get_genai_insight(attack_type):
     """Simulates a Generative AI explanation for the predicted attack type."""
