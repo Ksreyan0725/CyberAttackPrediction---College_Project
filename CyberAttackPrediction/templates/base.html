@@ -82,13 +82,15 @@
 
     <style>
         :root {
-            --primary-color: #3b82f6;
+            --primary-color: #007bff; /* Bright Neon Blue */
             --secondary-color: #64748b;
             --dark-color: #0f172a;
             --light-color: #f8fafc;
-            --success-color: #10b981;
-            --danger-color: #ef4444;
-            --info-color: #06b6d4;
+            --success-color: #20c997; /* Bright Mint Green */
+            --danger-color: #ff4757; /* Bright Coral Red */
+            --info-color: #00d2ff; /* Electric Cyan */
+            --primary-rgb: 0, 123, 255;
+            --info-rgb: 0, 210, 255;
 
             --bg-gradient: radial-gradient(circle at top right, #0a191f, #000000);
             --surface-bg: radial-gradient(circle at top right, #0a191f, #000000);
@@ -99,13 +101,22 @@
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-primary: #00ffa3;
-            --accent-glow: rgba(0, 255, 163, 0.2);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --navbar-bg: rgba(5, 5, 5, 0.7);
+            
+            /* Responsive Footnote Branding */
+            --brand-final-opacity: 0.5; /* Smooth fade in dark mode */
+            --brand-text-gradient: linear-gradient(to right, var(--primary-color), var(--info-color), var(--primary-color));
         }
 
         /* Light Mode Palette */
         .light-mode {
+            --primary-color: #007bff; /* Bright Neon Blue */
+            --primary-rgb: 0, 123, 255;
+            --info-color: #00d2ff; /* Electric Cyan */
+            --info-rgb: 0, 210, 255;
+            --success-color: #20c997;
+            --danger-color: #ff4757;
             --bg-gradient: radial-gradient(circle at top right, #f8f9fa, #e9ecef);
             --surface-bg: radial-gradient(circle at top right, #fdfdfd, #f0f2f5);
             --footer-bg: #e9ecef;
@@ -118,10 +129,25 @@
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --navbar-bg: rgba(255, 255, 255, 0.7);
+            
+            /* High Contrast Footer Branding */
+            --brand-final-opacity: 0.9; /* Harder, solid punch in light mode */
+            --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085); /* Deep royal navy to punch through the light background */
         }
 
         html {
             scroll-behavior: smooth !important;
+        }
+
+        /* Universal Cinematic Theme Transition */
+        .theme-transitioning, .theme-transitioning *, .theme-transitioning *::before, .theme-transitioning *::after {
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        background 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                        fill 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition-delay: 0s !important;
         }
 
         html,
@@ -218,41 +244,62 @@
         }
 
         .huge-brand-text {
-            position: absolute;
-            bottom: 25px;
+            position: fixed;
+            bottom: 50px;
             left: 0;
             width: 100%;
             text-align: center;
             transform: none;
             font-size: 8.5vw;
             font-weight: 900;
-            background: linear-gradient(90deg, #fff 0%, var(--primary-color) 45%, var(--info-color) 100%, #fff 200%);
-            background-size: 200% auto;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
             letter-spacing: -0.2vw;
             line-height: 0.8;
-            pointer-events: auto; /* UNLOCKED for hover effects */
-            z-index: 0;
+            pointer-events: auto; /* Restored for Spotlight Interaction */
+            z-index: 100; /* Stays below footer-content but above base layers */
             user-select: none;
             text-transform: uppercase;
             white-space: nowrap;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            opacity: 0.15; /* Trae Stealth Baseline */
-            filter: blur(1px);
-            animation: revealTrae 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            opacity: 0;
+            filter: blur(10px);
+            transform: translateY(20px);
+            
+            /* VIBRANT BASELINE: Guaranteed visibility regardless of theme */
+            background: var(--brand-text-gradient);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: var(--primary-color);
         }
+
+        /* Unified Theme Colors */
+        :root { --spotlight-color: #ffffff; /* Hot White Core */ }
+        [data-theme="light"], .light-mode { --spotlight-color: #00e5ff; /* Glowing Laser Cyan Core */ }
 
         .huge-brand-text:hover {
-            opacity: 0.55; /* High-contrast Trae Highlight */
+            opacity: 1;
             filter: blur(0);
-            background-position: right center; /* Subtle sweep scan */
+            background-image: radial-gradient(
+                circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
+                var(--spotlight-color) 0%, 
+                var(--primary-color) 25%, 
+                var(--info-color) 60%,
+                rgba(var(--primary-rgb), 0.1) 100%
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            background-size: 150% 150%;
+            background-position: center;
         }
 
-        @keyframes revealTrae {
-            0% { opacity: 0; filter: blur(10px); transform: translateY(10px); }
-            100% { opacity: 0.15; filter: blur(1px); transform: translateY(0); }
+        @keyframes revealTraeFinal {
+            0% { opacity: 0; filter: blur(10px); transform: translateY(20px); }
+            100% { opacity: var(--brand-final-opacity); filter: blur(1px); transform: translateY(0); }
+        }
+
+        .huge-brand-text.run-animation {
+            animation: revealTraeFinal 1s cubic-bezier(0.23, 1, 0.32, 1) forwards;
         }
 
         @media (max-width: 768px) {
@@ -272,9 +319,25 @@
 
         .footer-content {
             position: relative;
-            z-index: 2;
+            z-index: 110;
             width: 100%;
         }
+
+        .footer-content .col-md-4 {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .footer-content.run-animation .col-md-4 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered text column reveal from inside the display */
+        .footer-content.run-animation .col-md-4:nth-child(1) { transition-delay: 0.1s; }
+        .footer-content.run-animation .col-md-4:nth-child(2) { transition-delay: 0.2s; }
+        .footer-content.run-animation .col-md-4:nth-child(3) { transition-delay: 0.3s; }
 
         /* Universal Text Classes Sync */
         .footer .text-muted {
@@ -295,11 +358,18 @@
         }
 
         .navbar {
+            top: 16px !important; /* Emphasize the float with a generous top gap */
+            width: 95%;
+            max-width: 1200px;
+            margin: 0 auto; /* Center the floating pill */
+            left: 0;
+            right: 0;
+            border-radius: 50px; /* Semi pill shape */
+            border: 1px solid var(--glass-border) !important; /* Full border for the floating container */
             background: var(--navbar-bg);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 0.5rem 0;
+            padding: 0.45rem 2rem !important; /* Slimmer vertical height, maintaining pill curve */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
         }
@@ -310,7 +380,7 @@
         }
 
         .navbar.navbar-hidden {
-            transform: translateY(-100%);
+            transform: translateY(calc(-100% - 24px)) !important; /* Pull up by full height PLUS enough to clear the 16px top offset */
         }
 
         .navbar-brand {
@@ -419,22 +489,35 @@
         @keyframes shimmer {
             100% { transform: translateX(100%); }
         }
-
-        /* Second Visit: Block entry animations for body content ONLY */
-        .page-visited .reveal-premium,
-        .page-visited .reveal-depth,
-        .page-visited .reveal-soft,
-        .page-visited .reveal-slide-up {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-            transition: none !important;
+        /* Custom Theme-Aware Tooltips (Borderless) */
+        .tooltip-inner {
+            background-color: var(--dark-color) !important;
+            color: #ffffff !important;
+            border: none !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 0.85rem !important;
+            font-weight: 500 !important;
         }
 
-        /* Branding IMMUNITY: The big brand reveal ALWAYS plays for a premium first impression */
-        .page-visited .huge-brand-text {
-            animation: revealTrae 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+        .light-mode .tooltip-inner, [data-theme="light"] .tooltip-inner {
+            background-color: var(--light-color) !important;
+            color: var(--dark-color) !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
         }
+
+        /* Match Tooltip Arrows to Backgrounds */
+        .bs-tooltip-top .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before { border-top-color: var(--dark-color) !important; }
+        .bs-tooltip-bottom .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before { border-bottom-color: var(--dark-color) !important; }
+        .bs-tooltip-start .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before { border-left-color: var(--dark-color) !important; }
+        .bs-tooltip-end .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before { border-right-color: var(--dark-color) !important; }
+
+        .light-mode .bs-tooltip-top .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before { border-top-color: var(--light-color) !important; }
+        .light-mode .bs-tooltip-bottom .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before { border-bottom-color: var(--light-color) !important; }
+        .light-mode .bs-tooltip-start .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before { border-left-color: var(--light-color) !important; }
+        .light-mode .bs-tooltip-end .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before { border-right-color: var(--light-color) !important; }
+
 
         /* Navbar must ALWAYS work regardless of visit count */
         .navbar {
@@ -836,6 +919,42 @@
         input::-ms-clear {
             display: none !important;
         }
+
+        /* Floating Fullscreen Button - Matched to Navbar Pill */
+        .fullscreen-floating-btn {
+            position: fixed;
+            top: 16px; /* Matches navbar exactly */
+            right: 16px; /* Pinned symmetrically to the right margin */
+            z-index: 1050; /* Render strictly above navbar */
+            border-radius: 50%; /* Perfect circle matched to navbar height */
+            width: 48px; /* Explicit structural height guarantees a perfect match */
+            height: 48px;
+            background: var(--navbar-bg); /* Identical texture */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            color: var(--primary-color) !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+        }
+        .fullscreen-floating-btn i {
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+        }
+        .fullscreen-floating-btn.spin-transition i {
+            transform: scale(0.5) rotate(180deg);
+            opacity: 0;
+        }
+        .fullscreen-floating-btn:hover {
+            transform: scale(1.1);
+            color: var(--info-color) !important;
+            box-shadow: 0 0 15px var(--primary-color);
+            border-color: var(--info-color);
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
@@ -843,6 +962,12 @@
 <body data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
     data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
     data-logout-url="{{ url_for('Logout') }}">
+
+    <!-- Floating Fullscreen Toggle -->
+    <button id="fullscreen-floating-toggle" class="fullscreen-floating-btn"
+        data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle Fullscreen">
+        <i class="fas fa-expand"></i>
+    </button>
 
     <div id="flash-data" style="display: none;">
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -934,14 +1059,53 @@
                     {% endif %}
                     <li class="nav-item">
                         <div class="d-flex align-items-center h-100 ms-lg-2">
-                            <button id="clearAppData" class="btn btn-link nav-link p-2 me-1"
-                                title="Clear App Data & Refresh" style="font-size: 1.1rem;">
+                            <button id="clearAppData" class="btn btn-link nav-link p-2 me-1 text-decoration-none"
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear App Data" style="font-size: 1.1rem;">
                                 <i class="fas fa-broom icon-broom"></i>
                             </button>
-                            <div class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
+                            <div class="theme-toggle" id="theme-toggle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Toggle Theme">
                                 <i class="fas fa-moon"></i>
                             </div>
                         </div>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const fsBtn = document.getElementById('fullscreen-floating-toggle');
+                                if(fsBtn) {
+                                    const fsIcon = fsBtn.querySelector('i');
+                                    fsBtn.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        if (!document.fullscreenElement) {
+                                            document.documentElement.requestFullscreen().catch(err => {
+                                                console.warn(`Error attempting to enable fullscreen: ${err.message}`);
+                                            });
+                                        } else {
+                                            if (document.exitFullscreen) {
+                                                document.exitFullscreen();
+                                            }
+                                        }
+                                    });
+                                    document.addEventListener('fullscreenchange', function() {
+                                        // Cinematic spin animation to mask the OS resize jump
+                                        fsBtn.classList.add('spin-transition');
+                                        
+                                        setTimeout(() => {
+                                            if (!document.fullscreenElement) {
+                                                fsIcon.classList.remove('fa-compress');
+                                                fsIcon.classList.add('fa-expand');
+                                            } else {
+                                                fsIcon.classList.remove('fa-expand');
+                                                fsIcon.classList.add('fa-compress');
+                                            }
+                                            
+                                            // Release the spin after the swap
+                                            setTimeout(() => {
+                                                fsBtn.classList.remove('spin-transition');
+                                            }, 50);
+                                        }, 150); // Exact duration of the fade/spin-out
+                                    });
+                                }
+                            });
+                        </script>
                         <script>
                             (function () {
                                 const toggle = document.getElementById('theme-toggle');
@@ -953,7 +1117,11 @@
                                     return localStorage.getItem('theme') || 'auto';
                                 }
 
-                                function updateTheme(theme) {
+                                function updateTheme(theme, isUserClick = false) {
+                                    if (isUserClick) {
+                                        document.body.classList.add('theme-transitioning');
+                                    }
+
                                     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                                     const effectivelyDark = theme === 'dark' || (theme === 'auto' && systemDark);
                                     
@@ -969,6 +1137,12 @@
                                             navbar.classList.add('navbar-light');
                                             navbar.classList.remove('navbar-dark');
                                         }
+                                    }
+                                    
+                                    if (isUserClick) {
+                                        setTimeout(() => {
+                                            document.body.classList.remove('theme-transitioning');
+                                        }, 450); // Matches the 0.4s transition duration
                                     }
 
                                     // Update Icon and Title Safely
@@ -1003,7 +1177,7 @@
                                     else next = 'auto';
 
                                     localStorage.setItem('theme', next);
-                                    updateTheme(next);
+                                    updateTheme(next, true);
                                 });
                             })();
                         </script>
@@ -1019,6 +1193,9 @@
         <main class="flex-shrink-0">
             {% block content %}{% endblock %}
         </main>
+        
+        <!-- Invisible marker to trigger footer animations safely precisely when the footer gap begins to reveal -->
+        <div id="footer-reveal-trigger" style="position: absolute; bottom: 0; width: 100%; height: 1px; pointer-events: none;"></div>
     </div>
 
     <!-- Trae Reveal Footer -->
@@ -1052,18 +1229,41 @@
 
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
+        const fsBtnFloating = document.querySelector('.fullscreen-floating-btn');
 
         window.addEventListener('scroll', function () {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop > lastScrollTop && scrollTop > 100) {
                 // Scroll down
-                navbar.classList.add('navbar-hidden');
+                if (navbar) navbar.classList.add('navbar-hidden');
             } else {
                 // Scroll up
-                navbar.classList.remove('navbar-hidden');
+                if (navbar) navbar.classList.remove('navbar-hidden');
             }
             lastScrollTop = scrollTop;
         });
+
+        // Safe Footer Reveal Animation
+        const trigger = document.getElementById('footer-reveal-trigger');
+        const brandText = document.querySelector('.huge-brand-text');
+        const footerContent = document.querySelector('.footer-content');
+        
+        if (trigger && (brandText || footerContent)) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        if (brandText) brandText.classList.add('run-animation');
+                        if (footerContent) footerContent.classList.add('run-animation');
+                    } else {
+                        // Resets animation when scrolled away so it plays again
+                        if (brandText) brandText.classList.remove('run-animation');
+                        if (footerContent) footerContent.classList.remove('run-animation');
+                    }
+                });
+            }, { threshold: 0 }); // Triggers the exact moment the main-surface bottom hits the viewport
+            
+            observer.observe(trigger);
+        }
 
         // Smart Logout Features
         const body = document.body;
@@ -1199,11 +1399,6 @@
         // Restore on load
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(restoreScrollPositions, 100); 
-            // Mark current page as 'visited' for sessionStorage
-            sessionStorage.setItem('visited_' + window.location.pathname, 'true');
-            if (sessionStorage.getItem('visited_' + window.location.pathname)) {
-                document.body.classList.add('page-visited');
-            }
         });
 
         // Clear App Data Action
@@ -1225,12 +1420,24 @@
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
 
-        // Mark current page as 'seen' for this session after short delay
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                sessionStorage.setItem('visited_' + window.location.pathname, 'true');
-            }, 1000);
-        });
+        // BRANDING QUANTUM SPOTLIGHT DRIVER
+        const hugeBrand = document.querySelector('.huge-brand-text');
+        if (hugeBrand) {
+            hugeBrand.addEventListener('mousemove', (e) => {
+                const rect = hugeBrand.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                
+                hugeBrand.style.setProperty('--mouse-x', `${x}%`);
+                hugeBrand.style.setProperty('--mouse-y', `${y}%`);
+            });
+
+            hugeBrand.addEventListener('mouseleave', () => {
+                // Smoothly reset to center spotlight
+                hugeBrand.style.setProperty('--mouse-x', '50%');
+                hugeBrand.style.setProperty('--mouse-y', '50%');
+            });
+        }
     </script>
     {% block extra_js %}{% endblock %}
 </body>
