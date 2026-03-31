@@ -21,21 +21,11 @@
             const theme = savedTheme ? savedTheme : (systemPrefersDark ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', theme);
 
-            // Animation Memory: Only play entry animations once per session
-            if (sessionStorage.getItem('sessionActive')) {
-                document.documentElement.classList.add('disable-entry-animations');
-            } else {
-                sessionStorage.setItem('sessionActive', 'true');
+            // Animation Memory: Only play entry animations once per page per session
+            const currentPath = window.location.pathname;
+            if (sessionStorage.getItem('visited_' + currentPath)) {
+                document.documentElement.classList.add('page-visited');
             }
-
-            // Auto-clear on tab close or hard refresh, but strictly preserve theme preference
-            window.addEventListener('beforeunload', function () {
-                const currentTheme = localStorage.getItem('theme');
-                localStorage.clear();
-                if (currentTheme) {
-                    localStorage.setItem('theme', currentTheme);
-                }
-            });
         })();
     </script>
 
@@ -100,42 +90,54 @@
             --danger-color: #ef4444;
             --info-color: #06b6d4;
 
-            /* Theme Variables (Default Dark - Neutralized) */
-            --bg-gradient: linear-gradient(135deg, #050505 0%, #151515 100%);
-            --text-main: #f8fafc;
-            --text-muted: #cbd5e1; /* Increased contrast for dark mode muted text */
-            --navbar-bg: rgba(5, 5, 5, 0.7);
+            --bg-gradient: radial-gradient(circle at top right, #0a191f, #000000);
+            --surface-bg: radial-gradient(circle at top right, #0a191f, #000000);
+            --footer-bg: #000;
+            --brand-text-color: rgba(255, 255, 255, 0.04);
+            --text-main: #e0e0e0;
+            --text-muted: #cbd5e1;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --card-bg: rgba(20, 20, 20, 0.6);
-            --footer-bg: #050505;
-            --input-bg: rgba(255, 255, 255, 0.05);
-            --input-text: #ffffff;
-            --hero-bg: transparent;
-            --accent-bg: rgba(255, 255, 255, 0.05);
-            --footer-accent: rgba(0, 0, 0, 0.2);
+            --accent-primary: #00ffa3;
+            --accent-glow: rgba(0, 255, 163, 0.2);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --navbar-bg: rgba(5, 5, 5, 0.7);
         }
 
-        [data-theme="light"] {
-            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            --text-main: #0f172a;
+        /* Light Mode Palette */
+        .light-mode {
+            --bg-gradient: radial-gradient(circle at top right, #f8f9fa, #e9ecef);
+            --surface-bg: radial-gradient(circle at top right, #fdfdfd, #f0f2f5);
+            --footer-bg: #e9ecef;
+            --brand-text-color: rgba(0, 0, 0, 0.08);
+            --text-main: #212529;
             --text-muted: #475569;
-            --navbar-bg: rgba(255, 255, 255, 0.7);
-            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-bg: rgba(0, 0, 0, 0.02);
             --glass-border: rgba(0, 0, 0, 0.1);
-            --card-bg: #ffffff;
-            --footer-bg: #f8fafc;
-            --input-bg: #ffffff;
-            --input-text: #0f172a;
-            --hero-bg: #ffffff;
-            --accent-bg: rgba(0, 0, 0, 0.04);
-            --footer-accent: rgba(0, 0, 0, 0.06);
+            --accent-primary: #007bff;
+            --accent-glow: rgba(0, 123, 255, 0.15);
+            --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --navbar-bg: rgba(255, 255, 255, 0.7);
+        }
+
+        html {
+            scroll-behavior: smooth !important;
         }
 
         html,
         body {
             overflow-x: hidden;
             width: 100%;
+            /* Hide scrollbar visually while maintaining scroll functionality */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE/Edge */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* WebKit browsers (Chrome, Safari, newer Edge) */
+        ::-webkit-scrollbar {
+            display: none;
         }
 
         body {
@@ -144,10 +146,146 @@
             font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             color: var(--text-main);
             line-height: 1.6;
-            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Universal Text Classes */
+        /* Trae-Style Reveal Layout */
+        .main-surface {
+            position: relative;
+            z-index: 10;
+            background: var(--surface-bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            /* Ensure content clears the fixed navbar */
+            padding-top: 80px;
+            /* Create the 'Reveal Gap' matching the footer height */
+            margin-bottom: 350px; 
+            box-shadow: 0 15px 50px var(--card-shadow);
+            transition: background 0.4s ease, color 0.4s ease;
+            /* Ensure the surface covers the fixed footer until the end */
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .footer {
+            background-color: var(--footer-bg);
+            color: var(--text-main);
+            height: 350px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            padding-top: 40px; /* Lowers the content to eliminate top gap while leaving room for branding */
+            overflow: hidden;
+            border-top: 1px solid var(--glass-border);
+            pointer-events: auto;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        .footer-link {
+            color: var(--text-main);
+            text-decoration: none;
+            opacity: 0.6;
+            transition: opacity 0.3s ease, color 0.3s ease;
+            font-size: 0.85rem;
+        }
+
+        .footer-link:hover {
+            opacity: 1;
+            color: var(--accent-primary);
+        }
+
+        .footer-btn {
+            border: 1px solid var(--text-main);
+            color: var(--text-main);
+            background: transparent;
+            padding: 5px 20px;
+            border-radius: 50px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .footer-btn:hover {
+            opacity: 1;
+            background: var(--text-main);
+            color: var(--footer-bg);
+        }
+
+        .huge-brand-text {
+            position: absolute;
+            bottom: 25px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            transform: none;
+            font-size: 8.5vw;
+            font-weight: 900;
+            background: linear-gradient(90deg, #fff 0%, var(--primary-color) 45%, var(--info-color) 100%, #fff 200%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.2vw;
+            line-height: 0.8;
+            pointer-events: auto; /* UNLOCKED for hover effects */
+            z-index: 0;
+            user-select: none;
+            text-transform: uppercase;
+            white-space: nowrap;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0.15; /* Trae Stealth Baseline */
+            filter: blur(1px);
+            animation: revealTrae 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        }
+
+        .huge-brand-text:hover {
+            opacity: 0.55; /* High-contrast Trae Highlight */
+            filter: blur(0);
+            background-position: right center; /* Subtle sweep scan */
+        }
+
+        @keyframes revealTrae {
+            0% { opacity: 0; filter: blur(10px); transform: translateY(10px); }
+            100% { opacity: 0.15; filter: blur(1px); transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .huge-brand-text {
+                font-size: 15vw;
+                letter-spacing: -0.2vw;
+                bottom: 15px;
+            }
+            .footer {
+                height: 350px;
+                padding-bottom: 110px;
+            }
+            .main-surface {
+                margin-bottom: 350px;
+            }
+        }
+
+        .footer-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+        }
+
+        /* Universal Text Classes Sync */
+        .footer .text-muted {
+            color: var(--text-muted) !important;
+            opacity: 0.7;
+        }
+
+        .footer .fw-bold {
+            color: var(--text-main) !important;
+        }
+
         .dynamic-text {
             color: var(--text-main) !important;
         }
@@ -162,7 +300,6 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border-bottom: 1px solid var(--glass-border);
             padding: 0.5rem 0;
-            /* More compact navbar */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
         }
@@ -198,39 +335,58 @@
             transform: translateY(-1px);
         }
 
-        /* Premium UI Animations */
+        /* Premium UI Animations — GPU-optimised, no blur repaints */
         @keyframes revealPremium {
-            0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(5px); }
-            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            0%   { opacity: 0; transform: translateY(24px) scale(0.97); }
+            60%  { opacity: 1; transform: translateY(-3px) scale(1.005); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         @keyframes revealDepth {
-            0% { opacity: 0; transform: perspective(1000px) translate3d(0, 0, -100px); filter: brightness(0.5); }
-            100% { opacity: 1; transform: perspective(1000px) translate3d(0, 0, 0); filter: brightness(1); }
+            0%   { opacity: 0; transform: perspective(800px) translateZ(-60px) translateY(12px); }
+            70%  { opacity: 1; transform: perspective(800px) translateZ(4px) translateY(-2px); }
+            100% { opacity: 1; transform: perspective(800px) translateZ(0) translateY(0); }
         }
 
         @keyframes revealSoft {
-            0% { opacity: 0; transform: scale(0.95); }
+            0%   { opacity: 0; transform: scale(0.96) translateY(8px); }
+            70%  { opacity: 1; transform: scale(1.005); }
             100% { opacity: 1; transform: scale(1); }
         }
 
+        @keyframes revealSlideUp {
+            0%   { opacity: 0; transform: translateY(32px); }
+            60%  { opacity: 1; transform: translateY(-4px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         .reveal-premium {
-            animation: revealPremium 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+            will-change: transform, opacity;
+            animation: revealPremium 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
 
         .reveal-depth {
-            animation: revealDepth 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards !important;
+            will-change: transform, opacity;
+            animation: revealDepth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
 
         .reveal-soft {
-            animation: revealSoft 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards !important;
+            will-change: transform, opacity;
+            animation: revealSoft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
 
-        .anim-delay-100 { animation-delay: 0.1s; }
-        .anim-delay-200 { animation-delay: 0.2s; }
-        .anim-delay-300 { animation-delay: 0.3s; }
-        .anim-delay-400 { animation-delay: 0.4s; }
-        .anim-delay-500 { animation-delay: 0.5s; }
+        .reveal-slide-up {
+            will-change: transform, opacity;
+            animation: revealSlideUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+        }
+
+        .anim-delay-100 { animation-delay: 0.08s !important; }
+        .anim-delay-200 { animation-delay: 0.16s !important; }
+        .anim-delay-300 { animation-delay: 0.26s !important; }
+        .anim-delay-400 { animation-delay: 0.38s !important; }
+        .anim-delay-500 { animation-delay: 0.52s !important; }
+        .anim-delay-600 { animation-delay: 0.68s !important; }
+        .anim-delay-700 { animation-delay: 0.86s !important; }
 
         /* Skeleton Loading Effect */
         .skeleton-box {
@@ -262,6 +418,27 @@
 
         @keyframes shimmer {
             100% { transform: translateX(100%); }
+        }
+
+        /* Second Visit: Block entry animations for body content ONLY */
+        .page-visited .reveal-premium,
+        .page-visited .reveal-depth,
+        .page-visited .reveal-soft,
+        .page-visited .reveal-slide-up {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            transition: none !important;
+        }
+
+        /* Branding IMMUNITY: The big brand reveal ALWAYS plays for a premium first impression */
+        .page-visited .huge-brand-text {
+            animation: revealTrae 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards !important;
+        }
+
+        /* Navbar must ALWAYS work regardless of visit count */
+        .navbar {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
         /* Premium Toast Notifications */
@@ -415,15 +592,22 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .footer {
-            background-color: var(--footer-bg);
-            color: var(--text-main);
-            padding: 20px 0;
-            /* More compact footer padding */
-            margin-top: 40px;
-            /* Reduced margin */
-            border-top: 1px solid var(--glass-border);
-            transition: all 0.3s ease;
+        /* Skip animations if page already seen in this session (EXCLUDES infinite loops/blobs) */
+        /* Forces 'complete stage' instantly on repeat visits */
+        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor), 
+        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor)::before, 
+        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor)::after {
+            animation: none !important;
+            transition: none !important;
+            opacity: 1 !important;
+            transform: none !important;
+            filter: none !important;
+            visibility: visible !important;
+        }
+
+        /* Hide cursor on repeat visits */
+        html.page-visited #cursor {
+            display: none !important;
         }
 
         /* Theme Toggle Button Styles */
@@ -500,6 +684,27 @@
             color: white !important;
             background: #1e293b !important;
         }
+
+        /* Vivid Navigation Icons */
+        .nav-link i {
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .nav-link:hover i {
+            transform: translateY(-2px) scale(1.1);
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+        }
+
+        .icon-home { color: #3b82f6 !important; }      /* Blue */
+        .icon-docs { color: #10b981 !important; }      /* Emerald */
+        .icon-train { color: #a855f7 !important; }     /* Purple */
+        .icon-predict { color: #f59e0b !important; }   /* Amber */
+        .icon-signup { color: #6366f1 !important; }    /* Indigo */
+        .icon-login { color: #3b82f6 !important; }     /* Blue */
+        .icon-logout { color: #ef4444 !important; }    /* Red */
+        .icon-broom { color: #06b6d4 !important; }     /* Cyan */
+        .icon-user { color: var(--primary-color) !important; }
 
         .hero-section {
             background: transparent;
@@ -673,20 +878,20 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1"></i> Home</a>
+                        <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1 icon-home"></i> Home</a>
                     </li>
                     {% if session.get('user') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('documentation') }}"><i class="fas fa-book me-1"></i>
+                        <a class="nav-link" href="{{ url_for('documentation') }}"><i class="fas fa-book me-1 icon-docs"></i>
                             Documentation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('train_view') }}"><i class="fas fa-microchip me-1"></i>
+                        <a class="nav-link" href="{{ url_for('train_view') }}"><i class="fas fa-microchip me-1 icon-train"></i>
                             Train Model</a>
                     </li>
                     {% if page_type != 'train' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1"></i>
+                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1 icon-predict"></i>
                             Predict</a>
                     </li>
                     {% endif %}
@@ -694,7 +899,7 @@
                         <a class="nav-link dropdown-toggle fw-bold d-flex align-items-center" href="#" id="userDropdown" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false"
                             style="color: var(--primary-color) !important;">
-                            <i class="fas fa-user-circle me-1"></i> {{ session.get('user') }}
+                            <i class="fas fa-user-circle me-1 icon-user"></i> {{ session.get('user') }}
                             {% if session.get('is_ultimate') %}
                             <span class="badge rounded-pill bg-danger border border-light ms-2 p-1 px-2" style="font-size: 0.5rem; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);">MASTER</span>
                             {% endif %}
@@ -719,11 +924,11 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('Signup') }}"><i class="fas fa-user-plus me-1"></i>
+                        <a class="nav-link" href="{{ url_for('Signup') }}"><i class="fas fa-user-plus me-1 icon-signup"></i>
                             Sign Up</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1"></i>
+                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1 icon-login"></i>
                             Login</a>
                     </li>
                     {% endif %}
@@ -731,7 +936,7 @@
                         <div class="d-flex align-items-center h-100 ms-lg-2">
                             <button id="clearAppData" class="btn btn-link nav-link p-2 me-1"
                                 title="Clear App Data & Refresh" style="font-size: 1.1rem;">
-                                <i class="fas fa-broom"></i>
+                                <i class="fas fa-broom icon-broom"></i>
                             </button>
                             <div class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">
                                 <i class="fas fa-moon"></i>
@@ -739,31 +944,67 @@
                         </div>
                         <script>
                             (function () {
-                                const savedTheme = localStorage.getItem('theme');
-                                const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                                const currentTheme = savedTheme ? savedTheme : (systemPrefersDark ? 'dark' : 'light');
                                 const toggle = document.getElementById('theme-toggle');
-                                const icon = toggle.querySelector('i');
-                                const navbar = toggle.closest('.navbar');
-
-                                if (currentTheme === 'dark') {
-                                    navbar.classList.add('navbar-dark');
-                                    navbar.classList.remove('navbar-light');
-                                } else {
-                                    navbar.classList.add('navbar-light');
-                                    navbar.classList.remove('navbar-dark');
+                                const icon = toggle?.querySelector('i');
+                                const html = document.documentElement;
+                                const navbar = toggle?.closest('.navbar');
+                                
+                                function getTheme() {
+                                    return localStorage.getItem('theme') || 'auto';
                                 }
 
-                                if (savedTheme === 'dark') {
-                                    icon.className = 'fas fa-moon';
-                                    toggle.title = "Theme: Dark Mode";
-                                } else if (savedTheme === 'light') {
-                                    icon.className = 'fas fa-sun';
-                                    toggle.title = "Theme: Light Mode";
-                                } else {
-                                    icon.className = 'fas fa-desktop';
-                                    toggle.title = "Theme: System Sync";
+                                function updateTheme(theme) {
+                                    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                                    const effectivelyDark = theme === 'dark' || (theme === 'auto' && systemDark);
+                                    
+                                    if (effectivelyDark) {
+                                        html.classList.remove('light-mode');
+                                        if (navbar) {
+                                            navbar.classList.add('navbar-dark');
+                                            navbar.classList.remove('navbar-light');
+                                        }
+                                    } else {
+                                        html.classList.add('light-mode');
+                                        if (navbar) {
+                                            navbar.classList.add('navbar-light');
+                                            navbar.classList.remove('navbar-dark');
+                                        }
+                                    }
+
+                                    // Update Icon and Title Safely
+                                    if (!icon || !toggle) return;
+                                    
+                                    if (theme === 'dark') {
+                                        icon.className = 'fas fa-moon';
+                                        toggle.title = 'Theme: Dark Mode';
+                                    } else if (theme === 'light') {
+                                        icon.className = 'fas fa-sun';
+                                        toggle.title = 'Theme: Light Mode';
+                                    } else {
+                                        icon.className = 'fas fa-desktop';
+                                        toggle.title = 'Theme: System Sync';
+                                    }
                                 }
+
+                                // Initial Application
+                                updateTheme(getTheme());
+
+                                // Listen for System Changes
+                                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                                    if (getTheme() === 'auto') updateTheme('auto');
+                                });
+
+                                // 3-State Toggle Click (Auto -> Light -> Dark -> Auto)
+                                toggle?.addEventListener('click', () => {
+                                    const current = getTheme();
+                                    let next;
+                                    if (current === 'auto') next = 'light';
+                                    else if (current === 'light') next = 'dark';
+                                    else next = 'auto';
+
+                                    localStorage.setItem('theme', next);
+                                    updateTheme(next);
+                                });
                             })();
                         </script>
                     </li>
@@ -773,86 +1014,41 @@
     </nav>
 
     <!-- Content -->
-    <main style="padding-top: 65px;">
-        {% block content %}{% endblock %}
-    </main>
+    <div class="main-surface">
+        <!-- Main Core -->
+        <main class="flex-shrink-0">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 
-    <!-- Footer -->
-    <footer class="footer text-center">
-        <div class="container">
-            <p class="mb-0">&copy; 2026 Cyber Attack Prediction Project | Powered by ML & GenAI</p>
+    <!-- Trae Reveal Footer -->
+    <footer class="footer">
+        <div class="huge-brand-text">CYBERSHIELD AI</div>
+        <div class="container footer-content text-center">
+            <div class="row align-items-center mb-4">
+                <div class="col-md-4 text-start">
+                    <h4 class="fw-bold mb-0">Advanced Threat Intelligence</h4>
+                    <p class="xx-small text-muted mb-0">Intelligence meeting Infrastructure.</p>
+                </div>
+                <div class="col-md-4 text-center">
+                    <p class="mb-0 small opacity-75">&copy; 2026 Cyber Attack Prediction | Powered by ML & GenAI</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="#" class="footer-link mx-2">Terms</a>
+                    <a href="#" class="footer-link mx-2">Privacy</a>
+                    <a href="#" class="footer-link mx-2">Contact</a>
+                </div>
+            </div>
+            <div class="mt-2">
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top ↑</button>
+            </div>
         </div>
     </footer>
-
     <!-- Bootstrap 5 JS Bundle -->
     <div id="toastContainer"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Theme Toggle Logic
-        const themeToggle = document.getElementById('theme-toggle');
-        const themeIcon = themeToggle.querySelector('i');
-
-        function updateThemeIcon(savedState) {
-            if (savedState === 'light') {
-                themeIcon.className = 'fas fa-sun';
-                themeToggle.title = "Theme: Light Mode";
-            } else if (savedState === 'dark') {
-                themeIcon.className = 'fas fa-moon';
-                themeToggle.title = "Theme: Dark Mode";
-            } else {
-                themeIcon.className = 'fas fa-desktop';
-                themeToggle.title = "Theme: System Sync";
-            }
-        }
-
-        function setTheme(state, isManual = true) {
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const effectiveTheme = (state && state !== 'auto') ? state : (systemPrefersDark ? 'dark' : 'light');
-            
-            document.documentElement.setAttribute('data-theme', effectiveTheme);
-            const navbar = document.querySelector('.navbar');
-
-            if (effectiveTheme === 'light') {
-                navbar.classList.replace('navbar-dark', 'navbar-light');
-            } else {
-                navbar.classList.replace('navbar-light', 'navbar-dark');
-            }
-
-            if (isManual) {
-                if (!state || state === 'auto') {
-                    localStorage.removeItem('theme');
-                } else {
-                    localStorage.setItem('theme', state);
-                }
-            }
-            updateThemeIcon(state || 'auto');
-        }
-
-        // Listen for system theme changes (only affects 'auto' mode)
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-            if (!localStorage.getItem('theme')) {
-                setTheme('auto', false);
-            }
-        });
-
-        // Tab Synchronization
-        window.addEventListener('storage', (e) => {
-            if (e.key === 'theme') {
-                setTheme(e.newValue || 'auto', false);
-            }
-        });
-
-        // Toggle sequence: light -> dark -> auto -> light...
-        themeToggle.addEventListener('click', () => {
-            const currentState = localStorage.getItem('theme') || 'auto';
-            let nextState;
-            if (currentState === 'light') nextState = 'dark';
-            else if (currentState === 'dark') nextState = 'auto';
-            else nextState = 'light';
-            
-            setTheme(nextState);
-        });
 
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
@@ -908,6 +1104,14 @@
             const element = document.getElementById(elementId);
             const cursor = document.getElementById('cursor');
             if (!element) return;
+
+            // Fast-Skip for repeat visits
+            const currentPath = window.location.pathname;
+            if (sessionStorage.getItem('visited_' + currentPath)) {
+                element.textContent = text;
+                if (cursor) cursor.style.display = 'none';
+                return;
+            }
 
             let charIndex = 0;
             setTimeout(() => {
@@ -967,12 +1171,39 @@
             }
         }
 
-        // Save on navigate/unload
-        window.addEventListener('beforeunload', saveScrollPositions);
+        // Save on navigate/unload — single unified handler to avoid race conditions
+        window.addEventListener('beforeunload', function () {
+            // 1. Save scroll positions first
+            saveScrollPositions();
+
+            // 2. Collect keys we want to KEEP
+            const keysToKeep = {};
+            const theme = localStorage.getItem('theme');
+            if (theme) keysToKeep['theme'] = theme;
+
+            // Keep all scroll keys
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.includes('-scroll')) {
+                    keysToKeep[key] = localStorage.getItem(key);
+                }
+            }
+
+            // 3. Clear and restore only the keys we want
+            localStorage.clear();
+            for (const [k, v] of Object.entries(keysToKeep)) {
+                localStorage.setItem(k, v);
+            }
+        });
         
         // Restore on load
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(restoreScrollPositions, 100); // Slight delay for dynamic content
+            setTimeout(restoreScrollPositions, 100); 
+            // Mark current page as 'visited' for sessionStorage
+            sessionStorage.setItem('visited_' + window.location.pathname, 'true');
+            if (sessionStorage.getItem('visited_' + window.location.pathname)) {
+                document.body.classList.add('page-visited');
+            }
         });
 
         // Clear App Data Action
@@ -992,6 +1223,13 @@
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+
+        // Mark current page as 'seen' for this session after short delay
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                sessionStorage.setItem('visited_' + window.location.pathname, 'true');
+            }, 1000);
         });
     </script>
     {% block extra_js %}{% endblock %}

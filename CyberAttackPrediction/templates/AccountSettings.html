@@ -13,7 +13,14 @@
         border: 1px solid var(--glass-border);
         border-radius: 30px;
         box-shadow: var(--premium-shadow);
-        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, opacity;
+        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes fadeInUp {
+        0%   { opacity: 0; transform: translateY(28px) scale(0.98); }
+        65%  { opacity: 1; transform: translateY(-4px) scale(1.005); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     .form-control {

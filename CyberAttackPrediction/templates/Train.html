@@ -66,6 +66,100 @@
     [data-theme="light"] .accuracy-value {
         text-shadow: 0 2px 10px rgba(59, 130, 246, 0.15);
     }
+
+    /* Custom Dataset Styles */
+    .dataset-toggle-container {
+        display: flex;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 50px;
+        padding: 4px;
+        margin-bottom: 2rem;
+        border: 1px solid var(--glass-border);
+    }
+
+    .dataset-toggle-btn {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--text-main);
+        padding: 0.6rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        opacity: 0.6;
+    }
+
+    .dataset-toggle-btn.active {
+        background: var(--primary-color);
+        color: white;
+        opacity: 1;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .upload-zone {
+        border: 2px dashed var(--glass-border);
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .upload-zone:hover, .upload-zone.dragover {
+        border-color: var(--primary-color);
+        background: rgba(59, 130, 246, 0.05);
+    }
+
+    .upload-zone i {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+        opacity: 0.7;
+    }
+
+    .file-preview {
+        background: rgba(59, 130, 246, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: none;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    [data-theme="light"] .dataset-toggle-container {
+        background: rgba(0, 0, 0, 0.05);
+    }
+
+    /* Sliding Transition Styles */
+    .mode-slider-container {
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+    }
+
+    .mode-slider {
+        display: flex;
+        width: 200%;
+        transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+        will-change: transform;
+    }
+
+    .mode-slide {
+        width: 50%;
+        padding-bottom: 2rem;
+        flex-shrink: 0;
+    }
+
+    .mode-slider.custom-active {
+        transform: translateX(-50%);
+    }
+
+    #defaultModeContainer, #customModeContainer {
+        display: block !important; /* Managed by the slider now */
+    }
 </style>
 {% endblock %}
 
@@ -95,27 +189,63 @@
                 <div class="col-md-5">
                     <div class="h-100 d-flex flex-column">
                         <h5 class="dynamic-text mb-3 small fw-bold text-uppercase opacity-75">Control Center</h5>
-                        <div class="glass-card p-4 flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center">
-                            <i class="fas fa-database mb-3 h2 text-primary opacity-50"></i>
-                            <p class="small dynamic-muted mb-4">Current Dataset: <strong>NSL-KDD (Standardized)</strong></p>
+                        <div class="glass-card p-4 flex-grow-1 d-flex flex-column">
+                            <!-- Mode Toggle -->
+                            <div class="dataset-toggle-container">
+                                <button type="button" class="dataset-toggle-btn active" id="modeDefault">Default (NSL-KDD)</button>
+                                <button type="button" class="dataset-toggle-btn" id="modeCustom">Custom CSV</button>
+                            </div>
+
+                            <div class="mode-slider-container">
+                                <div class="mode-slider" id="modeSlider">
+                                    <div class="mode-slide text-center" id="defaultModeContainer">
+                                        <i class="fas fa-database mb-3 h2 text-primary opacity-50"></i>
+                                        <p class="small dynamic-muted mb-4 px-2">Ready to re-train using the standard <strong>NSL-KDD</strong> reference dataset.</p>
+                                    </div>
+
+                                    <div class="mode-slide text-center" id="customModeContainer">
+                                        <div class="upload-zone" id="dropZone">
+                                            <input type="file" id="trainingFile" class="d-none" accept=".csv">
+                                            <i class="fas fa-file-upload"></i>
+                                            <div class="small dynamic-text fw-bold">Click or Drop Dataset</div>
+                                            <div class="xx-small dynamic-muted mt-1">Accepts .csv with 'labels' column</div>
+                                            <div class="mt-2">
+                                                <a href="/DownloadSample" class="text-primary xx-small text-decoration-none fw-bold hover-underline">
+                                                    <i class="fas fa-download me-1"></i>Download Sample CSV
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <div id="filePreview" class="file-preview animate__animated animate__fadeIn">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center overflow-hidden">
+                                                    <i class="fas fa-file-csv me-2 mb-0 h5 text-primary"></i>
+                                                    <span id="fileName" class="xx-small dynamic-text text-truncate"></span>
+                                                </div>
+                                                <button type="button" class="btn btn-link btn-sm p-0 text-danger" id="removeFile">
+                                                    <i class="fas fa-times-circle"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            {% if model_ready %}
-                            <div class="alert alert-info bg-primary-light border-0 small w-100 mb-3 py-2 dynamic-text rounded-3">
-                                <i class="fas fa-check-circle me-1 text-primary"></i> Trained model active.
-                            </div>
-                            <div class="d-flex flex-column gap-2 w-100">
-                                <a href="{{ url_for('predictView') }}" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg text-white">
-                                    <i class="fas fa-search me-2"></i>Proceed to Prediction
-                                </a>
-                                <button id="startTrainingBtn" class="btn btn-outline-dynamic btn-sm w-100 py-2 rounded-pill mt-2">
-                                    <i class="fas fa-sync me-2"></i>Re-Train Model
+                            <div class="mt-auto pt-3">
+                                {% if model_ready %}
+                                <div class="alert alert-info bg-primary-light border-0 small w-100 mb-3 py-2 dynamic-text rounded-3">
+                                    <i class="fas fa-check-circle me-1 text-primary"></i> Current model is valid.
+                                </div>
+                                <div class="d-flex flex-column gap-2 w-100">
+                                    <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg text-white">
+                                        <i class="fas fa-sync me-2"></i>Re-Train Now
+                                    </button>
+                                </div>
+                                {% else %}
+                                <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg">
+                                    <i class="fas fa-play me-2"></i>Begin Training
                                 </button>
+                                {% endif %}
                             </div>
-                            {% else %}
-                            <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg">
-                                <i class="fas fa-play me-2"></i>Start Re-Training
-                            </button>
-                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -161,96 +291,117 @@
         const resultsArea = document.getElementById('resultsArea');
         const statusBadge = document.getElementById('trainingStatus');
         const startBtn = document.getElementById('startTrainingBtn');
+        const modeDefault = document.getElementById('modeDefault');
+        const modeCustom = document.getElementById('modeCustom');
+        const defaultContainer = document.getElementById('defaultModeContainer');
+        const customContainer = document.getElementById('customModeContainer');
+        const dropZone = document.getElementById('dropZone');
+        const trainingFile = document.getElementById('trainingFile');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
 
-        // --- GLOBAL SCROLL TRACKER ---
-        function restoreTrainState() {
-            const cachedLogs = localStorage.getItem('train-logs');
-            const cachedAccuracy = localStorage.getItem('train-accuracy');
-            const cachedClasses = localStorage.getItem('train-classes');
-            const cachedStatus = localStorage.getItem('train-status');
+        let selectedFile = null;
 
-            if (cachedLogs && logWindow) {
-                logWindow.innerHTML = cachedLogs;
-                logWindow.scrollTop = logWindow.scrollHeight;
+        const modeSlider = document.getElementById('modeSlider');
+
+        // Toggle Modes
+        modeDefault.onclick = () => {
+            modeDefault.classList.add('active');
+            modeCustom.classList.remove('active');
+            modeSlider.classList.remove('custom-active');
+        };
+
+        modeCustom.onclick = () => {
+            modeCustom.classList.add('active');
+            modeDefault.classList.remove('active');
+            modeSlider.classList.add('custom-active');
+        };
+
+        // File Selection
+        dropZone.onclick = () => trainingFile.click();
+        trainingFile.onchange = (e) => handleFile(e.target.files[0]);
+        
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('dragover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('dragover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            handleFile(e.dataTransfer.files[0]);
+        };
+
+        function handleFile(file) {
+            if (!file) return;
+            if (!file.name.endsWith('.csv')) {
+                showToast('Please upload a valid .csv file', 'error');
+                return;
             }
-            if (cachedAccuracy && resultsArea) {
-                document.getElementById('finalAccuracy').textContent = cachedAccuracy;
-                resultsArea.style.display = 'block';
-            }
-            if (cachedClasses && document.getElementById('classListing')) {
-                document.getElementById('classListing').innerHTML = cachedClasses;
-            }
-            if (cachedStatus && statusBadge) {
-                try {
-                    const status = JSON.parse(cachedStatus);
-                    statusBadge.className = status.className;
-                    statusBadge.innerHTML = status.inner;
-                } catch(e) {}
-            }
+            selectedFile = file;
+            fileName.textContent = file.name;
+            filePreview.style.display = 'block';
         }
+
+        removeFile.onclick = (e) => {
+            e.stopPropagation();
+            selectedFile = null;
+            filePreview.style.display = 'none';
+            trainingFile.value = '';
+        };
 
         function addLog(msg, type = 'info') {
             if (!logWindow) return;
             const entry = document.createElement('div');
             entry.className = 'log-entry dynamic-muted reveal-premium';
-            entry.innerHTML = `<span class="text-primary fw-bold">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
+            const colorClass = type === 'error' ? 'text-danger' : (type === 'success' ? 'text-success' : 'text-primary');
+            entry.innerHTML = `<span class="${colorClass} fw-bold">[${new Date().toLocaleTimeString()}]</span> ${msg}`;
             logWindow.appendChild(entry);
             logWindow.scrollTop = logWindow.scrollHeight;
-            
-            // Cache current logs
-            localStorage.setItem('train-logs', logWindow.innerHTML);
         }
-
-        // Restore on load
-        restoreTrainState();
 
         if (startBtn) {
             startBtn.addEventListener('click', async function() {
-                // Confirmation for re-training
-                const isRetrain = startBtn.textContent.includes('Re-Train');
-                if (isRetrain && !confirm('Are you sure you want to re-train the model? This will overwrite the current active model.')) {
+                const isCustom = modeCustom.classList.contains('active');
+                if (isCustom && !selectedFile) {
+                    showToast('Please upload a dataset first!', 'warning');
                     return;
                 }
 
-                showToast('Starting model training sequence...', 'info');
-                
-                // Clear cache for fresh run
-                localStorage.removeItem('train-logs');
-                localStorage.removeItem('train-accuracy');
-                localStorage.removeItem('train-classes');
-                localStorage.removeItem('train-status');
-                
+                if (!confirm('Start training sequence? Current model will be replaced.')) return;
+
                 startBtn.disabled = true;
                 resultsArea.style.display = 'none';
                 logWindow.innerHTML = '';
-                
                 statusBadge.className = 'status-badge status-running';
                 statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin me-1 small"></i> Training...';
 
                 addLog("Initializing training environment...");
-                addLog("Loading NSL-KDD dataset (20,000 samples)...");
+                
+                const formData = new FormData();
+                if (isCustom) {
+                    formData.append('training_data', selectedFile);
+                    addLog(`Loading custom dataset: ${selectedFile.name}...`);
+                } else {
+                    addLog("Loading default NSL-KDD dataset (20,000 samples)...");
+                }
                 
                 try {
                     const response = await fetch("{{ url_for('TrainAction') }}", {
-                        method: 'POST'
+                        method: 'POST',
+                        body: formData
                     });
-                    
-                    if (!response.ok) throw new Error(`Server returned ${response.status}: ${response.statusText}`);
                     
                     const data = await response.json();
                     
                     if (data.status === 'success') {
-                        showToast('Model training completed successfully!', 'success');
+                        showToast('Model training complete!', 'success');
                         addLog("Processing dataset features...");
+                        await new Promise(r => setTimeout(r, 600));
+                        addLog("Fitting AI Model (Random Forest)...");
                         await new Promise(r => setTimeout(r, 800));
-                        addLog("Fitting Random Forest Classifier...");
-                        await new Promise(r => setTimeout(r, 1200));
-                        addLog(`Success! Accuracy achieved: ${data.accuracy}%`, 'success');
+                        addLog(`Success! Accuracy: ${data.accuracy}%`, 'success');
+                        addLog(`Dataset used: ${data.dataset_used}`, 'info');
                         
-                        const finalAcc = data.accuracy + '%';
-                        document.getElementById('finalAccuracy').textContent = finalAcc;
-                        localStorage.setItem('train-accuracy', finalAcc);
-
+                        document.getElementById('finalAccuracy').textContent = data.accuracy + '%';
                         const classListing = document.getElementById('classListing');
                         classListing.innerHTML = '';
                         data.classes.forEach(cls => {
@@ -259,25 +410,19 @@
                             badge.textContent = cls.toUpperCase();
                             classListing.appendChild(badge);
                         });
-                        localStorage.setItem('train-classes', classListing.innerHTML);
                         
                         resultsArea.style.display = 'block';
                         statusBadge.className = 'status-badge status-success';
                         statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
-                        
-                        localStorage.setItem('train-status', JSON.stringify({
-                            className: statusBadge.className,
-                            inner: statusBadge.innerHTML
-                        }));
                     } else {
-                        showToast(`Training aborted: ${data.message}`, 'error');
-                        addLog(`Error: ${data.message}`, 'error');
+                        showToast(`Training Failed: ${data.message}`, 'error');
+                        addLog(`CRITICAL ERROR: ${data.message}`, 'error');
                         statusBadge.className = 'status-badge status-idle';
-                        statusBadge.innerHTML = '<i class="fas fa-times-circle me-1 small"></i> Training Failed';
+                        statusBadge.innerHTML = '<i class="fas fa-times-circle me-1 small"></i> Training Aborted';
                     }
                 } catch (error) {
-                    showToast(`Network failure: ${error.message}`, 'error');
-                    addLog(`Network error: ${error.message}`, 'error');
+                    showToast(`System Error: ${error.message}`, 'error');
+                    addLog(`System Error: ${error.message}`, 'error');
                     statusBadge.className = 'status-badge status-idle';
                     statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1 small"></i> Error';
                 } finally {

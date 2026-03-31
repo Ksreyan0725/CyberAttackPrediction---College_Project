@@ -461,12 +461,38 @@ def train_view():
     
     return render_template('Train.html', page_type='train', model_ready=model_ready)
 
+@app.route('/DownloadSample')
+def DownloadSample():
+    if 'user' not in session:
+        return redirect(url_for('index'))
+    
+    dataset_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dataset")
+    return send_from_directory(dataset_dir, "sample_train.csv", as_attachment=True)
+
 @app.route('/TrainAction', methods=['POST'])
 def TrainAction():
     if 'user' not in session:
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
     
-    result = run_training()
+    # Check if a custom file was uploaded
+    custom_path = None
+    if 'training_data' in request.files:
+        file = request.files['training_data']
+        if file.filename != '':
+            # Ensure Dataset directory exists
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            dataset_dir = os.path.join(base_dir, "Dataset")
+            if not os.path.exists(dataset_dir):
+                os.makedirs(dataset_dir)
+            
+            custom_path = os.path.join(dataset_dir, "custom_train.csv")
+            try:
+                file.save(custom_path)
+            except Exception as e:
+                return jsonify({"status": "error", "message": f"Failed to save training file: {str(e)}"})
+    
+    # Call training with optional path
+    result = run_training(dataset_path=custom_path)
     
     # If training was successful, reload the model in memory
     if result.get('status') == 'success':
