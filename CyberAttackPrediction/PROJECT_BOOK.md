@@ -10,7 +10,39 @@ The goal of this project is to analyze network traffic patterns across multiple 
 
 ---
 
-## 2. Notebook Roadmap: Extension File (`ExtensionCyberAttack.ipynb`)
+## 2. Project Architecture & File Structure
+
+The project is organized into a modular structure to separate data analysis (Jupyter), core logic (Python), and the user interface (Flask).
+
+### Core Directory Map
+
+- **`/` (Root)**:
+  - `Main.py`: The heart of the application. Handles Flask routing, session logic, and real-time inference.
+  - `train_model.py`: Utility script to re-train the Random Forest model and generate the `.pkl` artifact.
+  - `validate_pipeline.py`: Sanity check script for data processing and model compatibility.
+  - `PROJECT_BOOK.md`: Technical documentation and project guide (The file you are reading).
+  - `users.json`: Persistent user database (Salted/Hashed).
+  - `saved_creds.json`: Encrypted local session cache for "Quick Access".
+  - `requirements.txt`: Python dependency manifest.
+  - `.env`: Environment configuration (API keys, Secret keys).
+- **`/model`**:
+  - `trained_rf_model.pkl`: Serialized model artifact (includes Scaler and Encoders).
+  - `*.hdf5`: Binary weight files for deep learning components.
+- **`/templates`**:
+  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems).
+  - `index.html`, `Predict.html`, `Train.html`: Page-specific templates.
+- **`/static`**:
+  - `images/`: High-resolution brand assets (`favicon.svg`, `five_pillars.png`, `roadmap.png`).
+  - `Dataset/`: Legacy data mirrors and documentation.
+- **`/Dataset`**:
+  - `kdd_train.csv`, `kdd_test.csv`: NSL-KDD source data.
+  - `DatasetLink.txt`: Remote mirror links for large datasets.
+- **`/scripts`**:
+  - **Internal Maintenance Tooling**: A repository of 40+ surgical scripts used for notebook indexing, SHAP debugging, visual alignment, and environment silencing.
+
+---
+
+## 3. Notebook Roadmap: Extension File (`ExtensionCyberAttack.ipynb`)
 
 Use this index to find specific logic and code steps in the Extension notebook.
 
@@ -325,6 +357,26 @@ The **CyberAttackPrediction** project is designed as a learning bridge from trad
 4. **Level 4: The Generative Layer (Explainable AI)**:
     - Integrating a Large Language Model (LLM) mindset to translate AI decisions into human-readable security reports.
     - Providing "Contextual Mitigations" and action plans instead of just binary alerts.
+
+---
+
+## 11. Dashboard UX & Stability (The Premium Layer)
+
+To ensure a "Best-in-Class" user experience, the web application implements several high-end interface patterns that prioritize both aesthetics and stability.
+
+1. **Liquid-Glass Design System**:
+    - **Visuals**: Uses 80px Gaussian blur with 50% opacity to create a "glassmorphic" depth effect.
+    - **Performance**: Leverages GPU-accelerated backdrop filters for smooth rendering even on mobile devices.
+2. **Synchronized System Reset**:
+    - **Mechanism**: The "Clear System Data" action is a dual-sync operation. It clears both the **Browser LocalStorage** and the **Server Flask Session** simultaneously.
+    - **Consistency**: This ensures that analysis results (the "View Results" pill) are 100% removed from both ends, providing a truly fresh dashboard on reload.
+3. **Immersive Focus Lock (Modal System)**:
+    - **UX Pattern**: When a settings or detail modal is active, the background dashboard is automatically **blurred** and **interactive-locked** (pointer-events disabled).
+    - **Benefit**: This prevents accidental background clicks and eliminates distracting hover effects, focusing the user entirely on the current decision.
+4. **One-Time Reveal Animations**:
+    - **Engine**: Powered by a high-performance **Intersection Observer**.
+    - **Stability**: Unlike standard CSS animations that might re-trigger during layout shifts, these "Reveals" only play once per page session.
+    - **UX**: This ensures the dashboard stays stable and "locked-in" even as the user opens/closes popups or interacts with filters.
 
 ---
 

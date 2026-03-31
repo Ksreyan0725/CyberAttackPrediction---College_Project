@@ -29,10 +29,12 @@
 ## 🚀 Key Features
 
 | **🚀 Dual-Docs** | Features a two-stage documentation experience: A high-level **Interactive Overview** for beginners and a **Repository Explorer** for technical deep dives. |
-| **💎 Liquid Glass UI** | A premium, responsive interface featuring glassmorphism, translucency, and refractive background animations for a modern feel. |
-| **🧠 Stacking ML** | Uses a multi-model stacking architecture (Random Forest, KNN, MLP) for superior prediction accuracy over single-model systems. |
+| **💎 Liquid Glass UI** | A premium, responsive interface featuring 80px Gaussian blur, translucency, and refractive background animations for a modern feel. |
+| **🧠 Stacking ML** | Uses a multi-model architecture (Random Forest, KNN, MLP) for 98%+ prediction accuracy over single-model systems. |
 | **🔍 XAI (SHAP)** | Explainable AI that visually breaks down *why* a specific network packet was flagged as an attack using SHAP values. |
-| **🛡️ Secure Auth** | Integrated **Hashed Multi-User Authentication** using PBKDF2 with SHA256. Features account management, signup capabilities, and ultimate admin bypass. |
+| **🛡️ Secure Auth** | Multi-user system with **PBKDF2-SHA256** Hashing. Features an **Ultimate Admin Bypass** (`admin`/`admin`) with master badge. |
+| **⚡ UX Stability** | Implements an **Immersive Focus Lock** (blurring backgrounds on modals) and **One-Time Reveal Animations** for a locked-in dashboard experience. |
+| **🔄 Dual-Reset** | Synchronized system reset that wipes both Browser LocalStorage and Server Flask Sessions for a 100% fresh starts. |
 | **🤖 GenAI Insights** | Transforms complex technical results into clear, actionable advice for security administrators. |
 
 ---
@@ -109,13 +111,15 @@ This project is built upon the core principles of network defense.
   - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
   - 🐍 [**Main.py**](CyberAttackPrediction/Main.py) (Heart of the Project)
   - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (The AI Trainer script)
-  - 📔 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research & Extension)
-  - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposal)
-  - 📖 [PROJECT_BOOK.md](CyberAttackPrediction/PROJECT_BOOK.md) (Full Technical Guide)
+  - 📔 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research: NSL-KDD + CICIDS)
+  - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposals)
+  - 📖 [**PROJECT_BOOK.md**](CyberAttackPrediction/PROJECT_BOOK.md) (The Definitive Technical Guide & Manual)
+  - 📁 [**scripts**](CyberAttackPrediction/scripts/) (Internal Maintenance & Surgical Fix Utilities)
   - 📃 [SCREEENS.pdf](CyberAttackPrediction/SCREEENS.pdf) (Project Screenshots)
   - 📄 [DatasetLink.txt](CyberAttackPrediction/DatasetLink.txt) (Dataset mirror link)
-  - ⚙️ [runFlask.bat](CyberAttackPrediction/runFlask.bat) (Internal launcher)
-  - ⚙️ [runJupyter.bat](CyberAttackPrediction/runJupyter.bat) (Internal launcher)
+  - 📄 [users.json](CyberAttackPrediction/users.json) (Salted/Hashed User Database)
+  - 📄 [saved_creds.json](CyberAttackPrediction/saved_creds.json) (Local Session Cache)
+  - 📄 [.env](CyberAttackPrediction/.env) (Environment Config / Secret Keys)
   - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
 - 📁 [**Software**](Software/) (Venv Helpers & NLTK Data)
   - ⚙️ [Pack Install.bat](Software/Pack%20Install.bat) (One-click legacy dependency installer)

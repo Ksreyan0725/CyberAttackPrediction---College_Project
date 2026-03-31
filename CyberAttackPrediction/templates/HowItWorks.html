@@ -4,20 +4,22 @@
 
 {% block extra_css %}
 <style>
+    /* Standardize layout for footer reveal */
+    html, body {
+        margin: 0;
+    }
+    
     body {
         background: var(--bg-gradient);
         background-attachment: fixed;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
     }
 
     main {
-        flex: 1;
+        min-height: 80vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 3rem 1rem;
+        padding: 5rem 1rem 4rem;
     }
 
     .info-card {

@@ -4,26 +4,23 @@
 
 {% block extra_css %}
 <style>
+    /* Standardize layout for footer reveal */
     html, body {
-        height: 100%;
         margin: 0;
     }
     
     body {
-        display: flex;
-        flex-direction: column;
         background: var(--bg-gradient);
         background-attachment: fixed;
     }
 
     main {
-        flex: 1;
+        min-height: calc(100vh - 100px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2rem 1rem;
+        padding: 2rem 1rem 4rem;
         position: relative;
-        overflow: hidden;
         z-index: 1;
     }
 

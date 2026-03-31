@@ -92,13 +92,29 @@ def predictView():
     if 'user' not in session:
         return redirect(url_for('UserLogin'))
     
+    # Check if model is actually ready before allowing prediction
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "model", "trained_rf_model.pkl")
+    if not os.path.exists(model_path):
+        flash("Model not found. Please train the model before running predictions.", "warning")
+        return redirect(url_for('train_view'))
+    
     # If reset is requested, clear the last result
     if request.args.get('reset') == 'true':
         session.pop('last_result', None)
         session.pop('last_page_type', None)
         return redirect(url_for('predictView'))
         
-    return render_template('Predict.html', page_type='input')
+    # Allow the UI to know if a result already exists in this session
+    last_result = session.get('last_result')
+    return render_template('Predict.html', page_type='input', last_result=last_result)
+
+@app.route('/api/clear-session', methods=['POST'])
+def clear_session():
+    """API endpoint to clear specific session results for system reset."""
+    session.pop('last_result', None)
+    session.pop('last_page_type', None)
+    return jsonify({"status": "success", "message": "Session data cleared successfully"})
 
 # --- Security & User Management ---
 USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
@@ -196,7 +212,7 @@ def UserLoginAction():
                 json.dump({"user": "admin", "pass": "admin"}, f)
             session['remembered'] = True
         flash("Ultimate Admin access granted!", "success")
-        return redirect(url_for('predictView'))
+        return redirect(url_for('train_view'))
 
     users = load_users()
     user_data = users.get(username)
@@ -212,7 +228,7 @@ def UserLoginAction():
             session['remembered'] = True
         
         flash(f"Welcome back, {username}!", "success")
-        return redirect(url_for('predictView'))
+        return redirect(url_for('train_view'))
     else:
         flash("Invalid username or password", "danger")
         return redirect(url_for('UserLogin'))
@@ -456,10 +472,13 @@ def train_view():
     if 'user' not in session:
         return redirect(url_for('UserLogin'))
     
-    # Check if a model has already been trained
-    model_ready = os.path.exists('trained_rf_model.pkl')
+    # Check if a model has already been trained using the standardized path
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(base_dir, "model", "trained_rf_model.pkl")
+    model_ready = os.path.exists(model_path)
     
-    return render_template('Train.html', page_type='train', model_ready=model_ready)
+    train_result = session.get('train_result')
+    return render_template('Train.html', page_type='train', model_ready=model_ready, train_result=train_result)
 
 @app.route('/DownloadSample')
 def DownloadSample():
@@ -494,9 +513,10 @@ def TrainAction():
     # Call training with optional path
     result = run_training(dataset_path=custom_path)
     
-    # If training was successful, reload the model in memory
+    # If training was successful, reload the model in memory and persist in session
     if result.get('status') == 'success':
         load_ml_model()
+        session['train_result'] = result
         
     return jsonify(result)
 

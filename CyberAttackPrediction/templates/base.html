@@ -30,36 +30,59 @@
     </script>
 
     <script>
-        // Global Premium Toast System
-        function showToast(message, type = 'info') {
+        // Global Premium Toast System (Smart Stacking & Deduplication)
+        let lastToastInfo = { message: '', time: 0 };
+
+        function showToast(message, type = 'info', details = null) {
             const container = document.getElementById('toastContainer');
             if (!container) return;
 
+            // 1. Smart Deduplication: Avoid 'Notificiation Wall' of same errors
+            const currentTime = Date.now();
+            if (message === lastToastInfo.message && (currentTime - lastToastInfo.time < 3000)) {
+                return; // Skip if same message within 3s
+            }
+            lastToastInfo = { message, time: currentTime };
+
+            // 2. Concurrency Limit: Max 3 visible toasts
+            const activeToasts = container.querySelectorAll('.premium-toast:not(.hide)');
+            if (activeToasts.length >= 3) {
+                const oldest = activeToasts[0];
+                oldest.classList.add('hide');
+                setTimeout(() => oldest.remove(), 500);
+            }
+
             const toast = document.createElement('div');
             toast.className = `premium-toast toast-${type}`;
-            
+            if (details) toast.classList.add('cursor-pointer');
+
             let icon = 'info-circle';
             if (type === 'success') icon = 'check-circle';
             if (type === 'error' || type === 'danger') icon = 'exclamation-circle';
             if (type === 'warning') icon = 'exclamation-triangle';
 
+            const subtext = details ? '<div class="xx-small opacity-75 mt-1 mt-n1"><i class="fas fa-search-plus me-1"></i>Click to view details</div>' : '';
+
             toast.innerHTML = `
                 <div class="toast-icon text-white"><i class="fas fa-${icon}"></i></div>
                 <div class="toast-body">
                     <div class="small fw-bold dynamic-text">${message}</div>
+                    ${subtext}
                 </div>
-                <button type="button" class="btn-close btn-close-white ms-2 small" style="font-size: 0.6rem;" onclick="this.parentElement.remove()"></button>
+                <button type="button" class="btn-close btn-close-white ms-2 small" style="font-size: 0.6rem;" onclick="event.stopPropagation(); this.parentElement.remove()"></button>
             `;
 
+            if (details) {
+                toast.onclick = () => {
+                    showDetailModal(type.toUpperCase() + ' DETAILS', `<div class="p-3 bg-dark-soft rounded-3 border-glass font-monospace text-break">${details}</div>`);
+                };
+            }
+
             container.appendChild(toast);
-            
-            // Force reflow
-            toast.offsetHeight;
-            
-            // Show
+            toast.offsetHeight; // Force reflow
             toast.classList.add('show');
 
-            // Auto hide
+            // Auto hide after 5s
             setTimeout(() => {
                 if (toast.parentElement) {
                     toast.classList.add('hide');
@@ -82,13 +105,17 @@
 
     <style>
         :root {
-            --primary-color: #007bff; /* Bright Neon Blue */
+            --primary-color: #007bff;
+            /* Bright Neon Blue */
             --secondary-color: #64748b;
             --dark-color: #0f172a;
             --light-color: #f8fafc;
-            --success-color: #20c997; /* Bright Mint Green */
-            --danger-color: #ff4757; /* Bright Coral Red */
-            --info-color: #00d2ff; /* Electric Cyan */
+            --success-color: #20c997;
+            /* Bright Mint Green */
+            --danger-color: #ff4757;
+            /* Bright Coral Red */
+            --info-color: #00d2ff;
+            /* Electric Cyan */
             --primary-rgb: 0, 123, 255;
             --info-rgb: 0, 210, 255;
 
@@ -97,23 +124,31 @@
             --footer-bg: #000;
             --brand-text-color: rgba(255, 255, 255, 0.04);
             --text-main: #e0e0e0;
-            --text-muted: #cbd5e1;
+            --text-muted: #94a3b8; /* Significantly brighter for dark mode legibility */
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-primary: #00ffa3;
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --navbar-bg: rgba(5, 5, 5, 0.7);
-            
+            --dropdown-bg: rgba(10, 25, 31, 0.5); /* 50% Opacity as requested */
+
             /* Responsive Footnote Branding */
-            --brand-final-opacity: 0.5; /* Smooth fade in dark mode */
+            --brand-final-opacity: 0.85;
+            /* Bright punch in dark mode */
             --brand-text-gradient: linear-gradient(to right, var(--primary-color), var(--info-color), var(--primary-color));
+            
+            /* High-Contrast Alert Overrides for Dark Mode */
+            --alert-bg-primary: rgba(59, 130, 246, 0.15);
+            --alert-text-primary: #60a5fa; /* Brighter Blue */
         }
 
         /* Light Mode Palette */
         .light-mode {
-            --primary-color: #007bff; /* Bright Neon Blue */
+            --primary-color: #007bff;
+            /* Bright Neon Blue */
             --primary-rgb: 0, 123, 255;
-            --info-color: #00d2ff; /* Electric Cyan */
+            --info-color: #00d2ff;
+            /* Electric Cyan */
             --info-rgb: 0, 210, 255;
             --success-color: #20c997;
             --danger-color: #ff4757;
@@ -129,10 +164,16 @@
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --navbar-bg: rgba(255, 255, 255, 0.7);
+            --dropdown-bg: rgba(255, 255, 255, 0.5); /* 50% Opacity as requested */
             
+            --alert-bg-primary: rgba(13, 110, 253, 0.1);
+            --alert-text-primary: #0d6efd;
+
             /* High Contrast Footer Branding */
-            --brand-final-opacity: 0.9; /* Harder, solid punch in light mode */
-            --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085); /* Deep royal navy to punch through the light background */
+            --brand-final-opacity: 0.9;
+            /* Harder, solid punch in light mode */
+            --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085);
+            /* Deep royal navy to punch through the light background */
         }
 
         html {
@@ -140,14 +181,25 @@
         }
 
         /* Universal Cinematic Theme Transition */
-        .theme-transitioning, .theme-transitioning *, .theme-transitioning *::before, .theme-transitioning *::after {
-            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        background 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        fill 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            transition-delay: 0s !important;
+        .theme-transitioning,
+        .theme-transitioning * {
+            transition: background-color 1s cubic-bezier(0.23, 1, 0.32, 1),
+                background 1s cubic-bezier(0.23, 1, 0.32, 1),
+                color 1s cubic-bezier(0.23, 1, 0.32, 1),
+                border-color 1s cubic-bezier(0.23, 1, 0.32, 1),
+                box-shadow 1s cubic-bezier(0.23, 1, 0.32, 1),
+                backdrop-filter 1s cubic-bezier(0.23, 1, 0.32, 1),
+                -webkit-backdrop-filter 1s cubic-bezier(0.23, 1, 0.32, 1),
+                fill 1s cubic-bezier(0.23, 1, 0.32, 1) !important;
+        }
+
+        /* Sea Wave Effect: Staggered Delay */
+        .theme-transitioning .main-surface {
+            transition-delay: 0.2s !important;
+        }
+
+        .theme-transitioning .footer {
+            transition-delay: 0.4s !important;
         }
 
         html,
@@ -155,8 +207,10 @@
             overflow-x: hidden;
             width: 100%;
             /* Hide scrollbar visually while maintaining scroll functionality */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE/Edge */
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
             margin: 0;
             padding: 0;
         }
@@ -186,7 +240,7 @@
             /* Ensure content clears the fixed navbar */
             padding-top: 80px;
             /* Create the 'Reveal Gap' matching the footer height */
-            margin-bottom: 350px; 
+            margin-bottom: 350px;
             box-shadow: 0 15px 50px var(--card-shadow);
             transition: background 0.4s ease, color 0.4s ease;
             /* Ensure the surface covers the fixed footer until the end */
@@ -206,7 +260,8 @@
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
-            padding-top: 40px; /* Lowers the content to eliminate top gap while leaving room for branding */
+            padding-top: 40px;
+            /* Lowers the content to eliminate top gap while leaving room for branding */
             overflow: hidden;
             border-top: 1px solid var(--glass-border);
             pointer-events: auto;
@@ -254,8 +309,10 @@
             font-weight: 900;
             letter-spacing: -0.2vw;
             line-height: 0.8;
-            pointer-events: auto; /* Restored for Spotlight Interaction */
-            z-index: 100; /* Stays below footer-content but above base layers */
+            pointer-events: auto;
+            /* Restored for Spotlight Interaction */
+            z-index: 100;
+            /* Stays below footer-content but above base layers */
             user-select: none;
             text-transform: uppercase;
             white-space: nowrap;
@@ -263,7 +320,7 @@
             opacity: 0;
             filter: blur(10px);
             transform: translateY(20px);
-            
+
             /* VIBRANT BASELINE: Guaranteed visibility regardless of theme */
             background: var(--brand-text-gradient);
             background-size: 200% auto;
@@ -274,19 +331,25 @@
         }
 
         /* Unified Theme Colors */
-        :root { --spotlight-color: #ffffff; /* Hot White Core */ }
-        [data-theme="light"], .light-mode { --spotlight-color: #00e5ff; /* Glowing Laser Cyan Core */ }
+        :root {
+            --spotlight-color: #ffffff;
+            /* Hot White Core */
+        }
+
+        [data-theme="light"],
+        .light-mode {
+            --spotlight-color: #00e5ff;
+            /* Glowing Laser Cyan Core */
+        }
 
         .huge-brand-text:hover {
             opacity: 1;
             filter: blur(0);
-            background-image: radial-gradient(
-                circle at var(--mouse-x, 50%) var(--mouse-y, 50%), 
-                var(--spotlight-color) 0%, 
-                var(--primary-color) 25%, 
-                var(--info-color) 60%,
-                rgba(var(--primary-rgb), 0.1) 100%
-            );
+            background-image: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+                    var(--spotlight-color) 0%,
+                    var(--primary-color) 25%,
+                    var(--info-color) 60%,
+                    rgba(var(--primary-rgb), 0.1) 100%);
             -webkit-background-clip: text;
             background-clip: text;
             background-size: 150% 150%;
@@ -294,8 +357,17 @@
         }
 
         @keyframes revealTraeFinal {
-            0% { opacity: 0; filter: blur(10px); transform: translateY(20px); }
-            100% { opacity: var(--brand-final-opacity); filter: blur(1px); transform: translateY(0); }
+            0% {
+                opacity: 0;
+                filter: blur(10px);
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: var(--brand-final-opacity);
+                filter: blur(1px);
+                transform: translateY(0);
+            }
         }
 
         .huge-brand-text.run-animation {
@@ -308,10 +380,12 @@
                 letter-spacing: -0.2vw;
                 bottom: 15px;
             }
+
             .footer {
                 height: 350px;
                 padding-bottom: 110px;
             }
+
             .main-surface {
                 margin-bottom: 350px;
             }
@@ -335,14 +409,22 @@
         }
 
         /* Staggered text column reveal from inside the display */
-        .footer-content.run-animation .col-md-4:nth-child(1) { transition-delay: 0.1s; }
-        .footer-content.run-animation .col-md-4:nth-child(2) { transition-delay: 0.2s; }
-        .footer-content.run-animation .col-md-4:nth-child(3) { transition-delay: 0.3s; }
+        .footer-content.run-animation .col-md-4:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .footer-content.run-animation .col-md-4:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .footer-content.run-animation .col-md-4:nth-child(3) {
+            transition-delay: 0.3s;
+        }
 
         /* Universal Text Classes Sync */
         .footer .text-muted {
             color: var(--text-muted) !important;
-            opacity: 0.7;
+            opacity: 0.85; /* Increased opacity for legibility */
         }
 
         .footer .fw-bold {
@@ -357,19 +439,28 @@
             color: var(--text-muted) !important;
         }
 
+        /* Semantic Alert Helpers */
+        .text-primary-dynamic { color: var(--alert-text-primary) !important; }
+        .bg-primary-light-dynamic { background-color: var(--alert-bg-primary) !important; }
+
         .navbar {
-            top: 16px !important; /* Emphasize the float with a generous top gap */
+            top: 16px !important;
+            /* Emphasize the float with a generous top gap */
             width: 95%;
             max-width: 1200px;
-            margin: 0 auto; /* Center the floating pill */
+            margin: 0 auto;
+            /* Center the floating pill */
             left: 0;
             right: 0;
-            border-radius: 50px; /* Semi pill shape */
-            border: 1px solid var(--glass-border) !important; /* Full border for the floating container */
+            border-radius: 50px;
+            /* Semi pill shape */
+            border: 1px solid var(--glass-border) !important;
+            /* Full border for the floating container */
             background: var(--navbar-bg);
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
-            padding: 0.45rem 2rem !important; /* Slimmer vertical height, maintaining pill curve */
+            padding: 0.45rem 2rem !important;
+            /* Slimmer vertical height, maintaining pill curve */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
         }
@@ -380,7 +471,8 @@
         }
 
         .navbar.navbar-hidden {
-            transform: translateY(calc(-100% - 24px)) !important; /* Pull up by full height PLUS enough to clear the 16px top offset */
+            transform: translateY(calc(-100% - 24px)) !important;
+            /* Pull up by full height PLUS enough to clear the 16px top offset */
         }
 
         .navbar-brand {
@@ -407,56 +499,118 @@
 
         /* Premium UI Animations — GPU-optimised, no blur repaints */
         @keyframes revealPremium {
-            0%   { opacity: 0; transform: translateY(24px) scale(0.97); }
-            60%  { opacity: 1; transform: translateY(-3px) scale(1.005); }
-            100% { opacity: 1; transform: translateY(0) scale(1); }
+            0% {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
+
+            60% {
+                opacity: 1;
+                transform: translateY(-3px) scale(1.005);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         @keyframes revealDepth {
-            0%   { opacity: 0; transform: perspective(800px) translateZ(-60px) translateY(12px); }
-            70%  { opacity: 1; transform: perspective(800px) translateZ(4px) translateY(-2px); }
-            100% { opacity: 1; transform: perspective(800px) translateZ(0) translateY(0); }
+            0% {
+                opacity: 0;
+                transform: perspective(800px) translateZ(-60px) translateY(12px);
+            }
+
+            70% {
+                opacity: 1;
+                transform: perspective(800px) translateZ(4px) translateY(-2px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: perspective(800px) translateZ(0) translateY(0);
+            }
         }
 
         @keyframes revealSoft {
-            0%   { opacity: 0; transform: scale(0.96) translateY(8px); }
-            70%  { opacity: 1; transform: scale(1.005); }
-            100% { opacity: 1; transform: scale(1); }
+            0% {
+                opacity: 0;
+                transform: scale(0.96) translateY(8px);
+            }
+
+            70% {
+                opacity: 1;
+                transform: scale(1.005);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
         @keyframes revealSlideUp {
-            0%   { opacity: 0; transform: translateY(32px); }
-            60%  { opacity: 1; transform: translateY(-4px); }
-            100% { opacity: 1; transform: translateY(0); }
+            0% {
+                opacity: 0;
+                transform: translateY(32px);
+            }
+            60% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        .reveal-premium {
+        /* One-Time Reveal Initial States (Hidden by default) */
+        .reveal-premium, .reveal-depth, .reveal-soft, .reveal-slide-up {
+            opacity: 0;
             will-change: transform, opacity;
+        }
+
+        /* The Animation Trigger (Added once by IntersectionObserver) */
+        .revealed.reveal-premium {
             animation: revealPremium 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
-
-        .reveal-depth {
-            will-change: transform, opacity;
+        .revealed.reveal-depth {
             animation: revealDepth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
-
-        .reveal-soft {
-            will-change: transform, opacity;
+        .revealed.reveal-soft {
             animation: revealSoft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
-
-        .reveal-slide-up {
-            will-change: transform, opacity;
+        .revealed.reveal-slide-up {
             animation: revealSlideUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
 
-        .anim-delay-100 { animation-delay: 0.08s !important; }
-        .anim-delay-200 { animation-delay: 0.16s !important; }
-        .anim-delay-300 { animation-delay: 0.26s !important; }
-        .anim-delay-400 { animation-delay: 0.38s !important; }
-        .anim-delay-500 { animation-delay: 0.52s !important; }
-        .anim-delay-600 { animation-delay: 0.68s !important; }
-        .anim-delay-700 { animation-delay: 0.86s !important; }
+        .anim-delay-100 {
+            animation-delay: 0.08s !important;
+        }
+
+        .anim-delay-200 {
+            animation-delay: 0.16s !important;
+        }
+
+        .anim-delay-300 {
+            animation-delay: 0.26s !important;
+        }
+
+        .anim-delay-400 {
+            animation-delay: 0.38s !important;
+        }
+
+        .anim-delay-500 {
+            animation-delay: 0.52s !important;
+        }
+
+        .anim-delay-600 {
+            animation-delay: 0.68s !important;
+        }
+
+        .anim-delay-700 {
+            animation-delay: 0.86s !important;
+        }
 
         /* Skeleton Loading Effect */
         .skeleton-box {
@@ -475,48 +629,95 @@
             bottom: 0;
             left: 0;
             transform: translateX(-100%);
-            background-image: linear-gradient(
-                90deg,
-                rgba(255, 255, 255, 0) 0,
-                rgba(255, 255, 255, 0.2) 20%,
-                rgba(255, 255, 255, 0.5) 60%,
-                rgba(255, 255, 255, 0)
-            );
+            background-image: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0) 0,
+                    rgba(255, 255, 255, 0.2) 20%,
+                    rgba(255, 255, 255, 0.5) 60%,
+                    rgba(255, 255, 255, 0));
             animation: shimmer 2s infinite;
             content: '';
         }
 
-        @keyframes shimmer {
-            100% { transform: translateX(100%); }
+        /* Immersive Backdrop Focus (Focus Lock) */
+        body.modal-open .main-surface,
+        body.modal-open .navbar {
+            pointer-events: none !important;
+            user-select: none !important;
+            filter: blur(2px) grayscale(0.15);
+            opacity: 0.9;
+            transition: filter 0.3s ease, opacity 0.3s ease;
         }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
         /* Custom Theme-Aware Tooltips (Borderless) */
         .tooltip-inner {
             background-color: var(--dark-color) !important;
             color: #ffffff !important;
             border: none !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4) !important;
             border-radius: 8px !important;
             padding: 8px 12px !important;
             font-size: 0.85rem !important;
             font-weight: 500 !important;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
-        .light-mode .tooltip-inner, [data-theme="light"] .tooltip-inner {
+        .light-mode .tooltip-inner,
+        [data-theme="light"] .tooltip-inner {
             background-color: var(--light-color) !important;
             color: var(--dark-color) !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15) !important;
         }
 
         /* Match Tooltip Arrows to Backgrounds */
-        .bs-tooltip-top .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before { border-top-color: var(--dark-color) !important; }
-        .bs-tooltip-bottom .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before { border-bottom-color: var(--dark-color) !important; }
-        .bs-tooltip-start .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before { border-left-color: var(--dark-color) !important; }
-        .bs-tooltip-end .tooltip-arrow::before, .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before { border-right-color: var(--dark-color) !important; }
+        .bs-tooltip-top .tooltip-arrow::before,
+        .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+            border-top-color: var(--dark-color) !important;
+            transition: border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
 
-        .light-mode .bs-tooltip-top .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before { border-top-color: var(--light-color) !important; }
-        .light-mode .bs-tooltip-bottom .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before { border-bottom-color: var(--light-color) !important; }
-        .light-mode .bs-tooltip-start .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before { border-left-color: var(--light-color) !important; }
-        .light-mode .bs-tooltip-end .tooltip-arrow::before, .light-mode .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before { border-right-color: var(--light-color) !important; }
+        .bs-tooltip-bottom .tooltip-arrow::before,
+        .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+            border-bottom-color: var(--dark-color) !important;
+            transition: border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .bs-tooltip-start .tooltip-arrow::before,
+        .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+            border-left-color: var(--dark-color) !important;
+            transition: border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .bs-tooltip-end .tooltip-arrow::before,
+        .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+            border-right-color: var(--dark-color) !important;
+            transition: border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        .light-mode .bs-tooltip-top .tooltip-arrow::before,
+        .light-mode .bs-tooltip-auto[data-popper-placement^="top"] .tooltip-arrow::before {
+            border-top-color: var(--light-color) !important;
+        }
+
+        .light-mode .bs-tooltip-bottom .tooltip-arrow::before,
+        .light-mode .bs-tooltip-auto[data-popper-placement^="bottom"] .tooltip-arrow::before {
+            border-bottom-color: var(--light-color) !important;
+        }
+
+        .light-mode .bs-tooltip-start .tooltip-arrow::before,
+        .light-mode .bs-tooltip-auto[data-popper-placement^="left"] .tooltip-arrow::before {
+            border-left-color: var(--light-color) !important;
+        }
+
+        .light-mode .bs-tooltip-end .tooltip-arrow::before,
+        .light-mode .bs-tooltip-auto[data-popper-placement^="right"] .tooltip-arrow::before {
+            border-right-color: var(--light-color) !important;
+        }
 
 
         /* Navbar must ALWAYS work regardless of visit count */
@@ -576,9 +777,20 @@
             font-size: 0.9rem;
         }
 
-        .toast-success .toast-icon { background: rgba(25, 135, 84, 0.2); color: #198754; }
-        .toast-error .toast-icon { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
-        .toast-info .toast-icon { background: rgba(13, 202, 240, 0.2); color: #0dcaf0; }
+        .toast-success .toast-icon {
+            background: rgba(25, 135, 84, 0.2);
+            color: #198754;
+        }
+
+        .toast-error .toast-icon {
+            background: rgba(220, 53, 69, 0.2);
+            color: #dc3545;
+        }
+
+        .toast-info .toast-icon {
+            background: rgba(13, 202, 240, 0.2);
+            color: #0dcaf0;
+        }
 
         .glass-card {
             background: var(--card-bg);
@@ -677,8 +889,8 @@
 
         /* Skip animations if page already seen in this session (EXCLUDES infinite loops/blobs) */
         /* Forces 'complete stage' instantly on repeat visits */
-        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor), 
-        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor)::before, 
+        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor),
+        html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor)::before,
         html.page-visited *:not(.blob):not(.animate__infinite):not([class*="infinite"]):not(#cursor)::after {
             animation: none !important;
             transition: none !important;
@@ -771,23 +983,99 @@
         /* Vivid Navigation Icons */
         .nav-link i {
             transition: all 0.3s ease;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
 
         .nav-link:hover i {
             transform: translateY(-2px) scale(1.1);
-            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
         }
 
-        .icon-home { color: #3b82f6 !important; }      /* Blue */
-        .icon-docs { color: #10b981 !important; }      /* Emerald */
-        .icon-train { color: #a855f7 !important; }     /* Purple */
-        .icon-predict { color: #f59e0b !important; }   /* Amber */
-        .icon-signup { color: #6366f1 !important; }    /* Indigo */
-        .icon-login { color: #3b82f6 !important; }     /* Blue */
-        .icon-logout { color: #ef4444 !important; }    /* Red */
-        .icon-broom { color: #06b6d4 !important; }     /* Cyan */
-        .icon-user { color: var(--primary-color) !important; }
+        .icon-home {
+            color: #3b82f6 !important;
+        }
+
+        /* Blue */
+        .icon-docs {
+            color: #10b981 !important;
+        }
+
+        /* Emerald */
+        .icon-train {
+            color: #a855f7 !important;
+        }
+
+        /* Purple */
+        .icon-predict {
+            color: #f59e0b !important;
+        }
+
+        /* Amber */
+        .icon-signup {
+            color: #6366f1 !important;
+        }
+
+        /* Indigo */
+        .icon-login {
+            color: #3b82f6 !important;
+        }
+
+        /* Blue */
+        .icon-logout {
+            color: #ef4444 !important;
+        }
+
+        /* Red */
+        .icon-broom {
+            color: #06b6d4 !important;
+        }
+
+        /* Cyan */
+        .icon-user {
+            color: var(--primary-color) !important;
+        }
+
+        /* --- High-End Dropdown Animations --- */
+        .navbar .dropdown-menu {
+            display: block;
+            visibility: hidden;
+            opacity: 0;
+            margin-top: 15px !important;
+            transition: opacity 0.3s ease, margin-top 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+            pointer-events: none;
+            right: 0; /* Match dropdown-menu-end behavior statically */
+            left: auto;
+        }
+
+        .navbar .dropdown-menu.show {
+            visibility: visible;
+            opacity: 1;
+            margin-top: 8px !important;
+            pointer-events: auto;
+        }
+
+        /* Hover enhancement for desktop if desired, but we follow Bootstrap's click behavior */
+        .dropdown-item {
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: rgba(var(--primary-rgb), 0.15) !important;
+            transform: translateX(5px);
+        }
+
+        /* --- Animated Dropdown Caret (Arrow) --- */
+        .dropdown-toggle::after {
+            display: inline-block;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            transform: rotate(0deg); /* Pointing down by default (Closed) - Standard */
+            vertical-align: middle;
+            margin-left: 0.5em;
+        }
+
+        .dropdown-toggle[aria-expanded="true"]::after {
+            transform: rotate(180deg); /* Pointing up when active (Open) - Standard */
+        }
 
         .hero-section {
             background: transparent;
@@ -923,13 +1211,19 @@
         /* Floating Fullscreen Button - Matched to Navbar Pill */
         .fullscreen-floating-btn {
             position: fixed;
-            top: 16px; /* Matches navbar exactly */
-            right: 16px; /* Pinned symmetrically to the right margin */
-            z-index: 1050; /* Render strictly above navbar */
-            border-radius: 50%; /* Perfect circle matched to navbar height */
-            width: 48px; /* Explicit structural height guarantees a perfect match */
+            top: 16px;
+            /* Matches navbar exactly */
+            right: 16px;
+            /* Pinned symmetrically to the right margin */
+            z-index: 1050;
+            /* Render strictly above navbar */
+            border-radius: 50%;
+            /* Perfect circle matched to navbar height */
+            width: 48px;
+            /* Explicit structural height guarantees a perfect match */
             height: 48px;
-            background: var(--navbar-bg); /* Identical texture */
+            background: var(--navbar-bg);
+            /* Identical texture */
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
@@ -938,17 +1232,20 @@
             align-items: center;
             justify-content: center;
             font-size: 1.15rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease;
             cursor: pointer;
         }
+
         .fullscreen-floating-btn i {
             transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
         }
+
         .fullscreen-floating-btn.spin-transition i {
             transform: scale(0.5) rotate(180deg);
             opacity: 0;
         }
+
         .fullscreen-floating-btn:hover {
             transform: scale(1.1);
             color: var(--info-color) !important;
@@ -964,38 +1261,45 @@
     data-logout-url="{{ url_for('Logout') }}">
 
     <!-- Floating Fullscreen Toggle -->
-    <button id="fullscreen-floating-toggle" class="fullscreen-floating-btn"
-        data-bs-toggle="tooltip" data-bs-placement="left" title="Toggle Fullscreen">
+    <button id="fullscreen-floating-toggle" class="fullscreen-floating-btn" data-bs-toggle="tooltip"
+        data-bs-placement="left" title="Toggle Fullscreen">
         <i class="fas fa-expand"></i>
     </button>
 
     <div id="flash-data" style="display: none;">
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash-message-data" data-category="{{ category }}" data-message="{{ message }}"></div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-message-data" data-category="{{ category }}" data-message="{{ message }}"></div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
     </div>
 
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center fw-bold" href="{{ url_for('index') }}" style="letter-spacing: -0.5px; font-size: 1.25rem;">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
+            <a class="navbar-brand d-flex align-items-center fw-bold" 
+                href="{% if request.endpoint in ['UserLogin', 'Signup'] %}javascript:void(0){% else %}{{ url_for('index') }}{% endif %}"
+                {% if request.endpoint in ['UserLogin', 'Signup'] %}style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: default;"{% else %}style="letter-spacing: -0.5px; font-size: 1.25rem;"{% endif %}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2"
+                    style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                     <defs>
                         <linearGradient id="logoGradNav" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
-                            <stop offset="0" stop-color="var(--primary-color)"/>
-                            <stop offset="1" stop-color="var(--info-color)"/>
+                            <stop offset="0" stop-color="var(--primary-color)" />
+                            <stop offset="1" stop-color="var(--info-color)" />
                         </linearGradient>
                     </defs>
-                    <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none" stroke="url(#logoGradNav)" stroke-width="4" stroke-linejoin="round"/>
+                    <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none"
+                        stroke="url(#logoGradNav)" stroke-width="4" stroke-linejoin="round" />
                     <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
-                    <circle cx="35" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
-                    <circle cx="65" cy="60" r="6" fill="var(--text-main)" opacity="0.8"/>
-                    <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
-                </svg><span style="background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-color) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">CyberShield AI</span>
+                    <circle cx="35" cy="60" r="6" fill="var(--text-main)" opacity="0.8" />
+                    <circle cx="65" cy="60" r="6" fill="var(--text-main)" opacity="0.8" />
+                    <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4"
+                        stroke-linecap="round" fill="none" opacity="0.6" />
+                </svg><span
+                    style="background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-color) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">CyberShield
+                    AI</span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -1003,42 +1307,48 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1 icon-home"></i> Home</a>
+                        <a class="nav-link" href="{{ url_for('index') }}"><i class="fas fa-home me-1 icon-home"></i>
+                            Home</a>
                     </li>
                     {% if session.get('user') %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('documentation') }}"><i class="fas fa-book me-1 icon-docs"></i>
+                        <a class="nav-link" href="{{ url_for('documentation') }}"><i
+                                class="fas fa-book me-1 icon-docs"></i>
                             Documentation</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('train_view') }}"><i class="fas fa-microchip me-1 icon-train"></i>
+                        <a class="nav-link" href="{{ url_for('train_view') }}"><i
+                                class="fas fa-microchip me-1 icon-train"></i>
                             Train Model</a>
                     </li>
                     {% if page_type != 'train' %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('predictView') }}"><i class="fas fa-search me-1 icon-predict"></i>
+                        <a class="nav-link" href="{{ url_for('predictView') }}"><i
+                                class="fas fa-search me-1 icon-predict"></i>
                             Predict</a>
                     </li>
                     {% endif %}
                     <li class="nav-item dropdown ms-lg-3">
-                        <a class="nav-link dropdown-toggle fw-bold d-flex align-items-center" href="#" id="userDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false"
+                        <a class="nav-link dropdown-toggle fw-bold d-flex align-items-center" href="#" id="userDropdown"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static"
                             style="color: var(--primary-color) !important;">
                             <i class="fas fa-user-circle me-1 icon-user"></i> {{ session.get('user') }}
                             {% if session.get('is_ultimate') %}
-                            <span class="badge rounded-pill bg-danger border border-light ms-2 p-1 px-2" style="font-size: 0.5rem; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);">MASTER</span>
+                            <span class="badge rounded-pill bg-danger border border-light ms-2 p-1 px-2"
+                                style="font-size: 0.5rem; letter-spacing: 0.5px; box-shadow: 0 0 10px rgba(220, 38, 38, 0.5);">MASTER</span>
                             {% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end glass-card border-glass p-2"
                             aria-labelledby="userDropdown"
-                            style="background: var(--glass-bg); backdrop-filter: blur(20px);">
+                            style="background: var(--dropdown-bg); backdrop-filter: blur(80px); -webkit-backdrop-filter: blur(80px);">
                             <li>
-                                <a class="dropdown-item nav-link rounded-3 px-3 mb-1"
-                                    href="{{ url_for('Account') }}">
+                                <a class="dropdown-item nav-link rounded-3 px-3 mb-1" href="{{ url_for('Account') }}">
                                     <i class="fas fa-cog me-1"></i> Account Settings
                                 </a>
                             </li>
-                            <li><hr class="dropdown-divider opacity-25"></li>
+                            <li>
+                                <hr class="dropdown-divider opacity-25">
+                            </li>
                             <li>
                                 <a class="dropdown-item nav-link nav-logout rounded-3 px-3"
                                     href="{{ url_for('Logout') }}">
@@ -1049,31 +1359,39 @@
                     </li>
                     {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('Signup') }}"><i class="fas fa-user-plus me-1 icon-signup"></i>
+                        <a class="nav-link" href="{{ url_for('Signup') }}"><i
+                                class="fas fa-user-plus me-1 icon-signup"></i>
                             Sign Up</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i class="fas fa-sign-in-alt me-1 icon-login"></i>
+                        <a class="nav-link" href="{{ url_for('UserLogin') }}"><i
+                                class="fas fa-sign-in-alt me-1 icon-login"></i>
                             Login</a>
                     </li>
                     {% endif %}
                     <li class="nav-item">
                         <div class="d-flex align-items-center h-100 ms-lg-2">
                             <button id="clearAppData" class="btn btn-link nav-link p-2 me-1 text-decoration-none"
-                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear App Data" style="font-size: 1.1rem;">
+                                data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear App Data"
+                                style="font-size: 1.1rem;">
                                 <i class="fas fa-broom icon-broom"></i>
                             </button>
-                            <div class="theme-toggle" id="theme-toggle" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Toggle Theme">
+                            <div class="theme-toggle" id="theme-toggle" data-bs-toggle="tooltip"
+                                data-bs-placement="bottom" title="Toggle Theme">
                                 <i class="fas fa-moon"></i>
                             </div>
                         </div>
                         <script>
-                            document.addEventListener('DOMContentLoaded', function() {
+                            document.addEventListener('DOMContentLoaded', function () {
                                 const fsBtn = document.getElementById('fullscreen-floating-toggle');
-                                if(fsBtn) {
+                                if (fsBtn) {
                                     const fsIcon = fsBtn.querySelector('i');
-                                    fsBtn.addEventListener('click', function(e) {
+                                    fsBtn.addEventListener('click', function (e) {
                                         e.preventDefault();
+                                        // Dismiss tooltip immediately on click to prevent it from sticking
+                                        const tooltip = bootstrap.Tooltip.getInstance(fsBtn);
+                                        if (tooltip) tooltip.hide();
+
                                         if (!document.fullscreenElement) {
                                             document.documentElement.requestFullscreen().catch(err => {
                                                 console.warn(`Error attempting to enable fullscreen: ${err.message}`);
@@ -1084,10 +1402,10 @@
                                             }
                                         }
                                     });
-                                    document.addEventListener('fullscreenchange', function() {
+                                    document.addEventListener('fullscreenchange', function () {
                                         // Cinematic spin animation to mask the OS resize jump
                                         fsBtn.classList.add('spin-transition');
-                                        
+
                                         setTimeout(() => {
                                             if (!document.fullscreenElement) {
                                                 fsIcon.classList.remove('fa-compress');
@@ -1096,7 +1414,7 @@
                                                 fsIcon.classList.remove('fa-expand');
                                                 fsIcon.classList.add('fa-compress');
                                             }
-                                            
+
                                             // Release the spin after the swap
                                             setTimeout(() => {
                                                 fsBtn.classList.remove('spin-transition');
@@ -1112,7 +1430,7 @@
                                 const icon = toggle?.querySelector('i');
                                 const html = document.documentElement;
                                 const navbar = toggle?.closest('.navbar');
-                                
+
                                 function getTheme() {
                                     return localStorage.getItem('theme') || 'auto';
                                 }
@@ -1124,30 +1442,32 @@
 
                                     const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
                                     const effectivelyDark = theme === 'dark' || (theme === 'auto' && systemDark);
-                                    
+
                                     if (effectivelyDark) {
                                         html.classList.remove('light-mode');
+                                        html.dataset.theme = 'dark';
                                         if (navbar) {
                                             navbar.classList.add('navbar-dark');
                                             navbar.classList.remove('navbar-light');
                                         }
                                     } else {
                                         html.classList.add('light-mode');
+                                        html.dataset.theme = 'light';
                                         if (navbar) {
                                             navbar.classList.add('navbar-light');
                                             navbar.classList.remove('navbar-dark');
                                         }
                                     }
-                                    
+
                                     if (isUserClick) {
                                         setTimeout(() => {
                                             document.body.classList.remove('theme-transitioning');
-                                        }, 450); // Matches the 0.4s transition duration
+                                        }, 1400); // Matches the 1s transition + 0.4s max delay
                                     }
 
                                     // Update Icon and Title Safely
                                     if (!icon || !toggle) return;
-                                    
+
                                     if (theme === 'dark') {
                                         icon.className = 'fas fa-moon';
                                         toggle.title = 'Theme: Dark Mode';
@@ -1170,6 +1490,10 @@
 
                                 // 3-State Toggle Click (Auto -> Light -> Dark -> Auto)
                                 toggle?.addEventListener('click', () => {
+                                    // Dismiss tooltip immediately on click to prevent it from sticking
+                                    const tooltip = bootstrap.Tooltip.getInstance(toggle);
+                                    if (tooltip) tooltip.hide();
+
                                     const current = getTheme();
                                     let next;
                                     if (current === 'auto') next = 'light';
@@ -1193,9 +1517,10 @@
         <main class="flex-shrink-0">
             {% block content %}{% endblock %}
         </main>
-        
+
         <!-- Invisible marker to trigger footer animations safely precisely when the footer gap begins to reveal -->
-        <div id="footer-reveal-trigger" style="position: absolute; bottom: 0; width: 100%; height: 1px; pointer-events: none;"></div>
+        <div id="footer-reveal-trigger"
+            style="position: absolute; bottom: 0; width: 100%; height: 1px; pointer-events: none;"></div>
     </div>
 
     <!-- Trae Reveal Footer -->
@@ -1217,7 +1542,8 @@
                 </div>
             </div>
             <div class="mt-2">
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top ↑</button>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top
+                    ↑</button>
             </div>
         </div>
     </footer>
@@ -1247,7 +1573,7 @@
         const trigger = document.getElementById('footer-reveal-trigger');
         const brandText = document.querySelector('.huge-brand-text');
         const footerContent = document.querySelector('.footer-content');
-        
+
         if (trigger && (brandText || footerContent)) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -1261,7 +1587,7 @@
                     }
                 });
             }, { threshold: 0 }); // Triggers the exact moment the main-surface bottom hits the viewport
-            
+
             observer.observe(trigger);
         }
 
@@ -1299,6 +1625,42 @@
             resetIdleTimer();
         }
 
+        // --- GLOBAL ONE-TIME REVEAL OBSERVER ---
+        (function() {
+            const revealCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('revealed');
+                        // Animation runs once, then we stop watching this element forever
+                        observer.unobserve(entry.target);
+                    }
+                });
+            };
+
+            const revealObserver = new IntersectionObserver(revealCallback, {
+                threshold: 0.1,    // Reveal when 10% visible
+                rootMargin: '0px 0px -50px 0px' // Slightly offset for better impact
+            });
+
+            // Re-scan for reveal elements (handles dynamically injected content too)
+            function initRevealObserver() {
+                const elements = document.querySelectorAll(
+                    '.reveal-premium, .reveal-depth, .reveal-soft, .reveal-slide-up'
+                );
+                elements.forEach(el => {
+                    if (!el.classList.contains('revealed')) {
+                        revealObserver.observe(el);
+                    }
+                });
+            }
+
+            // Initial Scan
+            document.addEventListener('DOMContentLoaded', initRevealObserver);
+            
+            // Also run after any AJAX/content injection if necessary
+            window.refreshRevealObserver = initRevealObserver;
+        })();
+
         // Global Typing Animation Utility
         function initTypingEffect(elementId, text, speed = 50, delay = 1000) {
             const element = document.getElementById(elementId);
@@ -1330,7 +1692,7 @@
 
         // --- GLOBAL SCROLL TRACKER (Page-Specific) ---
         const getScrollKey = (postfix) => `${window.location.pathname}-${postfix}`;
-        
+
         function saveScrollPositions() {
             const main = document.querySelector('main');
             const log = document.getElementById('logWindow');
@@ -1338,7 +1700,7 @@
 
             // Save window scroll
             localStorage.setItem(getScrollKey('window-scroll'), window.scrollY);
-            
+
             // Save component scrolls (if they exist)
             if (main) localStorage.setItem(getScrollKey('main-scroll'), main.scrollTop);
             if (log) localStorage.setItem(getScrollKey('log-scroll'), log.scrollTop);
@@ -1395,22 +1757,55 @@
                 localStorage.setItem(k, v);
             }
         });
-        
+
         // Restore on load
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(restoreScrollPositions, 100); 
+            setTimeout(restoreScrollPositions, 100);
+
+            // Process Flash Messages
+            const flashData = document.querySelectorAll('.flash-message-data');
+            flashData.forEach(f => {
+                const category = f.getAttribute('data-category') || 'info';
+                const message = f.getAttribute('data-message');
+                showToast(message, category);
+            });
         });
 
         // Clear App Data Action
         const clearBtn = document.getElementById('clearAppData');
         if (clearBtn) {
             clearBtn.addEventListener('click', function () {
-                if (confirm('Are you sure you want to clear all local application data and active results?')) {
-                    localStorage.clear();
-                    sessionStorage.clear();
-                    // Navigate to a reset route or just reload (user can hard refresh too)
-                    window.location.href = "{{ url_for('index') }}?reset=true";
-                }
+                // Dismiss tooltip immediately on click
+                const tooltip = bootstrap.Tooltip.getInstance(clearBtn);
+                if (tooltip) tooltip.hide();
+
+                customConfirm(
+                    "Clear System Data", 
+                    "Are you sure you want to clear all local application data and active results? This action cannot be undone.",
+                    async () => {
+                        try {
+                            // 1. Clear Server-Side Session first
+                            const response = await fetch('/api/clear-session', { method: 'POST' });
+                            if (!response.ok) throw new Error('Session Clear Failed');
+
+                            // 2. Clear Browser-Side Storage
+                            const savedTheme = localStorage.getItem('theme');
+                            const keysToKeep = {};
+                            if (savedTheme) keysToKeep['theme'] = savedTheme;
+                            
+                            localStorage.clear();
+                            for (const [k, v] of Object.entries(keysToKeep)) {
+                                localStorage.setItem(k, v);
+                            }
+                            
+                            showToast('System data successfully reset', 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } catch (err) {
+                            console.error(err);
+                            showToast('Error resetting system data', 'error');
+                        }
+                    }
+                );
             });
         }
 
@@ -1427,7 +1822,7 @@
                 const rect = hugeBrand.getBoundingClientRect();
                 const x = ((e.clientX - rect.left) / rect.width) * 100;
                 const y = ((e.clientY - rect.top) / rect.height) * 100;
-                
+
                 hugeBrand.style.setProperty('--mouse-x', `${x}%`);
                 hugeBrand.style.setProperty('--mouse-y', `${y}%`);
             });
@@ -1437,6 +1832,59 @@
                 hugeBrand.style.setProperty('--mouse-x', '50%');
                 hugeBrand.style.setProperty('--mouse-y', '50%');
             });
+        }
+    </script>
+    <!-- Global Theme-Aware Detail Modal -->
+    <div class="modal fade" id="themeDetailModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+            <div class="modal-content liquid-glass shadow-lg" style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px;">
+                <div class="modal-header py-3 border-0">
+                    <h5 class="modal-title dynamic-text fw-bold" id="modalTitle">
+                        <i class="fas fa-microchip me-2 text-info"></i>System Details
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div id="modalBodyContent" class="dynamic-muted small" style="max-height: 400px; overflow-y: auto;">
+                        <!-- Content Injected via JS -->
+                    </div>
+                </div>
+                <div class="modal-footer py-3 border-0 justify-content-end">
+                    <div id="modalActionContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Global Helper for Custom Confirmations (No Browser Popups) ---
+        function customConfirm(title, message, confirmCallback, confirmText = "Confirm") {
+            const modal = new bootstrap.Modal(document.getElementById('themeDetailModal'));
+            document.getElementById('modalTitle').innerHTML = `<i class="fas fa-question-circle me-2 text-warning"></i>${title}`;
+            document.getElementById('modalBodyContent').innerHTML = `<p class="dynamic-text mb-0">${message}</p>`;
+            
+            const footerActions = document.getElementById('modalActionContainer');
+            footerActions.innerHTML = `
+                <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 ms-2" id="modalConfirmBtn">${confirmText}</button>
+            `;
+            
+            const confirmBtn = document.getElementById('modalConfirmBtn');
+            confirmBtn.onclick = () => {
+                const modalInstance = bootstrap.Modal.getInstance(document.getElementById('themeDetailModal'));
+                if (modalInstance) modalInstance.hide();
+                if (confirmCallback) confirmCallback();
+            };
+            
+            modal.show();
+        }
+
+        // --- Enhanced Toast Interaction ---
+        function showDetailModal(title, content) {
+            const modal = new bootstrap.Modal(document.getElementById('themeDetailModal'));
+            document.getElementById('modalTitle').innerHTML = `<i class="fas fa-info-circle me-2 text-info"></i>${title}`;
+            document.getElementById('modalBodyContent').innerHTML = content;
+            document.getElementById('modalActionContainer').innerHTML = ''; // No extra buttons for info
+            modal.show();
         }
     </script>
     {% block extra_js %}{% endblock %}

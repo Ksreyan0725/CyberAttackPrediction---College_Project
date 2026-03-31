@@ -86,6 +86,9 @@
         font-weight: 700 !important;
         letter-spacing: 0.5px;
         color: white !important;
+        /* Fixes sub-pixel rendering 'lines' on hover/transform */
+        backface-visibility: hidden;
+        transform: translateZ(0); 
     }
 
     .btn-hero-glow:hover {
@@ -98,25 +101,7 @@
         box-shadow: 0 1px 4px rgba(0,0,0,0.3), inset 0 3px 8px rgba(0,0,0,0.3) !important;
     }
 
-    .btn-hero-glow::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-            120deg,
-            transparent,
-            rgba(255, 255, 255, 0.2),
-            transparent
-        );
-        transition: all 0.6s;
-    }
-
-    .btn-hero-glow:hover::before {
-        left: 100%;
-    }
+    /* REMOVED: Unwanted Shimmer Line Sweep from hero-glow */
 
     .btn-hero-glow i {
         transition: transform 0.3s ease;
@@ -130,12 +115,18 @@
     .skeleton-loader-bg {
         background: linear-gradient(
             90deg,
-            rgba(255, 255, 255, 0.03) 25%,
-            rgba(255, 255, 255, 0.08) 50%,
-            rgba(255, 255, 255, 0.03) 75%
+            rgba(255, 255, 255, 0.01) 25%,
+            rgba(255, 255, 255, 0.04) 50%,
+            rgba(255, 255, 255, 0.01) 75%
         );
         background-size: 200% 100%;
         animation: shimmerBg 2s infinite linear;
+    }
+
+    /* Stop shimmer and clear background background once image is loaded to prevent 'line' leakage in padding */
+    .skeleton-loader-bg.loaded {
+        animation: none;
+        background: transparent !important;
     }
 
     @keyframes shimmerBg {
@@ -161,15 +152,45 @@
         <h1 class="display-5 fw-bold mb-1 reveal-cyber-title hero-gradient-professional">Cyber Attack Prediction</h1>
         <p class="lead mb-3 fs-6 subtitle-professional reveal-smart-subtitle">From Traditional Machine Learning to Generative Artificial Intelligence</p>
         <div class="d-flex justify-content-center gap-3 reveal-premium anim-delay-200">
-            <a href="{{ url_for('UserLogin') }}" class="btn btn-hero-glow btn-lg shadow-lg d-inline-flex align-items-center justify-content-center">
+            <a href="{{ url_for('UserLogin') }}" id="get-started-btn" class="btn btn-hero-glow btn-lg shadow-lg d-inline-flex align-items-center justify-content-center">
                 <i class="fas fa-sign-in-alt me-2"></i>Get Started
             </a>
-            <a href="{{ url_for('documentation') }}" class="btn btn-outline-dynamic btn-lg px-4 shadow-sm d-inline-flex align-items-center justify-content-center">
+            <a href="{{ url_for('documentation') }}" id="learn-more-btn" class="btn btn-outline-dynamic btn-lg px-4 shadow-sm d-inline-flex align-items-center justify-content-center">
                 <i class="fas fa-book me-2"></i>Learn More
             </a>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const learnMoreBtn = document.getElementById('learn-more-btn');
+        if (learnMoreBtn) {
+            learnMoreBtn.addEventListener('click', function(e) {
+                const isLoggedIn = document.body.dataset.loggedIn === 'true';
+                
+                if (!isLoggedIn) {
+                    e.preventDefault(); // Stop navigation
+                    
+                    const isRemembered = document.body.dataset.remembered === 'true';
+                    let message = "Please log in to access the project documentation and AI insights.";
+                    if (isRemembered) {
+                        message = "Your session is saved but inactive. Please visit the login page to re-authenticate and access documentation.";
+                    }
+                    
+                    showToast('Authentication Required', message, 'warning');
+                    
+                    // Optional: Highlight the "Get Started" button or redirect after a delay
+                    const getStarted = document.getElementById('get-started-btn');
+                    if (getStarted) {
+                        getStarted.classList.add('animate__animated', 'animate__pulse');
+                        setTimeout(() => getStarted.classList.remove('animate__animated', 'animate__pulse'), 1000);
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 <div class="container pt-2 pb-2" id="about">
     <div class="row align-items-center mb-4">
@@ -210,7 +231,7 @@
                     <img src="{{ url_for('static', filename='images/tra.jpg') }}" 
                          class="img-fluid w-100 img-fade-init" 
                          alt="Cyber Security Visualization" 
-                         onload="this.classList.add('img-fade-loaded')"
+                         onload="this.classList.add('img-fade-loaded'); this.closest('.skeleton-loader-bg').classList.add('loaded')"
                          style="object-fit: contain; height: 300px; padding: 10px;">
                     <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
                         <h5 class="text-white mb-0 h5 fw-bold">Digital Asset Protection</h5>

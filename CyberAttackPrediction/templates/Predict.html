@@ -4,26 +4,40 @@
 
 {% block extra_css %}
 <style>
-    /* Ensure the body takes full height and uses flex to push footer to bottom */
-    html, body {
-        height: 100%;
-        margin: 0;
+    /* Reset any potential overrides to ensure standard scrolling flow */
+    html {
+        min-height: 100%;
     }
-    
+
     body {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden; /* Prevent scrolling on this page */
         background: var(--bg-gradient);
         background-attachment: fixed;
     }
 
+    /* Premium Alert Button (Fix: Visibility in Dark Theme) */
+    .btn-view-result {
+        background: rgba(0, 210, 255, 0.1);
+        border: 1px solid rgba(0, 210, 255, 0.3);
+        color: #00d2ff !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-view-result:hover {
+        background: rgba(0, 210, 255, 0.25) !important;
+        border-color: #00d2ff !important;
+        color: #fff !important;
+        box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
+        transform: translateY(-1px);
+    }
+    
     main {
-        flex: 1; /* Take up all available space between navbar and footer */
+        padding: 40px 10px;
+        min-height: calc(100vh - 200px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 10px;
     }
 
 /* Standard footer used from base.html */ /* Don't allow footer to shrink */
@@ -208,7 +222,29 @@
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center w-100 m-0">
+<div class="container pt-1 pb-5">
+    {% if last_result %}
+    <!-- Refined Floating Session Restore Pill (Fix: Precision Centering) -->
+    <div class="liquid-glass border-glass py-3 px-4 mb-4 d-flex align-items-center justify-content-between animate__animated animate__fadeInDown" 
+         style="max-width: 600px; margin: 0 auto; border-radius: 100px; z-index: 10; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        <div class="d-flex align-items-center" style="line-height: normal;">
+            <div class="icon-box-sm bg-primary-light-dynamic text-primary-dynamic me-3 d-flex align-items-center justify-content-center" 
+                 style="width: 32px; height: 32px; border-radius: 50%; min-width: 32px;">
+                <i class="fas fa-history small"></i>
+            </div>
+            <div class="d-flex flex-column justify-content-center">
+                <div class="xx-small fw-bold dynamic-text text-uppercase letter-spacing-1" style="line-height: 1;">Previous Analysis Detected</div>
+                <div class="xx-small dynamic-muted opacity-75 mt-1" style="line-height: 1;">Completed session data found.</div>
+            </div>
+        </div>
+        <a href="{{ url_for('index') }}" class="btn btn-view-result btn-xs rounded-pill px-4" style="font-size: 0.7rem; padding: 4px 12px;">
+            <i class="fas fa-chart-pie me-1"></i>View Result
+        </a>
+    </div>
+    {% endif %}
+
+    <div class="row g-4 justify-content-center">
+    <div class="row justify-content-center w-100 m-0">
     <div class="col-lg-6">
         <div class="card glass-card shadow-2xl border-0 reveal-premium">
             <div class="card-header border-glass text-center py-3">
@@ -426,4 +462,6 @@
         return new bootstrap.Tooltip(tooltipTriggerEl)
     })
 </script>
+    </div>
+</div>
 {% endblock %}

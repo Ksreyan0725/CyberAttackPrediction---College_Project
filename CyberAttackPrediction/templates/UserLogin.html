@@ -4,27 +4,23 @@
 
 {% block extra_css %}
 <style>
-    /* Ensure the body takes full height and uses flex to push footer to bottom */
+    /* Standardize layout for footer reveal */
     html, body {
-        height: 100%;
         margin: 0;
     }
     
     body {
-        display: flex;
-        flex-direction: column;
         background: var(--bg-gradient);
         background-attachment: fixed;
     }
 
     main {
-        flex: 1;
+        min-height: calc(100vh - 100px);
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 2rem 1rem;
+        padding: 2rem 1rem 4rem;
         position: relative;
-        overflow: hidden;
         z-index: 1;
     }
 
@@ -59,10 +55,15 @@
         100% { transform: translate(100px, 50px) scale(1.1); }
     }
 
-    @keyframes revealEntranceStaggered {
-        0%   { opacity: 0; transform: scale(0.97); filter: brightness(1.2); }
-        65%  { opacity: 1; transform: scale(1.002); filter: brightness(1); }
-        100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+    @keyframes wrapperExpandInstant {
+        0% { 
+            opacity: 0.2;
+            transform: scaleX(0.7) scaleY(0.9) translateZ(0);
+        }
+        100% { 
+            opacity: 1;
+            transform: scaleX(1) scaleY(1) translateZ(0);
+        }
     }
 
     .login-wrapper {
@@ -71,15 +72,14 @@
         background: transparent;
         display: flex;
         flex-direction: row;
+        animation: wrapperExpandInstant 0.45s cubic-bezier(0.19, 1, 0.22, 1) both;
+        will-change: transform, opacity;
+        transform-origin: center;
     }
 
     .info-panel, .form-panel {
-        will-change: transform, opacity;
-        animation: revealEntranceStaggered 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
-    }
-
-    .form-panel {
-        animation-delay: 0.15s;
+        /* Removed staggered animations for zero-latency feel */
+        opacity: 1;
     }
 
     /* Left Side - Info Panel */
@@ -124,6 +124,7 @@
         align-items: center;
         justify-content: center;
         margin-bottom: 1rem;
+        cursor: default;
     }
 
     .brand-title {
@@ -252,7 +253,7 @@
     <!-- Left: Informational Panel -->
     <div class="info-panel">
         <div class="brand-section">
-            <div class="brand-logo bg-transparent border-0 p-0 mb-3" style="width: 70px; height: 70px; margin: 0 auto;">
+            <div class="brand-logo bg-transparent border-0 p-0 mb-3" style="width: 70px; height: 70px; margin: 0 auto; cursor: default;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100" style="filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));">
                     <defs>
                         <linearGradient id="logoGradLog" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
@@ -377,7 +378,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Use Global Typing Animation Utility
         const typingSummary = "Secure. Persistent. Proactive. Save your login securely to skip authentication on your next visit.";
-        initTypingEffect('typingText', typingSummary, 40, 1000);
+        initTypingEffect('typingText', typingSummary, 35, 100);
 
         const btnDirectLogin = document.getElementById('btnDirectLogin');
         const btnResetCreds = document.getElementById('btnResetCreds');
@@ -411,7 +412,7 @@
                 .then(data => {
                     if (data.status === 'success') {
                         showToast('Authenticated! Redirecting...', 'success');
-                        setTimeout(() => window.location.href = '/Predict', 500);
+                        setTimeout(() => window.location.href = '/Train', 500);
                     } else {
                         showToast('Saved credentials invalid. Please login manually.', 'error');
                         setTimeout(() => location.reload(), 1500);

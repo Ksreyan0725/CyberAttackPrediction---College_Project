@@ -5,26 +5,22 @@
 {% block extra_css %}
 <style>
     /* Allow natural page scrolling for full table visibility */
+    /* Standardize layout for footer reveal */
     html, body {
-        height: auto;
-        min-height: 100%;
         margin: 0;
     }
     
     body {
-        display: flex;
-        flex-direction: column;
         background: var(--bg-gradient);
         background-attachment: fixed;
-        overflow-y: auto !important; /* Natural scroll */
     }
 
     main {
-        flex: 1;
+        min-height: 80vh;
         display: flex;
-        align-items: flex-start; /* Start from top to allow scrolling down */
+        align-items: flex-start; 
         justify-content: center;
-        padding: 20px 10px;
+        padding: 5rem 10px 4rem;
     }
 
     /* Footer standard from base.html */

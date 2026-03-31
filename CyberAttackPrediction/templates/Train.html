@@ -6,7 +6,12 @@
 <style>
     .training-card {
         max-width: 900px;
-        margin: 2rem auto;
+        margin: 0 auto; /* Removed top/bottom margin to rely on container padding */
+    }
+
+    /* Reset any potential overrides to ensure standard scrolling flow */
+    html {
+        min-height: 100%;
     }
     
     .status-badge {
@@ -29,12 +34,12 @@
     .log-container {
         background: var(--footer-accent);
         border-radius: 12px;
-        padding: 1rem;
+        padding: 0.75rem;
         font-family: 'Courier New', Courier, monospace;
-        height: 250px;
+        height: 150px;
         overflow-y: auto;
         border: 1px solid var(--glass-border);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
     }
     
     .log-entry {
@@ -69,15 +74,37 @@
 
     /* Custom Dataset Styles */
     .dataset-toggle-container {
+        position: relative;
         display: flex;
         background: rgba(0, 0, 0, 0.1);
         border-radius: 50px;
         padding: 4px;
-        margin-bottom: 2rem;
+        margin-bottom: 1.25rem;
         border: 1px solid var(--glass-border);
     }
 
+    /* The sliding blue pill */
+    .toggle-indicator {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: calc(50% - 4px);
+        height: calc(100% - 8px);
+        background: var(--primary-color);
+        border-radius: 50px;
+        box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.4);
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events: none;
+        z-index: 0;
+    }
+
+    .toggle-indicator.slide-right {
+        transform: translateX(100%);
+    }
+
     .dataset-toggle-btn {
+        position: relative;
+        z-index: 1;
         flex: 1;
         border: none;
         background: transparent;
@@ -86,22 +113,20 @@
         border-radius: 50px;
         font-size: 0.85rem;
         font-weight: 600;
-        transition: all 0.3s ease;
         cursor: pointer;
-        opacity: 0.6;
+        opacity: 0.55;
+        transition: opacity 0.3s ease, color 0.3s ease;
     }
 
     .dataset-toggle-btn.active {
-        background: var(--primary-color);
         color: white;
         opacity: 1;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .upload-zone {
         border: 2px dashed var(--glass-border);
         border-radius: 16px;
-        padding: 2rem;
+        padding: 1.25rem;
         text-align: center;
         transition: all 0.3s ease;
         cursor: pointer;
@@ -114,8 +139,8 @@
     }
 
     .upload-zone i {
-        font-size: 2.5rem;
-        margin-bottom: 1rem;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
         color: var(--primary-color);
         opacity: 0.7;
     }
@@ -138,19 +163,21 @@
         position: relative;
         overflow: hidden;
         width: 100%;
+        /* Fixed height so the outer card doesn't resize during transition */
+        min-height: 220px;
     }
 
     .mode-slider {
         display: flex;
         width: 200%;
-        transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+        transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1);
         will-change: transform;
     }
 
     .mode-slide {
         width: 50%;
-        padding-bottom: 2rem;
         flex-shrink: 0;
+        padding: 0.5rem 0 1rem;
     }
 
     .mode-slider.custom-active {
@@ -160,50 +187,86 @@
     #defaultModeContainer, #customModeContainer {
         display: block !important; /* Managed by the slider now */
     }
+
+    /* Slide direction indicators on toggle buttons */
+    #modeDefault i, #modeCustom i {
+        transition: transform 0.3s ease;
+    }
+
+    /* High-contrast theme-aware alert */
+    .status-alert-optimized {
+        background: rgba(var(--primary-rgb), 0.15);
+        border: 1px solid rgba(var(--primary-rgb), 0.2);
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+
+    [data-theme="dark"] .status-alert-optimized {
+        background: rgba(0, 210, 255, 0.1);
+        border-color: rgba(0, 210, 255, 0.2);
+        color: #00d2ff; /* Electric Cyan for dark mode visibility */
+    }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container pt-1 pb-5" style="margin: 0 auto !important;">
     <div class="training-card reveal-premium">
-        <div class="glass-card liquid-glass p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="glass-card liquid-glass p-3 mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <h2 class="h3 mb-1 dynamic-text"><i class="fas fa-brain me-2 text-primary"></i>Model Training Portal</h2>
-                    <p class="dynamic-muted mb-0">Re-calibrate your AI defenses using the latest network traffic patterns.</p>
+                    <h2 class="h4 mb-1 dynamic-text"><i class="fas fa-brain me-2 text-primary"></i>Model Training Portal</h2>
+                    <p class="xx-small dynamic-muted mb-0">Re-calibrate your AI defenses with the latest traffic patterns.</p>
                 </div>
                 <div id="trainingStatus" class="status-badge status-idle">
                     <i class="fas fa-circle me-1 small"></i> System Ready
                 </div>
             </div>
 
-            <div class="row g-4 mb-4">
+            <div class="row g-3 mb-3">
                 <div class="col-md-7">
                     <div class="h-100 d-flex flex-column">
                         <h5 class="dynamic-text mb-3 small fw-bold text-uppercase opacity-75">Live Training Logs</h5>
                         <div class="log-container flex-grow-1" id="logWindow">
-                            <div class="log-entry dynamic-muted">Waiting for user to initiate training...</div>
+                            {% if model_ready %}
+                            <div class="log-entry text-success">
+                                <span class="fw-bold">[System]</span> ✔ A trained model is loaded and active. Click <strong>Re-Train Now</strong> to update it.
+                            </div>
+                            {% else %}
+                            <div class="log-entry dynamic-muted">
+                                <span class="fw-bold">[System]</span> No model found. Click <strong>Begin Training</strong> to train one.
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
                 <div class="col-md-5">
-                    <div class="h-100 d-flex flex-column">
+                    <div class="d-flex flex-column">
                         <h5 class="dynamic-text mb-3 small fw-bold text-uppercase opacity-75">Control Center</h5>
-                        <div class="glass-card p-4 flex-grow-1 d-flex flex-column">
-                            <!-- Mode Toggle -->
-                            <div class="dataset-toggle-container">
-                                <button type="button" class="dataset-toggle-btn active" id="modeDefault">Default (NSL-KDD)</button>
-                                <button type="button" class="dataset-toggle-btn" id="modeCustom">Custom CSV</button>
+                        <div class="glass-card p-3 d-flex flex-column">
+                            <!-- Fixed Toggle Bar with sliding pill indicator -->
+                            <div class="dataset-toggle-container" id="toggleBar">
+                                <span class="toggle-indicator" id="toggleIndicator"></span>
+                                <button type="button" class="dataset-toggle-btn active" id="modeDefault">
+                                    <i class="fas fa-database me-1"></i>Default (NSL-KDD)
+                                </button>
+                                <button type="button" class="dataset-toggle-btn" id="modeCustom">
+                                    <i class="fas fa-file-csv me-1"></i>Custom CSV
+                                </button>
                             </div>
 
+                            <!-- Content-only slider synced to toggle -->
                             <div class="mode-slider-container">
                                 <div class="mode-slider" id="modeSlider">
+
+                                    <!-- SLIDE 1: Default Dataset -->
                                     <div class="mode-slide text-center" id="defaultModeContainer">
-                                        <i class="fas fa-database mb-3 h2 text-primary opacity-50"></i>
-                                        <p class="small dynamic-muted mb-4 px-2">Ready to re-train using the standard <strong>NSL-KDD</strong> reference dataset.</p>
+                                        <i class="fas fa-database h2 text-primary opacity-50 mb-2"></i>
+                                        <p class="small dynamic-muted mb-0 px-2">Ready to re-train using the standard <strong>NSL-KDD</strong> reference dataset.</p>
                                     </div>
 
-                                    <div class="mode-slide text-center" id="customModeContainer">
+                                    <!-- SLIDE 2: Custom CSV -->
+                                    <div class="mode-slide" id="customModeContainer">
                                         <div class="upload-zone" id="dropZone">
                                             <input type="file" id="trainingFile" class="d-none" accept=".csv">
                                             <i class="fas fa-file-upload"></i>
@@ -227,23 +290,27 @@
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
                             </div>
+
                             
-                            <div class="mt-auto pt-3">
+                            <div class="mt-2 pt-1">
                                 {% if model_ready %}
-                                <div class="alert alert-info bg-primary-light border-0 small w-100 mb-3 py-2 dynamic-text rounded-3">
-                                    <i class="fas fa-check-circle me-1 text-primary"></i> Current model is valid.
+                                <div class="alert status-alert-optimized small w-100 mb-2 py-2 dynamic-text rounded-3">
+                                    <i class="fas fa-check-circle me-1"></i> Current model is valid.
                                 </div>
-                                <div class="d-flex flex-column gap-2 w-100">
-                                    <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg text-white">
+                                <div class="d-flex justify-content-center w-100">
+                                    <button id="startTrainingBtn" class="btn btn-primary w-100 rounded-pill shadow px-4 py-2 text-white">
                                         <i class="fas fa-sync me-2"></i>Re-Train Now
                                     </button>
                                 </div>
                                 {% else %}
-                                <button id="startTrainingBtn" class="btn btn-primary btn-lg w-100 py-3 rounded-pill shadow-lg">
-                                    <i class="fas fa-play me-2"></i>Begin Training
-                                </button>
+                                <div class="d-flex justify-content-center w-100">
+                                    <button id="startTrainingBtn" class="btn btn-primary w-100 rounded-pill shadow px-4 py-2">
+                                        <i class="fas fa-play me-2"></i>Begin Training
+                                    </button>
+                                </div>
                                 {% endif %}
                             </div>
                         </div>
@@ -254,6 +321,7 @@
             <div id="resultsArea" style="display: none;" class="animate__animated animate__zoomIn">
                 <hr class="border-glass my-4">
                 <h5 class="dynamic-text mb-4 small fw-bold text-uppercase opacity-75">Training Results Summary</h5>
+                <div id="lastResultData" style="display: none;" data-result='{{ train_result | tojson | safe if train_result else "{}" }}'></div>
                 <div class="row g-4">
                     <div class="col-md-4">
                         <div class="metric-card">
@@ -291,8 +359,6 @@
         const resultsArea = document.getElementById('resultsArea');
         const statusBadge = document.getElementById('trainingStatus');
         const startBtn = document.getElementById('startTrainingBtn');
-        const modeDefault = document.getElementById('modeDefault');
-        const modeCustom = document.getElementById('modeCustom');
         const defaultContainer = document.getElementById('defaultModeContainer');
         const customContainer = document.getElementById('customModeContainer');
         const dropZone = document.getElementById('dropZone');
@@ -305,16 +371,22 @@
 
         const modeSlider = document.getElementById('modeSlider');
 
-        // Toggle Modes
+        const modeDefault     = document.getElementById('modeDefault');
+        const modeCustom      = document.getElementById('modeCustom');
+        const toggleIndicator = document.getElementById('toggleIndicator');
+
+        // Slide the pill indicator + toggle active label + slide content in sync
         modeDefault.onclick = () => {
             modeDefault.classList.add('active');
             modeCustom.classList.remove('active');
+            toggleIndicator.classList.remove('slide-right');
             modeSlider.classList.remove('custom-active');
         };
 
         modeCustom.onclick = () => {
             modeCustom.classList.add('active');
             modeDefault.classList.remove('active');
+            toggleIndicator.classList.add('slide-right');
             modeSlider.classList.add('custom-active');
         };
 
@@ -358,79 +430,104 @@
             logWindow.scrollTop = logWindow.scrollHeight;
         }
 
+        // --- Persistence: Restore Session Results if available ---
+        const resultContainer = document.getElementById('lastResultData');
+        const lastResult = JSON.parse(resultContainer.getAttribute('data-result') || '{}');
+        
+        if (lastResult && lastResult.status === 'success') {
+            document.getElementById('finalAccuracy').textContent = lastResult.accuracy + '%';
+            const classListing = document.getElementById('classListing');
+            classListing.innerHTML = '';
+            lastResult.classes.forEach(cls => {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill me-2 mb-2';
+                badge.textContent = cls.toUpperCase();
+                classListing.appendChild(badge);
+            });
+            resultsArea.style.display = 'block';
+            statusBadge.className = 'status-badge status-success';
+            statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Previous Session Complete';
+            addLog("Restored last training session results.", "success");
+        }
+
         if (startBtn) {
-            startBtn.addEventListener('click', async function() {
+            startBtn.addEventListener('click', function() {
                 const isCustom = modeCustom.classList.contains('active');
                 if (isCustom && !selectedFile) {
                     showToast('Please upload a dataset first!', 'warning');
                     return;
                 }
 
-                if (!confirm('Start training sequence? Current model will be replaced.')) return;
-
-                startBtn.disabled = true;
-                resultsArea.style.display = 'none';
-                logWindow.innerHTML = '';
-                statusBadge.className = 'status-badge status-running';
-                statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin me-1 small"></i> Training...';
-
-                addLog("Initializing training environment...");
-                
-                const formData = new FormData();
-                if (isCustom) {
-                    formData.append('training_data', selectedFile);
-                    addLog(`Loading custom dataset: ${selectedFile.name}...`);
-                } else {
-                    addLog("Loading default NSL-KDD dataset (20,000 samples)...");
-                }
-                
-                try {
-                    const response = await fetch("{{ url_for('TrainAction') }}", {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const data = await response.json();
-                    
-                    if (data.status === 'success') {
-                        showToast('Model training complete!', 'success');
-                        addLog("Processing dataset features...");
-                        await new Promise(r => setTimeout(r, 600));
-                        addLog("Fitting AI Model (Random Forest)...");
-                        await new Promise(r => setTimeout(r, 800));
-                        addLog(`Success! Accuracy: ${data.accuracy}%`, 'success');
-                        addLog(`Dataset used: ${data.dataset_used}`, 'info');
-                        
-                        document.getElementById('finalAccuracy').textContent = data.accuracy + '%';
-                        const classListing = document.getElementById('classListing');
-                        classListing.innerHTML = '';
-                        data.classes.forEach(cls => {
-                            const badge = document.createElement('span');
-                            badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill me-2 mb-2';
-                            badge.textContent = cls.toUpperCase();
-                            classListing.appendChild(badge);
-                        });
-                        
-                        resultsArea.style.display = 'block';
-                        statusBadge.className = 'status-badge status-success';
-                        statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
-                    } else {
-                        showToast(`Training Failed: ${data.message}`, 'error');
-                        addLog(`CRITICAL ERROR: ${data.message}`, 'error');
-                        statusBadge.className = 'status-badge status-idle';
-                        statusBadge.innerHTML = '<i class="fas fa-times-circle me-1 small"></i> Training Aborted';
-                    }
-                } catch (error) {
-                    showToast(`System Error: ${error.message}`, 'error');
-                    addLog(`System Error: ${error.message}`, 'error');
-                    statusBadge.className = 'status-badge status-idle';
-                    statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1 small"></i> Error';
-                } finally {
-                    startBtn.disabled = false;
-                }
+                customConfirm(
+                    "Re-Train Model", 
+                    "Are you sure you want to start the training sequence? This will replace the current active model and may take a few moments.",
+                    () => executeTraining(isCustom)
+                );
             });
         }
-    });
 
+        async function executeTraining(isCustom) {
+            startBtn.disabled = true;
+            resultsArea.style.display = 'none';
+            logWindow.innerHTML = '';
+            statusBadge.className = 'status-badge status-running';
+            statusBadge.innerHTML = '<i class="fas fa-spinner fa-spin me-1 small"></i> Training...';
+
+            addLog("Initializing training environment...");
+            
+            const formData = new FormData();
+            if (isCustom) {
+                formData.append('training_data', selectedFile);
+                addLog(`Loading custom dataset: ${selectedFile.name}...`);
+            } else {
+                addLog("Loading default NSL-KDD dataset (20,000 samples)...");
+            }
+            
+            try {
+                const response = await fetch("{{ url_for('TrainAction') }}", {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'success') {
+                    showToast('Model training complete!', 'success');
+                    addLog("Processing dataset features...", "info");
+                    await new Promise(r => setTimeout(r, 600));
+                    addLog("Fitting AI Model (Random Forest)...", "info");
+                    await new Promise(r => setTimeout(r, 800));
+                    addLog(`Success! Accuracy: ${data.accuracy}%`, 'success');
+                    addLog(`Dataset used: ${data.dataset_used}`, 'info');
+                    
+                    document.getElementById('finalAccuracy').textContent = data.accuracy + '%';
+                    const classListing = document.getElementById('classListing');
+                    classListing.innerHTML = '';
+                    data.classes.forEach(cls => {
+                        const badge = document.createElement('span');
+                        badge.className = 'badge bg-primary-light text-primary border border-primary border-opacity-25 py-2 px-3 rounded-pill me-2 mb-2';
+                        badge.textContent = cls.toUpperCase();
+                        classListing.appendChild(badge);
+                    });
+                    
+                    resultsArea.style.display = 'block';
+                    statusBadge.className = 'status-badge status-success';
+                    statusBadge.innerHTML = '<i class="fas fa-check-circle me-1 small"></i> Training Complete';
+                } else {
+                    showToast(`Training Failed: ${data.message}`, 'error', data.details || data.message);
+                    addLog(`CRITICAL ERROR: ${data.message}`, 'error');
+                    statusBadge.className = 'status-badge status-idle';
+                    statusBadge.innerHTML = '<i class="fas fa-times-circle me-1 small"></i> Training Aborted';
+                }
+            } catch (error) {
+                showToast(`System Error: ${error.message}`, 'error', error.stack || error.message);
+                addLog(`System Error: ${error.message}`, 'error');
+                statusBadge.className = 'status-badge status-idle';
+                statusBadge.innerHTML = '<i class="fas fa-exclamation-triangle me-1 small"></i> Error';
+            } finally {
+                startBtn.disabled = false;
+            }
+        }
+    });
 </script>
 {% endblock %}
