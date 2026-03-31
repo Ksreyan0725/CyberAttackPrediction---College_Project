@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
-  <img src="CyberAttackPrediction/static/images/favicon.svg" alt="CyberShield AI Logo" width="160" height="160">
+  <img src="/static/images/favicon.svg" alt="CyberShield AI Logo" width="160" height="160">
 </p>
 
 <h1 align="center">CyberShield AI</h1>
@@ -39,7 +39,7 @@
 
 ## 📊 Project Evolution & Roadmap
 
-![Project Roadmap](Project%20materials/roadmap.png)
+![Project Roadmap](/static/images/roadmap.png)
 *Above: The systematic development lifecycle from data ingestion to Generative AI integration.*
 
 ---
@@ -48,7 +48,7 @@
 
 This project is built upon the core principles of network defense.
 
-![Five Pillars](Project%20materials/five%20pillors%20of%20cybersecurity.png)
+![Five Pillars](/static/images/five_pillars.png)
 *The system aligns with standard cybersecurity frameworks to ensure comprehensive protection and monitoring.*
 
 ---
