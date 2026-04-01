@@ -1371,11 +1371,13 @@
                     {% endif %}
                     <li class="nav-item">
                         <div class="d-flex align-items-center h-100 ms-lg-2">
+                            {% if session.get('user') %}
                             <button id="clearAppData" class="btn btn-link nav-link p-2 me-1 text-decoration-none"
                                 data-bs-toggle="tooltip" data-bs-placement="bottom" title="Clear App Data"
                                 style="font-size: 1.1rem;">
                                 <i class="fas fa-broom icon-broom"></i>
                             </button>
+                            {% endif %}
                             <div class="theme-toggle" id="theme-toggle" data-bs-toggle="tooltip"
                                 data-bs-placement="bottom" title="Toggle Theme">
                                 <i class="fas fa-moon"></i>

@@ -112,6 +112,9 @@ def predictView():
 @app.route('/api/clear-session', methods=['POST'])
 def clear_session():
     """API endpoint to clear specific session results for system reset."""
+    if not session.get('user'):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        
     session.pop('last_result', None)
     session.pop('last_page_type', None)
     return jsonify({"status": "success", "message": "Session data cleared successfully"})
