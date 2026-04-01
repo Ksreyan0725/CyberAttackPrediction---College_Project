@@ -8,7 +8,7 @@
         max-width: 600px;
         margin: 4rem auto;
         padding: 2.5rem;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        background: var(--bg-card-soft);
         backdrop-filter: blur(20px);
         border: 1px solid var(--glass-border);
         border-radius: 30px;
@@ -47,7 +47,7 @@
         border-radius: 12px;
         background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
         border: none;
-        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
     }
 </style>
 {% endblock %}
@@ -56,7 +56,7 @@
 <div class="container mt-5">
     <div class="settings-wrapper liquid-glass">
         <div class="text-center mb-5">
-            <div class="user-avatar-circle" style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: rgba(59, 130, 246, 0.1); border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
+            <div class="user-avatar-circle" style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--primary-light); border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
                 <i class="fas fa-user-gear fa-2x"></i>
             </div>
             <h3 class="dynamic-text fw-bold">Account Management</h3>

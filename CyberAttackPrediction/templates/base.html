@@ -69,12 +69,12 @@
                     <div class="small fw-bold dynamic-text">${message}</div>
                     ${subtext}
                 </div>
-                <button type="button" class="btn-close btn-close-white ms-2 small" style="font-size: 0.6rem;" onclick="event.stopPropagation(); this.parentElement.remove()"></button>
+                <button type="button" class="btn-close ms-2 small" style="font-size: 0.6rem; filter: var(--close-filter, none);" onclick="event.stopPropagation(); this.parentElement.remove()"></button>
             `;
 
             if (details) {
                 toast.onclick = () => {
-                    showDetailModal(type.toUpperCase() + ' DETAILS', `<div class="p-3 bg-dark-soft rounded-3 border-glass font-monospace text-break">${details}</div>`);
+                    showDetailModal(type.toUpperCase() + ' DETAILS', `<div class="p-3 rounded-3 border-glass font-monospace text-break" style="background: var(--bg-card-soft);">${details}</div>`);
                 };
             }
 
@@ -106,55 +106,54 @@
     <style>
         :root {
             --primary-color: #007bff;
-            /* Bright Neon Blue */
             --secondary-color: #64748b;
             --dark-color: #0f172a;
             --light-color: #f8fafc;
             --success-color: #20c997;
-            /* Bright Mint Green */
             --danger-color: #ff4757;
-            /* Bright Coral Red */
             --info-color: #00d2ff;
-            /* Electric Cyan */
+
             --primary-rgb: 0, 123, 255;
             --info-rgb: 0, 210, 255;
+            --success-rgb: 32, 201, 151;
+            --danger-rgb: 255, 71, 87;
+            --text-main-rgb: 224, 224, 224;
 
             --bg-gradient: radial-gradient(circle at top right, #0a191f, #000000);
             --surface-bg: radial-gradient(circle at top right, #0a191f, #000000);
-            --footer-bg: #000;
+            --footer-bg: transparent;
             --brand-text-color: rgba(255, 255, 255, 0.04);
             --text-main: #e0e0e0;
-            --text-muted: #94a3b8; /* Significantly brighter for dark mode legibility */
+            --text-muted: #94a3b8;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-primary: #00ffa3;
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --navbar-bg: rgba(5, 5, 5, 0.7);
-            --dropdown-bg: rgba(10, 25, 31, 0.5); /* 50% Opacity as requested */
+            --dropdown-bg: rgba(10, 25, 31, 0.5);
+            --primary-light: rgba(var(--primary-rgb), 0.15);
+            --bg-card-soft: rgba(255, 255, 255, 0.04);
 
-            /* Responsive Footnote Branding */
             --brand-final-opacity: 0.85;
-            /* Bright punch in dark mode */
             --brand-text-gradient: linear-gradient(to right, var(--primary-color), var(--info-color), var(--primary-color));
-            
-            /* High-Contrast Alert Overrides for Dark Mode */
-            --alert-bg-primary: rgba(59, 130, 246, 0.15);
-            --alert-text-primary: #60a5fa; /* Brighter Blue */
+
+            --alert-bg-primary: rgba(var(--primary-rgb), 0.15);
+            --alert-text-primary: #60a5fa;
+            --close-filter: invert(1) grayscale(100%) brightness(200%);
         }
 
-        /* Light Mode Palette */
         .light-mode {
             --primary-color: #007bff;
-            /* Bright Neon Blue */
             --primary-rgb: 0, 123, 255;
             --info-color: #00d2ff;
-            /* Electric Cyan */
             --info-rgb: 0, 210, 255;
             --success-color: #20c997;
             --danger-color: #ff4757;
+            --text-main-rgb: 33, 37, 41;
+
             --bg-gradient: radial-gradient(circle at top right, #f8f9fa, #e9ecef);
             --surface-bg: radial-gradient(circle at top right, #fdfdfd, #f0f2f5);
-            --footer-bg: #e9ecef;
+            --footer-bg: transparent;
             --brand-text-color: rgba(0, 0, 0, 0.08);
             --text-main: #212529;
             --text-muted: #475569;
@@ -164,16 +163,16 @@
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             --navbar-bg: rgba(255, 255, 255, 0.7);
-            --dropdown-bg: rgba(255, 255, 255, 0.5); /* 50% Opacity as requested */
-            
+            --dropdown-bg: rgba(255, 255, 255, 0.5);
+            --primary-light: rgba(var(--primary-rgb), 0.08);
+            --bg-card-soft: rgba(0, 0, 0, 0.03);
+
             --alert-bg-primary: rgba(13, 110, 253, 0.1);
             --alert-text-primary: #0d6efd;
 
-            /* High Contrast Footer Branding */
             --brand-final-opacity: 0.9;
-            /* Harder, solid punch in light mode */
             --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085);
-            /* Deep royal navy to punch through the light background */
+            --close-filter: none;
         }
 
         html {
@@ -234,7 +233,7 @@
         .main-surface {
             position: relative;
             z-index: 10;
-            background: var(--surface-bg);
+            background: transparent;
             color: var(--text-main);
             min-height: 100vh;
             /* Ensure content clears the fixed navbar */
@@ -244,7 +243,6 @@
             box-shadow: 0 15px 50px var(--card-shadow);
             transition: background 0.4s ease, color 0.4s ease;
             /* Ensure the surface covers the fixed footer until the end */
-            border-bottom: 1px solid var(--glass-border);
         }
 
         .footer {
@@ -263,7 +261,6 @@
             padding-top: 40px;
             /* Lowers the content to eliminate top gap while leaving room for branding */
             overflow: hidden;
-            border-top: 1px solid var(--glass-border);
             pointer-events: auto;
             transition: background 0.4s ease, color 0.4s ease;
         }
@@ -287,13 +284,22 @@
             background: transparent;
             padding: 5px 20px;
             border-radius: 50px;
-            opacity: 0.7;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
             transition: all 0.3s ease;
             font-size: 0.8rem;
+            will-change: transform, opacity;
+        }
+
+        .footer-btn.show {
+            opacity: 0.7;
+            visibility: visible;
+            pointer-events: auto;
         }
 
         .footer-btn:hover {
-            opacity: 1;
+            opacity: 1 !important;
             background: var(--text-main);
             color: var(--footer-bg);
         }
@@ -424,7 +430,8 @@
         /* Universal Text Classes Sync */
         .footer .text-muted {
             color: var(--text-muted) !important;
-            opacity: 0.85; /* Increased opacity for legibility */
+            opacity: 0.85;
+            /* Increased opacity for legibility */
         }
 
         .footer .fw-bold {
@@ -440,8 +447,13 @@
         }
 
         /* Semantic Alert Helpers */
-        .text-primary-dynamic { color: var(--alert-text-primary) !important; }
-        .bg-primary-light-dynamic { background-color: var(--alert-bg-primary) !important; }
+        .text-primary-dynamic {
+            color: var(--alert-text-primary) !important;
+        }
+
+        .bg-primary-light-dynamic {
+            background-color: var(--alert-bg-primary) !important;
+        }
 
         .navbar {
             top: 16px !important;
@@ -463,6 +475,7 @@
             /* Slimmer vertical height, maintaining pill curve */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
             z-index: 1000;
+            will-change: transform;
         }
 
         .navbar-brand,
@@ -554,10 +567,12 @@
                 opacity: 0;
                 transform: translateY(32px);
             }
+
             60% {
                 opacity: 1;
                 transform: translateY(-4px);
             }
+
             100% {
                 opacity: 1;
                 transform: translateY(0);
@@ -565,7 +580,10 @@
         }
 
         /* One-Time Reveal Initial States (Hidden by default) */
-        .reveal-premium, .reveal-depth, .reveal-soft, .reveal-slide-up {
+        .reveal-premium,
+        .reveal-depth,
+        .reveal-soft,
+        .reveal-slide-up {
             opacity: 0;
             will-change: transform, opacity;
         }
@@ -574,12 +592,15 @@
         .revealed.reveal-premium {
             animation: revealPremium 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
+
         .revealed.reveal-depth {
             animation: revealDepth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
+
         .revealed.reveal-soft {
             animation: revealSoft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
+
         .revealed.reveal-slide-up {
             animation: revealSlideUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
         }
@@ -1043,7 +1064,8 @@
             margin-top: 15px !important;
             transition: opacity 0.3s ease, margin-top 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
             pointer-events: none;
-            right: 0; /* Match dropdown-menu-end behavior statically */
+            right: 0;
+            /* Match dropdown-menu-end behavior statically */
             left: auto;
         }
 
@@ -1068,13 +1090,15 @@
         .dropdown-toggle::after {
             display: inline-block;
             transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            transform: rotate(0deg); /* Pointing down by default (Closed) - Standard */
+            transform: rotate(0deg);
+            /* Pointing down by default (Closed) - Standard */
             vertical-align: middle;
             margin-left: 0.5em;
         }
 
         .dropdown-toggle[aria-expanded="true"]::after {
-            transform: rotate(180deg); /* Pointing up when active (Open) - Standard */
+            transform: rotate(180deg);
+            /* Pointing up when active (Open) - Standard */
         }
 
         .hero-section {
@@ -1279,9 +1303,11 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center fw-bold" 
+            <a class="navbar-brand d-flex align-items-center fw-bold"
                 href="{% if request.endpoint in ['UserLogin', 'Signup'] %}javascript:void(0){% else %}{{ url_for('index') }}{% endif %}"
-                {% if request.endpoint in ['UserLogin', 'Signup'] %}style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: default;"{% else %}style="letter-spacing: -0.5px; font-size: 1.25rem;"{% endif %}>
+                {% if request.endpoint in ['UserLogin', 'Signup' ]
+                %}style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: default;" {% else
+                %}style="letter-spacing: -0.5px; font-size: 1.25rem;" {% endif %}>
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2"
                     style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                     <defs>
@@ -1558,17 +1584,39 @@
         let lastScrollTop = 0;
         const navbar = document.querySelector('.navbar');
         const fsBtnFloating = document.querySelector('.fullscreen-floating-btn');
+        const backToTopBtn = document.querySelector('.footer-btn');
+        let isScrolling = false;
 
         window.addEventListener('scroll', function () {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            if (scrollTop > lastScrollTop && scrollTop > 100) {
-                // Scroll down
-                if (navbar) navbar.classList.add('navbar-hidden');
-            } else {
-                // Scroll up
-                if (navbar) navbar.classList.remove('navbar-hidden');
+            if (!isScrolling) {
+                window.requestAnimationFrame(() => {
+                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    
+                    // Navbar Hide/Show
+                    if (scrollTop > lastScrollTop && scrollTop > 100) {
+                        if (navbar) navbar.classList.add('navbar-hidden');
+                    } else {
+                        if (navbar) navbar.classList.remove('navbar-hidden');
+                    }
+
+                    // Back to Top Button Visibility logic
+                    if (backToTopBtn) {
+                        if (scrollTop > 300) {
+                            if (!backToTopBtn.classList.contains('show')) {
+                                backToTopBtn.classList.add('show');
+                            }
+                        } else {
+                            if (backToTopBtn.classList.contains('show')) {
+                                backToTopBtn.classList.remove('show');
+                            }
+                        }
+                    }
+
+                    lastScrollTop = scrollTop;
+                    isScrolling = false;
+                });
+                isScrolling = true;
             }
-            lastScrollTop = scrollTop;
         });
 
         // Safe Footer Reveal Animation
@@ -1628,7 +1676,7 @@
         }
 
         // --- GLOBAL ONE-TIME REVEAL OBSERVER ---
-        (function() {
+        (function () {
             const revealCallback = (entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -1658,7 +1706,7 @@
 
             // Initial Scan
             document.addEventListener('DOMContentLoaded', initRevealObserver);
-            
+
             // Also run after any AJAX/content injection if necessary
             window.refreshRevealObserver = initRevealObserver;
         })();
@@ -1673,19 +1721,39 @@
             const currentPath = window.location.pathname;
             if (sessionStorage.getItem('visited_' + currentPath)) {
                 element.textContent = text;
-                if (cursor) cursor.style.display = 'none';
+                if (cursor) {
+                    element.appendChild(cursor);
+                    cursor.style.display = 'inline-block';
+                    cursor.classList.add('animate__flash', 'animate__animated', 'animate__infinite');
+                }
                 return;
             }
 
             let charIndex = 0;
+            if (cursor) {
+                cursor.style.display = 'inline-block';
+                cursor.classList.remove('animate__flash', 'animate__animated', 'animate__infinite');
+            }
+
             setTimeout(() => {
                 function type() {
                     if (charIndex < text.length) {
-                        element.textContent += text.charAt(charIndex);
+                        // Use textContent for safety, but we need to keep cursor inside flow
+                        const char = text.charAt(charIndex);
+                        const textNode = document.createTextNode(char);
+
+                        // Insert text before cursor
+                        if (cursor && cursor.parentNode === element) {
+                            element.insertBefore(textNode, cursor);
+                        } else {
+                            element.appendChild(textNode);
+                            if (cursor) element.appendChild(cursor);
+                        }
+
                         charIndex++;
                         setTimeout(type, speed);
                     } else if (cursor) {
-                        cursor.classList.add('animate__flash');
+                        cursor.classList.add('animate__flash', 'animate__animated', 'animate__infinite');
                     }
                 }
                 type();
@@ -1782,7 +1850,7 @@
                 if (tooltip) tooltip.hide();
 
                 customConfirm(
-                    "Clear System Data", 
+                    "Clear System Data",
                     "Are you sure you want to clear all local application data and active results? This action cannot be undone.",
                     async () => {
                         try {
@@ -1794,12 +1862,12 @@
                             const savedTheme = localStorage.getItem('theme');
                             const keysToKeep = {};
                             if (savedTheme) keysToKeep['theme'] = savedTheme;
-                            
+
                             localStorage.clear();
                             for (const [k, v] of Object.entries(keysToKeep)) {
                                 localStorage.setItem(k, v);
                             }
-                            
+
                             showToast('System data successfully reset', 'success');
                             setTimeout(() => location.reload(), 1000);
                         } catch (err) {
@@ -1839,12 +1907,14 @@
     <!-- Global Theme-Aware Detail Modal -->
     <div class="modal fade" id="themeDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
-            <div class="modal-content liquid-glass shadow-lg" style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px;">
+            <div class="modal-content liquid-glass shadow-lg"
+                style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px;">
                 <div class="modal-header py-3 border-0">
                     <h5 class="modal-title dynamic-text fw-bold" id="modalTitle">
                         <i class="fas fa-microchip me-2 text-info"></i>System Details
                     </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        style="filter: var(--close-filter);"></button>
                 </div>
                 <div class="modal-body p-4">
                     <div id="modalBodyContent" class="dynamic-muted small" style="max-height: 400px; overflow-y: auto;">
@@ -1864,19 +1934,19 @@
             const modal = new bootstrap.Modal(document.getElementById('themeDetailModal'));
             document.getElementById('modalTitle').innerHTML = `<i class="fas fa-question-circle me-2 text-warning"></i>${title}`;
             document.getElementById('modalBodyContent').innerHTML = `<p class="dynamic-text mb-0">${message}</p>`;
-            
+
             const footerActions = document.getElementById('modalActionContainer');
             footerActions.innerHTML = `
                 <button type="button" class="btn btn-primary btn-sm rounded-pill px-4 ms-2" id="modalConfirmBtn">${confirmText}</button>
             `;
-            
+
             const confirmBtn = document.getElementById('modalConfirmBtn');
             confirmBtn.onclick = () => {
                 const modalInstance = bootstrap.Modal.getInstance(document.getElementById('themeDetailModal'));
                 if (modalInstance) modalInstance.hide();
                 if (confirmCallback) confirmCallback();
             };
-            
+
             modal.show();
         }
 

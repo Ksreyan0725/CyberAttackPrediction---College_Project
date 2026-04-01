@@ -5,10 +5,11 @@
 {% block extra_css %}
 <style>
     /* Standardize layout for footer reveal */
-    html, body {
+    html,
+    body {
         margin: 0;
     }
-    
+
     body {
         background: var(--bg-gradient);
         background-attachment: fixed;
@@ -22,6 +23,9 @@
         padding: 2rem 1rem 4rem;
         position: relative;
         z-index: 1;
+        /* Stable 3D Stage: High focal length minimizes width scaling */
+        perspective: 5000px;
+        overflow-x: hidden;
     }
 
     .blob {
@@ -34,47 +38,109 @@
         z-index: -1;
         opacity: 0.15;
         animation: float 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+        will-change: transform;
     }
 
-    .blob-1 { top: -10%; left: -10%; background: #3b82f6; }
-    .blob-2 { bottom: -10%; right: -10%; background: #8b5cf6; animation-delay: -10s; }
+    .blob-1 {
+        top: -10%;
+        left: -10%;
+        background: #3b82f6;
+    }
+
+    .blob-2 {
+        bottom: -10%;
+        right: -10%;
+        background: #8b5cf6;
+        animation-delay: -10s;
+    }
 
     @keyframes float {
-        0% { transform: translate(0, 0) scale(1); }
-        100% { transform: translate(100px, 50px) scale(1.1); }
+        0% {
+            transform: translate(0, 0) scale(1);
+        }
+
+        100% {
+            transform: translate(100px, 50px) scale(1.1);
+        }
     }
 
-    @keyframes revealEntranceStaggered {
-        0%   { opacity: 0; transform: scale(0.97); filter: brightness(1.2); }
-        65%  { opacity: 1; transform: scale(1.002); filter: brightness(1); }
-        100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+    @keyframes emergeFromDeep {
+        0% {
+            opacity: 0;
+            transform: translateZ(-400px) translateY(10px);
+            filter: blur(12px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateZ(0) translateY(0);
+            filter: blur(0px);
+        }
+    }
+
+    @keyframes revealFade {
+        0% {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Target all elements that need staggered reveal */
+    .animate-reveal {
+        opacity: 0;
+        animation: revealFade 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
     }
 
     .login-wrapper {
         width: 100%;
         max-width: 900px;
+        /* Forced width to stabilize during reveal - browser measurement fix */
+        width: 900px !important;
         background: transparent;
         display: flex;
         flex-direction: row;
+        animation: emergeFromDeep 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+        will-change: transform, opacity, filter;
+        transform-origin: center center;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
+        /* Stop any fighting transitions */
+        transition: none !important;
     }
 
-    .info-panel, .form-panel {
-        will-change: transform, opacity;
-        animation: revealEntranceStaggered 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    .info-panel,
+    .form-panel {
+        will-change: transform, opacity, filter;
+        animation: emergeFromDeep 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+        transition: none !important;
     }
 
     .form-panel {
         animation-delay: 0.15s;
-    }
-
-    .info-panel {
-        flex: 1.2;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
-        backdrop-filter: blur(20px);
-        padding: 1.75rem 2.25rem;
+        /* Hard-locked flex basis for zero movement to match login */
+        flex: 0 0 410px;
+        padding: 3rem 2.5rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        border-radius: 0 30px 30px 0 !important;
+        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .info-panel {
+        /* Hard-locked flex basis for zero movement to match login */
+        flex: 0 0 490px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        backdrop-filter: blur(20px);
+        padding: 2.5rem 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         border: 1px solid var(--glass-border);
         border-right: none;
         border-radius: 30px 0 0 30px;
@@ -117,12 +183,29 @@
         border-radius: 12px 0 0 12px;
     }
 
-    .form-control { border-radius: 0 12px 12px 0; }
+    .form-control {
+        border-radius: 0 12px 12px 0;
+    }
 
     @media (max-width: 900px) {
-        .login-wrapper { flex-direction: column; max-width: 500px; }
-        .info-panel { border-right: none; border-bottom: 1px solid var(--glass-border); border-radius: 30px 30px 0 0; }
-        .form-panel { border-radius: 0 0 30px 30px !important; }
+        .login-wrapper {
+            flex-direction: column;
+            max-width: 500px;
+        }
+
+        .info-panel {
+            padding: 2.5rem 3.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            border-right: none;
+            border-bottom: 1px solid var(--glass-border);
+            border-radius: 30px 30px 0 0;
+        }
+
+        .form-panel {
+            border-radius: 0 0 30px 30px !important;
+        }
     }
 </style>
 {% endblock %}
@@ -133,55 +216,65 @@
     <div class="blob blob-2"></div>
 
     <div class="login-wrapper">
-        <div class="info-panel">
+        <div class="info-panel" style="padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
             <div class="brand-section">
-                <div class="brand-logo bg-transparent border-0 p-0 mb-3" style="width: 70px; height: 70px; margin: 0 auto;">
+                <div class="brand-logo bg-transparent border-0 p-0 mb-3 animate-reveal"
+                    style="width: 70px; height: 70px; margin: 0 auto; animation-delay: 0.6s;">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100">
-                        <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none" stroke="var(--primary-color)" stroke-width="4" stroke-linejoin="round"/>
+                        <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none"
+                            stroke="var(--primary-color)" stroke-width="4" stroke-linejoin="round" />
                         <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
-                        <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4" stroke-linecap="round" fill="none" opacity="0.6"/>
+                        <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4"
+                            stroke-linecap="round" fill="none" opacity="0.6" />
                     </svg>
                 </div>
-                <h1 class="brand-title">Join CyberShield AI</h1>
-                <p class="dynamic-muted small">Create your account to start predicting and monitoring cyber attacks with generative AI insights.</p>
+                <h1 class="brand-title animate-reveal"
+                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 0.5rem auto;">Join CyberShield AI
+                </h1>
+                <div class="typing-container mb-4 animate-reveal"
+                    style="height: 95px; width: 100%; max-width: 440px; margin: 0 auto; text-align: left; animation-delay: 0.9s;">
+                    <p id="typingText" class="dynamic-muted mb-0"
+                        style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.4; font-size: 0.95rem;">
+                        <!-- Cursor is injected here via script to follow wrap -->
+                        <span id="cursor" class="text-primary fw-bold ms-1"
+                            style="display: none; vertical-align: baseline;">|</span>
+                    </p>
+                </div>
             </div>
         </div>
 
-        <div class="form-panel liquid-glass">
-            <div class="text-center mb-4">
+        <div class="form-panel liquid-glass"
+            style="padding: 3rem 2.5rem; display: flex; flex-direction: column; justify-content: center;">
+            <div class="text-center mb-4 animate-reveal" style="animation-delay: 0.7s;">
                 <h4 class="dynamic-text fw-bold">Create Account</h4>
                 <p class="xx-small dynamic-muted">Fill in your details to get started</p>
             </div>
 
             <form action="/SignupAction" method="post" onsubmit="return validateSignup(this);">
-                <div class="mb-3">
+                <div class="mb-3 animate-reveal" style="animation-delay: 0.85s;">
                     <label class="form-label fw-bold dynamic-muted xx-small mb-1">USERNAME</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user-plus"></i></span>
-                        <input type="text" class="form-control" name="username" placeholder="Choose a username" required>
+                        <input type="text" class="form-control" name="username" placeholder="Choose a username"
+                            required>
                     </div>
                 </div>
-                <div class="mb-3">
+                <div class="mb-3 animate-reveal" style="animation-delay: 1.0s;">
                     <label class="form-label fw-bold dynamic-muted xx-small mb-1">PASSWORD</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        <input type="password" class="form-control" name="password" id="p1" placeholder="••••••••" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label class="form-label fw-bold dynamic-muted xx-small mb-1">CONFIRM PASSWORD</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="fas fa-check-double"></i></span>
-                        <input type="password" class="form-control" name="confirm_password" id="p2" placeholder="••••••••" required>
+                        <input type="password" class="form-control" name="password" id="p1" placeholder="••••••••"
+                            required>
                     </div>
                 </div>
 
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-primary shadow-sm">
+                <div class="d-grid gap-2 animate-reveal" style="animation-delay: 1.3s;">
+                    <button type="submit" class="btn btn-primary shadow-sm py-2">
                         <i class="fas fa-user-check me-2"></i>Register Now
                     </button>
-                    <div class="text-center mt-3">
-                        <p class="xx-small dynamic-muted">Already have an account? <a href="/UserLogin" class="text-primary fw-bold text-decoration-none">Login here</a></p>
+                    <div class="text-center mt-3 animate-reveal" style="animation-delay: 1.4s;">
+                        <p class="xx-small dynamic-muted">Already have an account? <a href="/UserLogin"
+                                class="text-primary fw-bold text-decoration-none">Login here</a></p>
                     </div>
                 </div>
             </form>
@@ -192,11 +285,12 @@
 
 {% block extra_js %}
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const typingSummary = "Create your account to start predicting and monitoring cyber attacks with generative AI insights.";
+        initTypingEffect('typingText', typingSummary, 35, 100);
+    });
+
     function validateSignup(form) {
-        if (form.password.value !== form.confirm_password.value) {
-            showToast("Passwords do not match!", "error");
-            return false;
-        }
         if (form.password.value.length < 6) {
             showToast("Password must be at least 6 characters", "warning");
             return false;
