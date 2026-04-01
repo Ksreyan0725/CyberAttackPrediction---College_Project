@@ -140,6 +140,8 @@
             --alert-bg-primary: rgba(var(--primary-rgb), 0.15);
             --alert-text-primary: #60a5fa;
             --close-filter: invert(1) grayscale(100%) brightness(200%);
+            /* Base color for browser-level elements (overscroll/scrollbars) */
+            --bg-base: #000000;
         }
 
         .light-mode {
@@ -173,6 +175,8 @@
             --brand-final-opacity: 0.9;
             --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085);
             --close-filter: none;
+            /* Base color for browser-level elements (overscroll/scrollbars) */
+            --bg-base: #ffffff;
         }
 
         html {
@@ -205,6 +209,8 @@
         body {
             overflow-x: hidden;
             width: 100%;
+            /* Fix overscroll 'whiteness': set a theme-aware base color */
+            background-color: var(--bg-base);
             /* Hide scrollbar visually while maintaining scroll functionality */
             scrollbar-width: none;
             /* Firefox */
