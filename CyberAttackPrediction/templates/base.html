@@ -848,7 +848,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 60%);
+            /* Lowered shine to 0.05 for cleaner dark theme consistency */
+            background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
             pointer-events: none;
             z-index: 1;
         }
@@ -862,16 +863,19 @@
 
         [data-theme="dark"] .liquid-glass {
             --glass-rgb: 255, 255, 255;
-            background: rgba(255, 255, 255, 0.03) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            /* Deeper, more 'stealthy' background opacity to remove the white haze */
+            background: rgba(255, 255, 255, 0.015) !important;
+            /* Softened border to prevent sharp 'white line' catching on corners */
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
         }
 
         /* Glass Form Elements */
         .liquid-glass .form-control,
         .liquid-glass .input-group-text,
         .liquid-glass #togglePassword {
-            background: rgba(255, 255, 255, 0.05) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            /* Subtler haze for inputs to match the deeper theme */
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             backdrop-filter: blur(10px);
             color: var(--text-main) !important;
         }

@@ -16,7 +16,7 @@
     }
 
     main {
-        min-height: calc(100vh - 100px);
+        min-height: unset;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -25,7 +25,7 @@
         z-index: 1;
         /* Stable 3D Stage: High focal length minimizes width scaling */
         perspective: 5000px;
-        overflow-x: hidden;
+        overflow-x: visible;
     }
 
     /* Decorative Blobs */
@@ -110,9 +110,10 @@
         transform-origin: center center;
         transform-style: preserve-3d;
         backface-visibility: hidden;
-        /* Stop any fighting transitions */
+        /* Forced overflow visible to ensure only global page scroll handles content */
+        overflow: visible !important;
         transition: none !important;
-        will-change: transform, opacity;
+        margin: 2rem auto;
     }
 
     .info-panel,
@@ -126,30 +127,30 @@
     .info-panel {
         /* Hard-locked flex basis for zero movement */
         flex: 1.2 0 490.9px;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+        /* Lowered white opacity to 0.015 to remove the haze in dark mode */
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 1.75rem 2.25rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        border: 1px solid var(--glass-border);
-        border-right: none;
+        /* Custom border softening: Soft left border, zero right border to merge with form side */
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-right: none !important;
         border-radius: 30px 0 0 30px;
         position: relative;
-        overflow: hidden;
+        /* Forced overflow visible to prevent shadow clipping */
+        overflow: visible !important;
         box-shadow: -20px 25px 50px -12px rgba(0, 0, 0, 0.3);
     }
 
-    .info-panel::before {
-        content: '';
-        position: absolute;
-        top: -20%;
-        right: -10%;
-        width: 300px;
-        height: 300px;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
-        z-index: 0;
+    /* Disable all circular blobs and internal shines to clean the interface */
+    .info-panel::before,
+    .info-panel::after,
+    .form-panel::before,
+    .form-panel::after {
+        display: none !important;
     }
 
     .brand-section {
@@ -212,7 +213,12 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
+        /* Custom border softening: Soft right border, zero left border to merge with info side */
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-left: none !important;
         border-radius: 0 30px 30px 0 !important;
+        /* Forced overflow visible to prevent shadow clipping */
+        overflow: visible !important;
         box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
@@ -295,14 +301,15 @@
 {% endblock %}
 
 {% block content %}
-<main>
+<div class="main-content-section-fix">
     <!-- Background Decor -->
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
     <div class="login-wrapper">
         <!-- Left: Informational Panel -->
-        <div class="info-panel" style="padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+        <div class="info-panel"
+            style="padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
             <div class="brand-section" style="margin: 0 auto; padding: 0; width: 100%;">
                 <div class="brand-logo bg-transparent border-0 p-0 mb-4 animate-reveal"
                     style="width: 70px; height: 70px; margin: 0 auto; padding: 0; cursor: default; animation-delay: 0.6s;">
@@ -418,7 +425,6 @@
                 </form>
             </div>
         </div>
-</main>
 {% endblock %}
 
 {% block extra_js %}
