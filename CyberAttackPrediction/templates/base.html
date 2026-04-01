@@ -129,7 +129,7 @@
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent-primary: #00ffa3;
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --navbar-bg: rgba(5, 5, 5, 0.7);
+            --navbar-bg: rgba(0, 0, 0, 0.15);
             --dropdown-bg: rgba(10, 25, 31, 0.5);
             --primary-light: rgba(var(--primary-rgb), 0.15);
             --bg-card-soft: rgba(255, 255, 255, 0.04);
@@ -162,7 +162,7 @@
             --accent-primary: #007bff;
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --navbar-bg: rgba(255, 255, 255, 0.7);
+            --navbar-bg: rgba(255, 255, 255, 0.15);
             --dropdown-bg: rgba(255, 255, 255, 0.5);
             --primary-light: rgba(var(--primary-rgb), 0.08);
             --bg-card-soft: rgba(0, 0, 0, 0.03);
@@ -743,7 +743,11 @@
 
         /* Navbar must ALWAYS work regardless of visit count */
         .navbar {
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            background: var(--navbar-bg) !important;
+            backdrop-filter: blur(20px) saturate(180%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+            border-bottom: 1px solid var(--glass-border) !important;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
         }
 
         /* Premium Toast Notifications */
