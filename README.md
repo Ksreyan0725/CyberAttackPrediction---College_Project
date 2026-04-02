@@ -12,10 +12,10 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/python-3.11-blue.svg?style=for-the-badge&logo=python" alt="Python">
-  <img src="https://img.shields.io/badge/flask-v3.0-EA4335.svg?style=for-the-badge&logo=flask" alt="Flask">
-  <img src="https://img.shields.io/badge/scikit--learn-F7931E.svg?style=for-the-badge&logo=scikit-learn" alt="Scikit-Learn">
-  <img src="https://img.shields.io/badge/Status-Academic--Ready-success.svg?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Flask-v3.0-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
+  <img src="https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
+  <img src="https://img.shields.io/badge/Status-Academic--Ready-success?style=for-the-badge" alt="Status">
 </p>
 
 ---
@@ -26,32 +26,47 @@
 
 ---
 
-## 🚀 Key Features
+## 🚀 Academic Quick Launch (Examiner Ready)
 
-| **🚀 Dual-Docs** | Features a two-stage documentation experience: A high-level **Interactive Overview** for beginners and a **Repository Explorer** for technical deep dives. |
-| **💎 Liquid Glass UI** | A premium, responsive interface featuring 80px Gaussian blur, translucency, and refractive background animations for a modern feel. |
-| **🧠 Stacking ML** | Uses a multi-model architecture (Random Forest, KNN, MLP) for 98%+ prediction accuracy over single-model systems. |
-| **🔍 XAI (SHAP)** | Explainable AI that visually breaks down *why* a specific network packet was flagged as an attack using SHAP values. |
-| **🛡️ Secure Auth** | Multi-user system with **PBKDF2-SHA256** Hashing. Features an **Ultimate Admin Bypass** (`admin`/`admin`) with master badge. |
-| **⚡ UX Stability** | Implements an **Immersive Focus Lock** (blurring backgrounds on modals) and **One-Time Reveal Animations** for a locked-in dashboard experience. |
-| **🔄 Dual-Reset** | Synchronized system reset that wipes both Browser LocalStorage and Server Flask Sessions for a 100% fresh starts. |
-| **🤖 GenAI Insights** | Transforms complex technical results into clear, actionable advice for security administrators. |
+This project includes all necessary software. Follow these **3 simple steps** to launch the application for your viva:
 
----
+1. **Install Python**: Open the [📁 Software/](Software/) folder and run `python-3.11.9-amd64.exe`.
+2. **Install Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically install all AI libraries.
+3. **One-Click Start**: Run [⚙️ Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) directly from the root to launch the dashboard.
 
-## 📊 Project Evolution & Roadmap
-
-![Project Roadmap](CyberAttackPrediction/static/images/roadmap.png)
-*Above: The systematic development lifecycle from data ingestion to Generative AI integration.*
+> [!TIP]
+> **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
 
 ---
 
-## 🛡️ Cybersecurity Foundations
+## 💎 Premium Key Features
 
-This project is built upon the core principles of network defense.
+- **🚀 Dual-Docs Experience**
+  - Seamless navigation between a **High-Level Interactive Overview** and a **Surgical Repository Explorer**.
+- **💎 Liquid Glass Design System**
+  - A state-of-the-art UI featuring 80px Gaussian blur, translucency, and refractive background animations.
+- **🧠 Stacking Ensemble AI**
+  - Uses a multi-model architecture (Random Forest, KNN, MLP) for **98%+ Accuracy**.
+- **🔍 XAI (Explainable AI)**
+  - Visualizes *why* a specific network packet was flagged using **SHAP (Shapley Additive Explanations)**.
+- **🤖 GenAI Mitigation Insights**
+  - Converts technical classification results into plain-English advice for security administrators.
+- **🔄 Synchronized System Reset**
+  - Total data-wipe capability: Clears both LocalStorage and Server Sessions for a 100% fresh environment.
 
-![Five Pillars](CyberAttackPrediction/static/images/five_pillars.png)
-*The system aligns with standard cybersecurity frameworks to ensure comprehensive protection and monitoring.*
+---
+
+## 📊 Project Foundations
+
+<p align="center">
+  <img src="CyberAttackPrediction/static/images/roadmap.png" alt="Project Roadmap" width="85%">
+  <br><i>The systematic development lifecycle from data ingestion to Generative AI integration.</i>
+</p>
+
+<p align="center">
+  <img src="CyberAttackPrediction/static/images/five_pillars.png" alt="Five Pillars" width="85%">
+  <br><i>Aligning with cybersecurity frameworks for comprehensive monitoring and defense.</i>
+</p>
 
 ---
 
@@ -117,7 +132,7 @@ This project is built upon the core principles of network defense.
   - 📁 [**scripts**](CyberAttackPrediction/scripts/) (Internal Maintenance & Surgical Fix Utilities)
   - 📃 [SCREEENS.pdf](CyberAttackPrediction/SCREEENS.pdf) (Project Screenshots)
   - 📄 [DatasetLink.txt](CyberAttackPrediction/DatasetLink.txt) (Dataset mirror link)
-  - 📄 [users.json](CyberAttackPrediction/users.json) (Salted/Hashed User Database)
+- 📄 [users.json](CyberAttackPrediction/users.json) (Salted/Hashed User Database)
   - 📄 [saved_creds.json](CyberAttackPrediction/saved_creds.json) (Local Session Cache)
   - 📄 [.env](CyberAttackPrediction/.env) (Environment Config / Secret Keys)
   - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)
