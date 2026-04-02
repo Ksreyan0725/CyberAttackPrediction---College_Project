@@ -30,7 +30,9 @@ The project is organized into a modular structure to separate data analysis (Jup
   - `*.hdf5`: Binary weight files for deep learning components.
 - **`/templates`**:
   - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems).
-  - `index.html`, `Predict.html`, `Train.html`: Page-specific templates.
+  - `AccountSettings.html`: The **CyberShield Command Center**. A high-security administrator dashboard with live system monitoring and user registry management.
+  - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.
+
 - **`/static`**:
   - `images/`: High-resolution brand assets (`favicon.svg`, `five_pillars.png`, `roadmap.png`).
   - `Dataset/`: Legacy data mirrors and documentation.
@@ -322,22 +324,30 @@ To ensure production-grade security, the application transitioned from a hardcod
 
 ### Key Security Implementations
 
-1. **Password Hashing (Werkzeug Security)**:
-    - **Mechanism**: Passwords are never stored in plain text. Instead, we use `generate_password_hash` with the **pbkdf2:sha256** method.
+1. **AJAX Authentication Flow**:
+    - **Mechanism**: The login portal uses a zero-reload `fetch()` architecture.
+    - **Experience**: Failed attempts trigger a "Glass Toast" error instantly without interrupting UI animations or background effects.
+    - **Security**: Validated via a JSON response from the server, which includes a secure redirect token for the project workflow.
+2. **Password Hashing (Werkzeug Security)**:
+    - **Mechanism**: Passwords are never stored in plain text. Instead, we use `generate_password_hash` with the **pbkdf2:sha256** and **scrypt** methods.
     - **Security**: This prevents attackers from reading passwords even if they gain access to the `users.json` database.
-2. **Persistent User Database (`users.json`)**:
+3. **Persistent User Database (`users.json`)**:
     - Stores user credentials in a JSON format.
     - **Self-Healing**: If the file is deleted, the system automatically recreates it and seeds the default admin account from the legacy `.env` configuration.
-3. **Ultimate Admin Bypass**:
+4. **Ultimate Admin Bypass**:
     - **Credentials**: `admin` / `admin`.
     - **Purpose**: Provides a master "overrule" account that bypasses standard database checks.
     - **Visual Indicator**: When logged in as the ultimate admin, a **MASTER** badge appears in the navigation bar.
-4. **Session Management**:
+5. **Session Management**:
     - Uses Flask's encrypted signed cookies (`secret_key`).
     - Includes inactivity protection and secure logout mechanisms.
     - **Inactivity Timeout**: Set to 1 hour of idle time.
-5. **Local "Quick Access" Storage**:
+6. **Local "Quick Access" Storage**:
     - The `saved_creds.json` file hashes local sessions to enable one-click access while keeping the filesystem secure.
+    - **Session Bypass**: Enabled when a valid token is detected, bypassing the full login UI and routing directly to the training workflow.
+7. **Master Admin User Registry**:
+    - **Dashboard**: Accessible via the Command Center for users with `MASTER` status.
+    - **Tools**: Includes high-level "Override Key" (Password Reset) and "Terminate" (Account Deletion) capabilities to manage the platform manually.
 
 ---
 
@@ -364,19 +374,39 @@ The **CyberAttackPrediction** project is designed as a learning bridge from trad
 
 To ensure a "Best-in-Class" user experience, the web application implements several high-end interface patterns that prioritize both aesthetics and stability.
 
-1. **Liquid-Glass Design System**:
+1. **CyberShield Command Center**:
+    - **Architecture**: A hardware-style, two-column grid using a backdrop blur (40px) and neon-accented borders.
+    - **Heartbeat Monitoring**: Live system health display with CSS-animated "Pulse Heart" dots for real-time connection status.
+    - **Operational Sidebar**: Sticky, glassmorphic navigation panel that keeps system tools available even on deep-scroll maintenance tasks.
+2. **Liquid-Glass Design System**:
     - **Visuals**: Uses 80px Gaussian blur with 50% opacity to create a "glassmorphic" depth effect.
     - **Performance**: Leverages GPU-accelerated backdrop filters for smooth rendering even on mobile devices.
-2. **Synchronized System Reset**:
+3. **Synchronized System Reset**:
     - **Mechanism**: The "Clear System Data" action is a dual-sync operation. It clears both the **Browser LocalStorage** and the **Server Flask Session** simultaneously.
     - **Consistency**: This ensures that analysis results (the "View Results" pill) are 100% removed from both ends, providing a truly fresh dashboard on reload.
-3. **Immersive Focus Lock (Modal System)**:
+4. **Immersive Focus Lock (Modal System)**:
     - **UX Pattern**: When a settings or detail modal is active, the background dashboard is automatically **blurred** and **interactive-locked** (pointer-events disabled).
     - **Benefit**: This prevents accidental background clicks and eliminates distracting hover effects, focusing the user entirely on the current decision.
-4. **One-Time Reveal Animations**:
+5. **One-Time Reveal Animations**:
     - **Engine**: Powered by a high-performance **Intersection Observer**.
     - **Stability**: Unlike standard CSS animations that might re-trigger during layout shifts, these "Reveals" only play once per page session.
     - **UX**: This ensures the dashboard stays stable and "locked-in" even as the user opens/closes popups or interacts with filters.
+
+---
+
+## 12. Technical Workflow Lifecycle
+
+The CyberShield AI system operates on a strictly locked 3-phase technical lifecycle to ensure project integrity and sequential data processing.
+
+1. **PHASE 01: DATASET INTELLIGENCE (Ingestion & Cleaning)**
+    - Users interact with NSL-KDD, CICIDS, and IIoT traffic logs.
+    - The system performs automated encoding of protocol signatures (TCP/UDP/HTTP).
+2. **PHASE 02: MODEL SYNTHESIS (Random Forest Core)**
+    - Accessible directly upon authentication.
+    - The training engine builds the ensemble brain and exports the `.pkl` artifact.
+3. **PHASE 03: THREAT INFERENCE (Real-Time Prediction)**
+    - Final stage where new, unseen traffic is classified.
+    - Results are visually interpreted via the glass-depth system.
 
 ---
 

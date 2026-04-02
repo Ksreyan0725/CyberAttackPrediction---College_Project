@@ -1,122 +1,598 @@
 {% extends "base.html" %}
 
-{% block title %}Account Settings - CyberShield AI{% endblock %}
+{% block title %}Command Center - CyberShield AI{% endblock %}
 
 {% block extra_css %}
 <style>
-    .settings-wrapper {
-        max-width: 600px;
-        margin: 4rem auto;
-        padding: 2.5rem;
-        background: var(--bg-card-soft);
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 30px;
-        box-shadow: var(--premium-shadow);
-        will-change: transform, opacity;
-        animation: fadeInUp 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    :root {
+        --dashboard-bg: rgba(10, 10, 15, 0.8);
+        --sidebar-width: 280px;
+        --accent-glow: 0 0 15px rgba(59, 130, 246, 0.4);
     }
 
-    @keyframes fadeInUp {
-        0%   { opacity: 0; transform: translateY(28px) scale(0.98); }
-        65%  { opacity: 1; transform: translateY(-4px) scale(1.005); }
-        100% { opacity: 1; transform: translateY(0) scale(1); }
+    .dashboard-container {
+        max-width: 1300px;
+        margin: 0 auto;
+        padding: 2rem 1rem 5rem;
     }
 
-    .form-control {
-        background: var(--input-bg);
-        border: 1px solid var(--glass-border);
-        color: var(--input-text) !important;
-        border-radius: 12px;
-        padding: 0.75rem 1rem;
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: var(--sidebar-width) 1fr;
+        gap: 2rem;
+        align-items: start;
     }
 
-    .input-group-text {
-        background: var(--input-bg);
-        border: 1px solid var(--glass-border);
-        border-right: none;
+    /* Sidebar Styling */
+    .sidebar-panel {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 1.5rem;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    }
+
+    .user-profile-mini {
+        text-align: center;
+        padding-bottom: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .status-pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 6px;
+        box-shadow: 0 0 10px #10b981;
+        animation: pulseHeart 2s infinite;
+    }
+
+    @keyframes pulseHeart {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5); opacity: 0.5; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+
+    .glass-tab-btn {
+        width: 100%;
+        padding: 0.9rem 1.2rem;
+        margin-bottom: 0.5rem;
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 14px;
+        color: var(--text-main);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-align: left;
+    }
+
+    .glass-tab-btn i {
+        font-size: 1.1rem;
+        opacity: 0.6;
+        transition: opacity 0.3s;
+    }
+
+    .glass-tab-btn:hover {
+        background: rgba(255, 255, 255, 0.03);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-tab-btn.active {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.05));
+        border-color: rgba(59, 130, 246, 0.3);
         color: var(--primary-color);
-        border-radius: 12px 0 0 12px;
+        box-shadow: var(--accent-glow);
     }
 
-    .form-control { border-radius: 0 12px 12px 0; }
+    .glass-tab-btn.active i {
+        opacity: 1;
+        color: var(--primary-color);
+    }
 
-    .btn-update {
-        padding: 0.8rem 2rem;
-        font-weight: 700;
-        border-radius: 12px;
-        background: linear-gradient(135deg, var(--primary-color) 0%, var(--info-color) 100%);
-        border: none;
-        box-shadow: 0 4px 15px rgba(var(--primary-rgb), 0.3);
+    /* Main Content Area */
+    .content-panel {
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 2.5rem;
+        min-height: 600px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+
+    .tab-content {
+        animation: slideUpFade 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    @keyframes slideUpFade {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* User Management Table */
+    .user-matrix-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+    }
+
+    .user-row {
+        background: rgba(255, 255, 255, 0.015);
+        border-radius: 16px;
+        transition: all 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .user-row:hover {
+        background: rgba(255, 255, 255, 0.04);
+        transform: scale(1.005);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .user-row td {
+        padding: 1.25rem 1.5rem;
+        vertical-align: middle;
+    }
+
+    .user-row td:first-child { border-radius: 16px 0 0 16px; }
+    .user-row td:last-child { border-radius: 0 16px 16px 0; }
+
+    .admin-pill {
+        font-size: 10px;
+        font-weight: 800;
+        padding: 3px 10px;
+        border-radius: 6px;
+        background: rgba(59, 130, 246, 0.1);
+        color: #60a5fa;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        letter-spacing: 0.5px;
+    }
+
+    /* Quick Access Cards */
+    .stat-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 18px;
+        padding: 1.25rem;
+        transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* Form Styling */
+    .cyber-input {
+        background: rgba(0, 0, 0, 0.2) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px !important;
+        color: white !important;
+        padding: 0.75rem 1rem !important;
+        font-size: 0.9rem !important;
+    }
+
+    .cyber-input:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 15px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-grid { grid-template-columns: 1fr; }
+        .sidebar-panel { position: relative; top: 0; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="settings-wrapper liquid-glass">
-        <div class="text-center mb-5">
-            <div class="user-avatar-circle" style="width: 80px; height: 80px; margin: 0 auto 1.5rem; background: var(--primary-light); border: 2px solid var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--primary-color);">
-                <i class="fas fa-user-gear fa-2x"></i>
+<div class="dashboard-container">
+    <!-- Header Area -->
+    <div class="d-flex justify-content-between align-items-center mb-5 reveal-premium">
+        <div>
+            <h2 class="dynamic-text fw-bold mb-1 tracking-tight">Command Center</h2>
+            <div class="d-flex align-items-center">
+                <span class="status-pulse-dot"></span>
+                <span class="xx-small dynamic-muted text-uppercase tracking-widest fw-bold">System Online & Protected</span>
             </div>
-            <h3 class="dynamic-text fw-bold">Account Management</h3>
-            <p class="xx-small dynamic-muted">Update your profile information and security settings</p>
+        </div>
+        <div class="text-end">
+            <div id="live-time" class="dynamic-text fw-bold h4 mb-0 font-monospace"></div>
+            <div id="live-date" class="xx-small dynamic-muted text-uppercase"></div>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Dashboard Sidebar -->
+        <div class="reveal-premium" style="animation-delay: 0.1s;">
+            <div class="sidebar-panel">
+                <div class="user-profile-mini">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center shadow-lg" 
+                             style="width: 80px; height: 80px; background: linear-gradient(45deg, #1e293b, #334155); border: 2px solid rgba(255,255,255,0.1);">
+                            <i class="fas fa-user-shield text-primary h2 mb-0"></i>
+                        </div>
+                        <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 14px; height: 14px; border: 2px solid #000;"></div>
+                    </div>
+                    <h5 class="dynamic-text fw-bold mb-1">{{ user_data.username }}</h5>
+                    <div class="d-inline-flex align-items-center gap-2">
+                        <span class="admin-pill text-uppercase">{{ user_data.role }}</span>
+                    </div>
+                </div>
+
+                <div class="nav-menu">
+                    <button class="glass-tab-btn active" onclick="switchControlTab('profile', this)">
+                        <i class="fas fa-fingerprint"></i> Identity & Keys
+                    </button>
+                    {% if user_data.role == 'admin' or session.get('is_ultimate') %}
+                    <button class="glass-tab-btn" onclick="switchControlTab('registry', this); fetchRegistryUsers();">
+                        <i class="fas fa-database"></i> User Registry
+                    </button>
+                    {% endif %}
+                    <button class="glass-tab-btn" onclick="switchControlTab('status', this)">
+                        <i class="fas fa-satellite-dish"></i> Status Monitor
+                    </button>
+                    <button class="glass-tab-btn" onclick="switchControlTab('manual', this)">
+                        <i class="fas fa-terminal"></i> Operation Manual
+                    </button>
+                    
+                    <hr class="my-4 opacity-5">
+                    
+                    <a href="/Logout" class="glass-tab-btn text-danger">
+                        <i class="fas fa-power-off"></i> Terminate Access
+                    </a>
+                </div>
+            </div>
         </div>
 
-        <form action="/UpdateAccountAction" method="post" onsubmit="return validateUpdate(this);">
-            <div class="mb-4">
-                <label class="form-label fw-bold dynamic-muted xx-small mb-1">CURRENT USERNAME</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-user"></i></span>
-                    <input type="text" class="form-control" name="username" value="{{ user_data.username }}" required>
-                </div>
-                <div class="xx-small dynamic-muted mt-2 ps-2">Leave as is unless you want to change it</div>
-            </div>
+        <!-- Main Workspace -->
+        <div class="reveal-premium" style="animation-delay: 0.2s;">
+            <div class="content-panel">
+                <!-- Profile Panel -->
+                <div id="panel-profile" class="tab-content">
+                    <div class="mb-5">
+                        <h4 class="dynamic-text fw-bold mb-1">Identity Configuration</h4>
+                        <p class="small dynamic-muted">Modify your digital credentials and security clearance.</p>
+                    </div>
 
-            <div class="mb-4 pt-3 border-top border-secondary opacity-25">
-                <label class="form-label fw-bold dynamic-muted xx-small mb-1">CHANGE PASSWORD (OPTIONAL)</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-shield-halved"></i></span>
-                    <input type="password" class="form-control" name="password" id="p1" placeholder="Enter new password">
-                </div>
-                <div class="xx-small dynamic-muted mt-2 ps-2">Only fill this if you want to change your password</div>
-            </div>
+                    <form action="/UpdateAccountAction" method="post" onsubmit="return validateProfileUpdate(this);">
+                        <div class="row g-4">
+                            <div class="col-12">
+                                <label class="xx-small fw-bold dynamic-muted text-uppercase mb-2">Primary Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-transparent border-0 text-primary ps-0"><i class="fas fa-at"></i></span>
+                                    <input type="text" class="form-control cyber-input" name="username" value="{{ user_data.username }}" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="xx-small fw-bold dynamic-muted text-uppercase mb-2">New Access Key</label>
+                                <input type="password" class="form-control cyber-input" name="password" id="key1" placeholder="Minimum 5 characters">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="xx-small fw-bold dynamic-muted text-uppercase mb-2">Verify Access Key</label>
+                                <input type="password" class="form-control cyber-input" id="key2" placeholder="Confirm new key">
+                            </div>
+                        </div>
 
-            <div class="mb-5">
-                <label class="form-label fw-bold dynamic-muted xx-small mb-1">CONFIRM NEW PASSWORD</label>
-                <div class="input-group">
-                    <span class="input-group-text"><i class="fas fa-check-shield"></i></span>
-                    <input type="password" class="form-control" id="p2" placeholder="Re-type new password">
+                        <div class="mt-5 pt-4 border-top border-glass d-flex align-items-center justify-content-between">
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                                    <i class="fas fa-shield-alt me-2"></i>Apply Override
+                                </button>
+                                <a href="/Predict" class="btn btn-outline-secondary rounded-pill px-4 fw-bold opacity-75">
+                                    <i class="fas fa-chevron-left me-2"></i>Return to Analysis
+                                </a>
+                            </div>
+                            <span class="xx-small dynamic-muted italic">Last Updated: <span id="last-login-time">Today</span></span>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Registry Panel -->
+                <div id="panel-registry" class="tab-content" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-start mb-5">
+                        <div>
+                            <h4 class="dynamic-text fw-bold mb-1">Central User Registry</h4>
+                            <p class="small dynamic-muted">Audit and manage all active system accounts.</p>
+                        </div>
+                        <button class="btn btn-outline-primary btn-sm rounded-circle" onclick="fetchRegistryUsers()" style="width: 36px; height: 36px;">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+
+                    <div id="registry-loader" class="text-center py-5">
+                        <div class="spinner-grow text-primary" role="status"></div>
+                        <p class="xx-small dynamic-muted mt-3 tracking-widest text-uppercase">Synchronizing with Mainframe...</p>
+                    </div>
+
+                    <div id="registry-table-wrap" style="display: none;">
+                        <table class="user-matrix-table">
+                            <tbody id="registry-body">
+                                <!-- Users Injected Here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Status Panel -->
+                <div id="panel-status" class="tab-content" style="display: none;">
+                    <h4 class="dynamic-text fw-bold mb-4">Hardware Monitor</h4>
+                    
+                    <div class="row g-4 mb-5">
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="xx-small dynamic-muted fw-bold text-uppercase mb-1">Model Latency</div>
+                                <div class="dynamic-text h4 fw-bold mb-0">12ms</div>
+                                <div class="progress mt-3" style="height: 3px; background: rgba(255,255,255,0.05);">
+                                    <div class="progress-bar bg-info" style="width: 15%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="xx-small dynamic-muted fw-bold text-uppercase mb-1">Detection Accuracy</div>
+                                <div class="dynamic-text h4 fw-bold mb-0 text-success">98.4%</div>
+                                <div class="progress mt-3" style="height: 3px; background: rgba(255,255,255,0.05);">
+                                    <div class="progress-bar bg-success" style="width: 98%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stat-card">
+                                <div class="xx-small dynamic-muted fw-bold text-uppercase mb-1">Threats Blocked</div>
+                                <div class="dynamic-text h4 fw-bold mb-0 text-warning">1,402</div>
+                                <div class="progress mt-3" style="height: 3px; background: rgba(255,255,255,0.05);">
+                                    <div class="progress-bar bg-warning" style="width: 45%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="dynamic-text fw-bold mb-3">Environmental Themes</h5>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('oled')">
+                                <div class="mb-2"><i class="fas fa-moon text-primary"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">OLED BLACK</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('emerald')">
+                                <div class="mb-2"><i class="fas fa-leaf text-success"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">CYBER GREEN</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Operations Manual Panel -->
+                <div id="panel-manual" class="tab-content" style="display: none;">
+                    <h4 class="dynamic-text fw-bold mb-4">Tactical Operations Guide</h4>
+                    
+                    <div class="accordion accordion-flush bg-transparent border-0" id="opManual">
+                        <div class="accordion-item bg-transparent border-glass mb-3 rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button bg-transparent dynamic-text fw-bold py-4 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#m1">
+                                    Phase 1: Traffic Analysis
+                                </button>
+                            </h2>
+                            <div id="m1" class="accordion-collapse collapse show" data-bs-parent="#opManual">
+                                <div class="accordion-body dynamic-muted xx-small lh-lg px-4 pb-4">
+                                    Upload your network snapshot (CSV) in the **Analysis Engine**. The Random Forest algorithm performs deep-packet inspection and classifies the signature. GenAI will then generate a tactical report for any detected threats.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item bg-transparent border-glass mb-3 rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text fw-bold py-4 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#m2">
+                                    Phase 2: Administrative Clearance
+                                </button>
+                            </h2>
+                            <div id="m2" class="accordion-collapse collapse" data-bs-parent="#opManual">
+                                <div class="accordion-body dynamic-muted xx-small lh-lg px-4 pb-4">
+                                    As a Master Admin, navigate to the **User Registry** to monitor active system occupants. <br><br>
+                                    • <strong>Override Protocol</strong>: Use 'Reset Key' to manually set new credentials for any user account.<br>
+                                    • <strong>Termination Protocol</strong>: Use 'Terminate' to permanently purge user data from the central mainframe.<br>
+                                    All administrative actions are logged and take effect instantly across all nodes.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item bg-transparent border-glass mb-3 rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text fw-bold py-4 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#m3">
+                                    Phase 3: Tactical Monitoring
+                                </button>
+                            </h2>
+                            <div id="m3" class="accordion-collapse collapse" data-bs-parent="#opManual">
+                                <div class="accordion-body dynamic-muted xx-small lh-lg px-4 pb-4">
+                                    The **Status Monitor** provides a real-time heartbeat of the CyberShield AI. Monitor model latency, detection accuracy, and total blocked threats. In high-glare environments, use the **Environmental Themes** to switch between OLED Black and Cyber Green modes.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item bg-transparent border-glass mb-3 rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text fw-bold py-4 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#m4">
+                                    Phase 4: Generative Intelligence
+                                </button>
+                            </h2>
+                            <div id="m4" class="accordion-collapse collapse" data-bs-parent="#opManual">
+                                <div class="accordion-body dynamic-muted xx-small lh-lg px-4 pb-4">
+                                    After each classification (Neptune, Satan, Back, etc.), the system automatically invokes the **GenAI Layer**. This layer analyzes the packet signature and generates a human-readable tactical response, including mitigation steps and risk assessment.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion-item bg-transparent border-glass mb-3 rounded-4 overflow-hidden">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text fw-bold py-4 px-4 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#m5">
+                                    Phase 5: Maintenance & Local Data Access
+                                </button>
+                            </h2>
+                            <div id="m5" class="accordion-collapse collapse" data-bs-parent="#opManual">
+                                <div class="accordion-body dynamic-muted xx-small lh-lg px-4 pb-4">
+                                    For manual configuration without using the dashboard, you can direct-edit the project files at the following locations:<br><br>
+                                    • <strong>User Registry</strong>: <code class="text-info">Project/CyberAttackPrediction/users.json</code><br>
+                                    <em>Manual Edit: Open this file to see usernames and hashed passwords. You can manually delete an entry to purge a user.</em><br><br>
+                                    • <strong>Training Datasets</strong>: <code class="text-info">Project/CyberAttackPrediction/Dataset/</code><br>
+                                    <em>Management: Drop new CSV files here to update the training pool. Ensure headers match the original schema for model training.</em><br><br>
+                                    • <strong>AI Model Binaries</strong>: <code class="text-info">Project/CyberAttackPrediction/model/</code><br>
+                                    <em>Observation: This directory contains the serialized Random Forest model and the data scaler. Do not edit these files manually.</em><br><br>
+                                    • <strong>Runtime Uploads</strong>: <code class="text-info">Project/CyberAttackPrediction/Dataset/uploaded_test.csv</code><br>
+                                    <em>Inspection: Every time an analysis is run, the uploaded data is mirrored here for temporary processing.</em><br><br>
+                                    • <strong>UI Templates</strong>: <code class="text-info">Project/CyberAttackPrediction/templates/</code><br>
+                                    <em>Customization: All HTML structures for the login, dashboard, and analysis pages are stored here.</em><br><br>
+                                    • <strong>Static Assets</strong>: <code class="text-info">Project/CyberAttackPrediction/static/</code><br>
+                                    <em>Styling: Contains the images and CSS responsible for the premium visual effects of the Command Center.</em>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="d-grid gap-3">
-                <button type="submit" class="btn btn-primary btn-update">
-                    <i class="fas fa-save me-2"></i>Save Changes
-                </button>
-                <a href="/Predict" class="btn btn-outline-secondary btn-sm rounded-pill opacity-75">
-                    <i class="fas fa-arrow-left me-2"></i>Back to Analysis
-                </a>
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    function validateUpdate(form) {
-        if (form.password.value !== "") {
-            if (form.password.value.length < 6) {
-                showToast("Password must be at least 6 characters", "warning");
-                return false;
+    // Tab Control Engine
+    function switchControlTab(tab, btn) {
+        // Update Buttons
+        document.querySelectorAll('.glass-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Update Panels with Animation
+        document.querySelectorAll('.tab-content').forEach(p => p.style.display = 'none');
+        const targetPanel = document.getElementById(`panel-${tab}`);
+        targetPanel.style.display = 'block';
+        
+        // Save state
+        localStorage.setItem('active_command_tab', tab);
+    }
+
+    // Live Clock Engine
+    function startOperationalClock() {
+        const update = () => {
+            const now = new Date();
+            document.getElementById('live-time').innerHTML = now.getHours().toString().padStart(2, '0') + ":" + 
+                                                           now.getMinutes().toString().padStart(2, '0') + ":" + 
+                                                           now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('live-date').innerHTML = now.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        };
+        setInterval(update, 1000);
+        update();
+    }
+
+    // Registry Fetch Engine
+    async function fetchRegistryUsers() {
+        const loader = document.getElementById('registry-loader');
+        const wrap = document.getElementById('registry-table-wrap');
+        const body = document.getElementById('registry-body');
+
+        loader.style.display = 'block';
+        wrap.style.display = 'none';
+
+        try {
+            const res = await fetch('/AdminGetUsers');
+            const users = await res.json();
+
+            if (res.status === 403) {
+                body.innerHTML = '<tr><td class="text-center py-5 tracking-widest text-danger">ACCESS DENIED: CLEARANCE LEVEL LOWER THAN ADMIN</td></tr>';
+            } else {
+                body.innerHTML = users.map((u, i) => `
+                    <tr class="user-row animate-reveal" style="animation-delay: ${i*0.1}s">
+                        <td>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2);">
+                                    <i class="fas fa-user-secret text-primary"></i>
+                                </div>
+                                <div>
+                                    <div class="dynamic-text fw-bold">${u.username}</div>
+                                    <div class="xx-small dynamic-muted text-uppercase tracking-wider">Access Level: ${u.role}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex gap-2 justify-content-end">
+                                <button class="btn btn-sm btn-outline-info rounded-pill px-3 border-0 bg-glass" onclick="adminResetKey('${u.username}')">
+                                    <i class="fas fa-key me-1"></i> Override Key
+                                </button>
+                                ${u.username !== 'admin' ? `
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 border-0 bg-glass" onclick="adminTerminateUser('${u.username}')">
+                                        <i class="fas fa-trash-alt me-1"></i> Terminate
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
             }
-            if (form.password.value !== document.getElementById('p2').value) {
-                showToast("Passwords do not match!", "error");
-                return false;
-            }
+            loader.style.display = 'none';
+            wrap.style.display = 'block';
+        } catch (e) {
+            body.innerHTML = '<tr><td class="text-center py-5 text-danger">REGISTRY FETCH FAILURE</td></tr>';
+            loader.style.display = 'none';
+            wrap.style.display = 'block';
+        }
+    }
+
+    async function adminTerminateUser(username) {
+        if (!confirm(`CONFIRM TERMINATION: Deleting user [${username}] will revoke all system access immediately.`)) return;
+        const res = await fetch('/AdminDeleteUser', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username}) });
+        const data = await res.json();
+        if (data.status === 'success') { showToast(data.message, "success"); fetchRegistryUsers(); }
+        else showToast(data.message, "error");
+    }
+
+    async function adminResetKey(username) {
+        const newPass = prompt(`RESET PROTOCOL: Enter new secure access key for [${username}]`, "sre2024");
+        if (!newPass) return;
+        const res = await fetch('/AdminResetPassword', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password: newPass}) });
+        const data = await res.json();
+        if (data.status === 'success') showToast(data.message, "success");
+        else showToast(data.message, "error");
+    }
+
+    function updateEnvTheme(theme) {
+        if (theme === 'oled') {
+            document.documentElement.style.setProperty('--bg-main', '#000000');
+            document.documentElement.style.setProperty('--primary-color', '#3b82f6');
+        } else {
+            document.documentElement.style.setProperty('--bg-main', '#022c22');
+            document.documentElement.style.setProperty('--primary-color', '#10b981');
+        }
+        showToast(`Environmental Theme synchronized: ${theme.toUpperCase()}`, "info");
+    }
+
+    function validateProfileUpdate(f) {
+        if (f.password.value !== "" && f.password.value !== document.getElementById('key2').value) {
+            showToast("Access Key mismatch", "warning"); return false;
         }
         return true;
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        startOperationalClock();
+        const lastTab = localStorage.getItem('active_command_tab');
+        if (lastTab && lastTab !== 'profile') {
+            const btn = Array.from(document.querySelectorAll('.glass-tab-btn')).find(b => b.innerText.toLowerCase().includes(lastTab));
+            if (btn) btn.click();
+        }
+    });
 </script>
 {% endblock %}

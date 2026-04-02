@@ -126,7 +126,7 @@
             --text-main: #e0e0e0;
             --text-muted: #94a3b8;
             --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.12);
             --accent-primary: #00ffa3;
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             --navbar-bg: rgba(0, 0, 0, 0.15);
@@ -160,7 +160,7 @@
             --text-main: #212529;
             --text-muted: #475569;
             --glass-bg: rgba(0, 0, 0, 0.02);
-            --glass-border: rgba(0, 0, 0, 0.1);
+            --glass-border: rgba(0, 0, 0, 0.12);
             --accent-primary: #007bff;
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -238,8 +238,11 @@
         /* Trae-Style Reveal Layout */
         .main-surface {
             position: relative;
-            z-index: 10;
-            background: transparent;
+            /* ULTIMATE STACKING: Higher than branding text (1) but below overlays */
+            z-index: 20;
+            /* ULTIMATE OPACITY: Must be opaque to hide fixed text in Chrome */
+            background: var(--bg-gradient) !important;
+            transform: translateZ(0);
             color: var(--text-main);
             min-height: 100vh;
             /* Ensure content clears the fixed navbar */
@@ -306,8 +309,8 @@
 
         .footer-btn:hover {
             opacity: 1 !important;
-            background: var(--text-main);
-            color: var(--footer-bg);
+            background: var(--text-main) !important;
+            color: var(--bg-base) !important;
         }
 
         .huge-brand-text {
@@ -323,15 +326,20 @@
             line-height: 0.8;
             pointer-events: auto;
             /* Restored for Spotlight Interaction */
-            z-index: 100;
+            /* REVEAL FIX: Must be at the absolute back (z-index: 1) */
+            z-index: 1;
             /* Stays below footer-content but above base layers */
             user-select: none;
             text-transform: uppercase;
             white-space: nowrap;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            /* SUPER-SMOOTH EXIT: Primarily use opacity for performance */
+            transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+                        transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             opacity: 0;
-            filter: blur(10px);
-            transform: translateY(20px);
+            transform: translateY(10px) scale(0.98);
+            will-change: transform, opacity;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
 
             /* VIBRANT BASELINE: Guaranteed visibility regardless of theme */
             background: var(--brand-text-gradient);
@@ -340,6 +348,25 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: var(--primary-color);
+        }
+
+        /* Smooth Reveal State: GPU Optimized */
+        .huge-brand-text.run-animation {
+            opacity: 0.85 !important;
+            transform: translateY(0) scale(1) !important;
+        }
+
+        .footer-content {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
+                        opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        .footer-content.run-animation {
+            opacity: 1 !important;
+            transform: translateY(0) !important;
         }
 
         /* Unified Theme Colors */
@@ -452,47 +479,54 @@
             color: var(--text-muted) !important;
         }
 
-        /* Semantic Alert Helpers */
-        .text-primary-dynamic {
-            color: var(--alert-text-primary) !important;
-        }
+        /* --- Global Utility Helpers (Unified) --- */
+        .bg-primary-light { background-color: rgba(var(--primary-rgb), 0.1) !important; }
+        .bg-danger-light { background-color: rgba(var(--danger-rgb), 0.1) !important; }
+        .bg-success-light { background-color: rgba(var(--success-rgb), 0.1) !important; }
 
-        .bg-primary-light-dynamic {
-            background-color: var(--alert-bg-primary) !important;
+        .hover-lift { 
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+            will-change: transform;
         }
+        .hover-lift:hover { transform: translateY(-8px); }
 
+        /* --- Navbar System (Merged & Optimized) --- */
         .navbar {
             top: 16px !important;
-            /* Emphasize the float with a generous top gap */
             width: 95%;
             max-width: 1200px;
             margin: 0 auto;
-            /* Center the floating pill */
             left: 0;
             right: 0;
             border-radius: 50px;
-            /* Semi pill shape */
             border: 1px solid var(--glass-border) !important;
-            /* Full border for the floating container */
-            background: var(--navbar-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            background: var(--navbar-bg) !important;
+            backdrop-filter: blur(8px) saturate(145%);
+            -webkit-backdrop-filter: blur(8px) saturate(145%);
             padding: 0.45rem 2rem !important;
-            /* Slimmer vertical height, maintaining pill curve */
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
             z-index: 1000;
+            overflow: hidden; /* Added to clip the progress bar to the rounded corners */
             will-change: transform;
         }
 
-        .navbar-brand,
-        .nav-link {
-            color: var(--text-main) !important;
+        .nav-top-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+            width: 0%;
+            opacity: 0;
+            transition: width 0.4s cubic-bezier(0.1, 0.5, 0.5, 1), opacity 0.3s ease;
+            z-index: 10000;
+            box-shadow: 0 0 12px var(--primary-color);
+            pointer-events: none;
+            will-change: width, opacity;
         }
 
-        .navbar.navbar-hidden {
-            transform: translateY(calc(-100% - 24px)) !important;
-            /* Pull up by full height PLUS enough to clear the 16px top offset */
-        }
+        .navbar-brand, .nav-link { color: var(--text-main) !important; }
+        .navbar.navbar-hidden { transform: translateY(calc(-100% - 24px)) !important; }
 
         .navbar-brand {
             font-weight: 800;
@@ -516,128 +550,24 @@
             transform: translateY(-1px);
         }
 
-        /* Premium UI Animations — GPU-optimised, no blur repaints */
-        @keyframes revealPremium {
-            0% {
-                opacity: 0;
-                transform: translateY(24px) scale(0.97);
-            }
+        /* --- Master Reveal System (Consolidated) --- */
+        @keyframes reveal-premium { 0% { opacity: 0; transform: translateY(24px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes reveal-depth { 0% { opacity: 0; transform: perspective(800px) translateZ(-50px) translateY(12px); } 100% { opacity: 1; transform: perspective(800px) translateZ(0) translateY(0); } }
+        @keyframes reveal-soft { 0% { opacity: 0; transform: scale(0.96) translateY(8px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
 
-            60% {
-                opacity: 1;
-                transform: translateY(-3px) scale(1.005);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        @keyframes revealDepth {
-            0% {
-                opacity: 0;
-                transform: perspective(800px) translateZ(-60px) translateY(12px);
-            }
-
-            70% {
-                opacity: 1;
-                transform: perspective(800px) translateZ(4px) translateY(-2px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: perspective(800px) translateZ(0) translateY(0);
-            }
-        }
-
-        @keyframes revealSoft {
-            0% {
-                opacity: 0;
-                transform: scale(0.96) translateY(8px);
-            }
-
-            70% {
-                opacity: 1;
-                transform: scale(1.005);
-            }
-
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes revealSlideUp {
-            0% {
-                opacity: 0;
-                transform: translateY(32px);
-            }
-
-            60% {
-                opacity: 1;
-                transform: translateY(-4px);
-            }
-
-            100% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* One-Time Reveal Initial States (Hidden by default) */
-        .reveal-premium,
-        .reveal-depth,
-        .reveal-soft,
-        .reveal-slide-up {
+        .reveal-premium, .reveal-depth, .reveal-soft {
             opacity: 0;
             will-change: transform, opacity;
         }
 
-        /* The Animation Trigger (Added once by IntersectionObserver) */
-        .revealed.reveal-premium {
-            animation: revealPremium 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-        }
+        .revealed.reveal-premium { animation: reveal-premium 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
+        .revealed.reveal-depth { animation: reveal-depth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
+        .revealed.reveal-soft { animation: reveal-soft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
 
-        .revealed.reveal-depth {
-            animation: revealDepth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-        }
-
-        .revealed.reveal-soft {
-            animation: revealSoft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-        }
-
-        .revealed.reveal-slide-up {
-            animation: revealSlideUp 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
-        }
-
-        .anim-delay-100 {
-            animation-delay: 0.08s !important;
-        }
-
-        .anim-delay-200 {
-            animation-delay: 0.16s !important;
-        }
-
-        .anim-delay-300 {
-            animation-delay: 0.26s !important;
-        }
-
-        .anim-delay-400 {
-            animation-delay: 0.38s !important;
-        }
-
-        .anim-delay-500 {
-            animation-delay: 0.52s !important;
-        }
-
-        .anim-delay-600 {
-            animation-delay: 0.68s !important;
-        }
-
-        .anim-delay-700 {
-            animation-delay: 0.86s !important;
-        }
+        /* Staggered Delay Tokens */
+        .delay-100 { animation-delay: 0.1s !important; }
+        .delay-200 { animation-delay: 0.2s !important; }
+        .delay-300 { animation-delay: 0.3s !important; }
 
         /* Skeleton Loading Effect */
         .skeleton-box {
@@ -647,6 +577,123 @@
             overflow: hidden;
             background-color: rgba(var(--text-main-rgb), 0.05);
             border-radius: 4px;
+        }
+
+        /* --- DASHBOARD SYSTEM --- */
+        .dashboard-container {
+            max-width: 1250px;
+            margin: 6.5rem auto;
+            padding: 0 24px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 2.2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .dashboard-card {
+            background: var(--bg-card-soft);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 2.2rem;
+            box-shadow: var(--premium-shadow);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+        }
+
+        .glass-tab-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1.1rem 1.6rem;
+            margin-bottom: 0.6rem;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--dynamic-text);
+            display: flex;
+            align-items: center;
+            gap: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            opacity: 0.75;
+        }
+
+        .glass-tab-btn i {
+            width: 22px;
+            text-align: center;
+            font-size: 1.1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .glass-tab-btn:hover {
+            background: rgba(var(--primary-rgb), 0.1);
+            border-color: var(--glass-border);
+            transform: translateX(6px);
+            opacity: 1;
+        }
+
+        .glass-tab-btn.active {
+            background: linear-gradient(90deg, rgba(var(--primary-rgb), 0.18) 0%, transparent 100%);
+            border-color: var(--glass-border);
+            color: var(--primary-color);
+            box-shadow: inset 4px 0 0 var(--primary-color);
+            opacity: 1;
+        }
+
+        .glass-tab-btn.active i { transform: scale(1.15); }
+
+        /* System Health Pulse */
+        .pulse-glow { position: relative; padding-left: 28px; }
+        .pulse-glow::before {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #22c55e;
+            border-radius: 50%;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
+            animation: statusPulse 2s infinite;
+        }
+
+        @keyframes statusPulse {
+            0% { transform: translateY(-50%) scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
+            70% { transform: translateY(-50%) scale(1.1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: translateY(-50%) scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        .guide-step {
+            border-left: 2px solid var(--glass-border);
+            padding-left: 1.8rem;
+            margin-bottom: 2.2rem;
+            position: relative;
+        }
+
+        .guide-step::before {
+            content: attr(data-step);
+            position: absolute;
+            left: -13px;
+            top: 0;
+            width: 24px;
+            height: 24px;
+            background: var(--bg-card);
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--primary-color);
         }
 
         .skeleton-box::after {
@@ -746,15 +793,6 @@
             border-right-color: var(--light-color) !important;
         }
 
-
-        /* Navbar must ALWAYS work regardless of visit count */
-        .navbar {
-            background: var(--navbar-bg) !important;
-            backdrop-filter: blur(20px) saturate(180%) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
-            border-bottom: 1px solid var(--glass-border) !important;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
-        }
 
         /* Premium Toast Notifications */
         #toastContainer {
@@ -1297,6 +1335,7 @@
 <body data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
     data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
     data-logout-url="{{ url_for('Logout') }}">
+    <div class="nav-top-progress"></div>
 
     <!-- Floating Fullscreen Toggle -->
     <button id="fullscreen-floating-toggle" class="fullscreen-floating-btn" data-bs-toggle="tooltip"
@@ -1582,10 +1621,8 @@
                     <a href="#" class="footer-link mx-2">Privacy</a>
                     <a href="#" class="footer-link mx-2">Contact</a>
                 </div>
-            </div>
             <div class="mt-2">
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top
-                    ↑</button>
+                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top ↑</button>
             </div>
         </div>
     </footer>
@@ -1594,66 +1631,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-
-        let lastScrollTop = 0;
-        const navbar = document.querySelector('.navbar');
-        const fsBtnFloating = document.querySelector('.fullscreen-floating-btn');
-        const backToTopBtn = document.querySelector('.footer-btn');
-        let isScrolling = false;
-
-        window.addEventListener('scroll', function () {
-            if (!isScrolling) {
-                window.requestAnimationFrame(() => {
-                    let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    
-                    // Navbar Hide/Show
-                    if (scrollTop > lastScrollTop && scrollTop > 100) {
-                        if (navbar) navbar.classList.add('navbar-hidden');
-                    } else {
-                        if (navbar) navbar.classList.remove('navbar-hidden');
-                    }
-
-                    // Back to Top Button Visibility logic
-                    if (backToTopBtn) {
-                        if (scrollTop > 300) {
-                            if (!backToTopBtn.classList.contains('show')) {
-                                backToTopBtn.classList.add('show');
-                            }
-                        } else {
-                            if (backToTopBtn.classList.contains('show')) {
-                                backToTopBtn.classList.remove('show');
-                            }
-                        }
-                    }
-
-                    lastScrollTop = scrollTop;
-                    isScrolling = false;
-                });
-                isScrolling = true;
-            }
-        });
-
-        // Safe Footer Reveal Animation
-        const trigger = document.getElementById('footer-reveal-trigger');
-        const brandText = document.querySelector('.huge-brand-text');
-        const footerContent = document.querySelector('.footer-content');
-
-        if (trigger && (brandText || footerContent)) {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        if (brandText) brandText.classList.add('run-animation');
-                        if (footerContent) footerContent.classList.add('run-animation');
-                    } else {
-                        // Resets animation when scrolled away so it plays again
-                        if (brandText) brandText.classList.remove('run-animation');
-                        if (footerContent) footerContent.classList.remove('run-animation');
-                    }
-                });
-            }, { threshold: 0 }); // Triggers the exact moment the main-surface bottom hits the viewport
-
-            observer.observe(trigger);
-        }
+        // LEGACY SCRIPTS REMOVED - Unified into CyberMaster.
 
         // Smart Logout Features
         const body = document.body;
@@ -1690,40 +1668,167 @@
         }
 
         // --- GLOBAL ONE-TIME REVEAL OBSERVER ---
-        (function () {
-            const revealCallback = (entries, observer) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('revealed');
-                        // Animation runs once, then we stop watching this element forever
-                        observer.unobserve(entry.target);
+        /**
+         * CyberMaster Unified Controller
+         * Orchestrates all high-performance UI reactions (Scroll, Mouse, Reveal)
+         */
+        const CyberMaster = {
+            state: {
+                lastScroll: 0,
+                isTicking: false,
+                winHeight: window.innerHeight,
+                docHeight: document.documentElement.scrollHeight
+            },
+
+            elements: {},
+
+            init() {
+                this.updateElements();
+                this.updateDimensions();
+                this.initRevealObserver();
+                this.bindEvents();
+                this.updateUI(); // Initial state check
+                console.log('CyberMaster: Status OK');
+            },
+
+            updateElements() {
+                this.elements = {
+                    navbar: document.querySelector('.navbar'),
+                    brandText: document.querySelector('.huge-brand-text'),
+                    footer: document.querySelector('.footer-content'),
+                    backToTop: document.querySelector('.footer-btn'),
+                    progress: document.querySelector('.nav-top-progress')
+                };
+            },
+
+            updateDimensions() {
+                this.state.winHeight = window.innerHeight;
+                this.state.docHeight = document.documentElement.scrollHeight;
+            },
+
+            initRevealObserver() {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('revealed');
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+                document.querySelectorAll('.reveal-premium, .reveal-depth, .reveal-soft').forEach(el => {
+                    if (!el.classList.contains('revealed')) observer.observe(el);
+                });
+            },
+
+            bindEvents() {
+                window.addEventListener('scroll', () => this.requestTick(), { passive: true });
+                window.addEventListener('resize', () => {
+                    this.updateDimensions();
+                    this.requestTick();
+                }, { passive: true });
+
+                // Brand Spotlight Driver
+                if (this.elements.brandText) {
+                    this.elements.brandText.addEventListener('mousemove', (e) => this.handleSpotlight(e));
+                    this.elements.brandText.addEventListener('mouseleave', () => this.resetSpotlight());
+                }
+
+                // Page Navigation Loading with Full-Fill Delay
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link && link.href && !link.target && !link.href.includes('#') && !link.href.includes('javascript:') && link.origin === location.origin) {
+                        e.preventDefault();
+                        const targetUrl = link.href;
+                        
+                        // Fill to data-end instantly for visual feedback
+                        if (this.elements.progress) {
+                            this.elements.progress.style.opacity = '1';
+                            this.elements.progress.style.width = '100%';
+                        }
+                        
+                        // Synthetic delay to allow the 100% fill to finish
+                        setTimeout(() => {
+                            window.location.href = targetUrl;
+                        }, 500); // 500ms for the animation to hit the right edge
                     }
                 });
-            };
 
-            const revealObserver = new IntersectionObserver(revealCallback, {
-                threshold: 0.1,    // Reveal when 10% visible
-                rootMargin: '0px 0px -50px 0px' // Slightly offset for better impact
-            });
+                window.addEventListener('load', () => this.finishLoading());
+            },
 
-            // Re-scan for reveal elements (handles dynamically injected content too)
-            function initRevealObserver() {
-                const elements = document.querySelectorAll(
-                    '.reveal-premium, .reveal-depth, .reveal-soft, .reveal-slide-up'
-                );
-                elements.forEach(el => {
-                    if (!el.classList.contains('revealed')) {
-                        revealObserver.observe(el);
-                    }
-                });
+            requestTick() {
+                if (!this.state.isTicking) {
+                    requestAnimationFrame(() => this.updateUI());
+                    this.state.isTicking = true;
+                }
+            },
+
+            updateUI() {
+                const top = window.pageYOffset || document.documentElement.scrollTop;
+                const docHeight = this.state.docHeight;
+                const winHeight = this.state.winHeight;
+                
+                // 1. Smart Navbar Visibility
+                if (this.elements.navbar) {
+                    const shouldHide = top > 100 && top > this.state.lastScroll;
+                    this.elements.navbar.classList.toggle('navbar-hidden', shouldHide);
+                }
+
+                // 2. Branding & Footer Sync (End Zone: 320px from bottom)
+                const scrollFromBottom = docHeight - (top + winHeight);
+                const isEndZone = scrollFromBottom < 320;
+
+                if (this.elements.brandText) {
+                    this.elements.brandText.classList.toggle('run-animation', isEndZone);
+                }
+
+                if (this.elements.footer) {
+                    this.elements.footer.classList.toggle('run-animation', isEndZone);
+                    this.elements.footer.style.opacity = isEndZone ? '1' : '0';
+                    this.elements.footer.style.pointerEvents = isEndZone ? 'auto' : 'none';
+                }
+
+                if (this.elements.backToTop) {
+                    this.elements.backToTop.classList.toggle('show', isEndZone || top > 500);
+                }
+
+                this.state.lastScroll = top;
+                this.state.isTicking = false;
+            },
+
+            startLoading() {
+                if (!this.elements.progress) return;
+                this.elements.progress.style.opacity = '1';
+                this.elements.progress.style.width = '70%';
+            },
+
+            finishLoading() {
+                if (!this.elements.progress) return;
+                this.elements.progress.style.width = '100%';
+                setTimeout(() => {
+                    this.elements.progress.style.opacity = '0';
+                    setTimeout(() => {
+                        this.elements.progress.style.width = '0%';
+                    }, 400);
+                }, 300);
+            },
+
+            handleSpotlight(e) {
+                const rect = this.elements.brandText.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                this.elements.brandText.style.setProperty('--mouse-x', `${x}%`);
+                this.elements.brandText.style.setProperty('--mouse-y', `${y}%`);
+            },
+
+            resetSpotlight() {
+                this.elements.brandText.style.setProperty('--mouse-x', '50%');
+                this.elements.brandText.style.setProperty('--mouse-y', '50%');
             }
+        };
 
-            // Initial Scan
-            document.addEventListener('DOMContentLoaded', initRevealObserver);
-
-            // Also run after any AJAX/content injection if necessary
-            window.refreshRevealObserver = initRevealObserver;
-        })();
+        document.addEventListener('DOMContentLoaded', () => CyberMaster.init());
 
         // Global Typing Animation Utility
         function initTypingEffect(elementId, text, speed = 50, delay = 1000) {
@@ -1899,24 +2004,6 @@
             return new bootstrap.Tooltip(tooltipTriggerEl)
         });
 
-        // BRANDING QUANTUM SPOTLIGHT DRIVER
-        const hugeBrand = document.querySelector('.huge-brand-text');
-        if (hugeBrand) {
-            hugeBrand.addEventListener('mousemove', (e) => {
-                const rect = hugeBrand.getBoundingClientRect();
-                const x = ((e.clientX - rect.left) / rect.width) * 100;
-                const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-                hugeBrand.style.setProperty('--mouse-x', `${x}%`);
-                hugeBrand.style.setProperty('--mouse-y', `${y}%`);
-            });
-
-            hugeBrand.addEventListener('mouseleave', () => {
-                // Smoothly reset to center spotlight
-                hugeBrand.style.setProperty('--mouse-x', '50%');
-                hugeBrand.style.setProperty('--mouse-y', '50%');
-            });
-        }
     </script>
     <!-- Global Theme-Aware Detail Modal -->
     <div class="modal fade" id="themeDetailModal" tabindex="-1" aria-hidden="true">

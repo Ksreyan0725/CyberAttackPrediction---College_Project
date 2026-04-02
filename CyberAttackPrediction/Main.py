@@ -214,8 +214,7 @@ def UserLoginAction():
             with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
                 json.dump({"user": "admin", "pass": "admin"}, f)
             session['remembered'] = True
-        flash("Ultimate Admin access granted!", "success")
-        return redirect(url_for('train_view'))
+        return jsonify({"status": "success", "message": "Ultimate Admin access granted!", "redirect": url_for('train_view')})
 
     users = load_users()
     user_data = users.get(username)
@@ -230,11 +229,9 @@ def UserLoginAction():
                 json.dump({"user": username, "pass": password}, f)
             session['remembered'] = True
         
-        flash(f"Welcome back, {username}!", "success")
-        return redirect(url_for('train_view'))
+        return jsonify({"status": "success", "message": f"Welcome back, {username}!", "redirect": url_for('train_view')})
     else:
-        flash("Invalid username or password", "danger")
-        return redirect(url_for('UserLogin'))
+        return jsonify({"status": "error", "message": "Invalid username or password"}), 401
 
 @app.route('/Signup')
 def Signup():
@@ -283,10 +280,15 @@ def UpdateAccountAction():
     
     users = load_users()
     if old_username not in users:
-        flash("User session expired. Please login again.", "danger")
-        return redirect(url_for('UserLogin'))
-        
-    user_data = users.pop(old_username)
+        # Check for ultimate admin bypass
+        if old_username == "admin" and session.get('is_ultimate'):
+            # Ultimate admin can update themselves too (stored in file if they want)
+            user_data = {"username": "admin", "password": generate_password_hash("admin"), "role": "admin"}
+        else:
+            flash("User session expired. Please login again.", "danger")
+            return redirect(url_for('UserLogin'))
+    else:
+        user_data = users.pop(old_username)
     
     # Update username if changed and not taken
     if new_username != old_username:
@@ -305,6 +307,62 @@ def UpdateAccountAction():
     save_users(users)
     flash("Profile updated successfully!", "success")
     return redirect(url_for('Account'))
+
+@app.route('/AdminGetUsers')
+def AdminGetUsers():
+    """Returns a list of all users for the dashboard."""
+    if 'user' not in session or (session.get('user') != 'admin' and not session.get('is_ultimate')):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    
+    users = load_users()
+    user_list = []
+    for uname, data in users.items():
+        user_list.append({
+            "username": uname,
+            "role": data.get('role', 'user')
+        })
+    return jsonify(user_list)
+
+@app.route('/AdminDeleteUser', methods=['POST'])
+def AdminDeleteUser():
+    """Deletes a user account (Admin only)."""
+    if 'user' not in session or (session.get('user') != 'admin' and not session.get('is_ultimate')):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    
+    target_user = request.json.get('username')
+    if target_user == "admin" or target_user == session['user']:
+        return jsonify({"status": "error", "message": "Cannot delete root admin or current session"}), 400
+        
+    users = load_users()
+    if target_user in users:
+        del users[target_user]
+        save_users(users)
+        return jsonify({"status": "success", "message": f"User {target_user} deleted"})
+    return jsonify({"status": "error", "message": "User not found"}), 404
+
+@app.route('/AdminResetPassword', methods=['POST'])
+def AdminResetPassword():
+    """Allows an administrator to reset a user's password."""
+    if 'user' not in session or (session.get('user') != 'admin' and not session.get('is_ultimate')):
+        return jsonify({"status": "error", "message": "Unauthorized"}), 403
+    
+    data = request.json
+    target_user = data.get('username')
+    new_password = data.get('password')
+    
+    if not target_user or not new_password:
+        return jsonify({"status": "error", "message": "Username and new password are required"}), 400
+        
+    if target_user == "admin" and not session.get('is_ultimate'):
+         return jsonify({"status": "error", "message": "Only the developer can reset the root account"}), 400
+
+    users = load_users()
+    if target_user in users:
+        users[target_user]['password'] = generate_password_hash(new_password)
+        save_users(users)
+        return jsonify({"status": "success", "message": f"Credentials for {target_user} have been updated"})
+    
+    return jsonify({"status": "error", "message": "User not found"}), 404
 
 @app.route('/Logout')
 def Logout():

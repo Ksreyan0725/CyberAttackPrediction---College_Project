@@ -429,23 +429,55 @@
 
 {% block extra_js %}
 <script>
-    function validateForm(form) {
-        if (form.t1.value.trim() === "") {
-            showToast("Please enter your username", "error");
-            form.t1.focus();
-            return false;
-        }
-        if (form.t2.value.trim() === "") {
-            showToast("Please enter your password", "error");
-            form.t2.focus();
-            return false;
+    // Refined AJAX Login Handler
+    async function handleLogin(e) {
+        e.preventDefault();
+        const form = e.target;
+        const btn = form.querySelector('button[type="submit"]');
+        const username = form.t1.value.trim();
+        const password = form.t2.value.trim();
+        const remember = form.remember.checked;
+
+        if (!username || !password) {
+            showToast("Username and Password are required", "error");
+            return;
         }
 
-        // Show loading state on Authenticate button
-        const btn = form.querySelector('button[type="submit"]');
+        // Visual Feedback (Loading state)
+        const originalBtnContent = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="skeleton-box" style="width: 20px; height: 20px; border-radius: 50%; vertical-align: middle;"></span> Authenticating...';
-        return true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+
+        try {
+            const formData = new FormData();
+            formData.append('t1', username);
+            formData.append('t2', password);
+            if (remember) formData.append('remember', 'on');
+
+            const res = await fetch('/UserLoginAction', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                showToast(data.message, "success");
+                // Smooth transition delay to let toast be seen
+                setTimeout(() => window.location.href = data.redirect, 800);
+            } else {
+                showToast(data.message, "error");
+                // Re-enable button on error WITHOUT reload
+                btn.disabled = false;
+                btn.innerHTML = originalBtnContent;
+                form.t2.value = ''; // Clear password field for security
+                form.t2.focus();
+            }
+        } catch (error) {
+            showToast("Connection failed. Check your mainframe link.", "error");
+            btn.disabled = false;
+            btn.innerHTML = originalBtnContent;
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -455,14 +487,17 @@
 
         const btnDirectLogin = document.getElementById('btnDirectLogin');
         const btnResetCreds = document.getElementById('btnResetCreds');
-        const loginForm = document.querySelector('form[name="f1"]'); // Changed to select by name as no ID
-        const standardLoginArea = document.getElementById('standardLoginArea');
+        const loginForm = document.querySelector('form[name="f1"]');
+        
+        // Attach AJAZ interceptor
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+        }
 
-        // Password Toggle Logic
+        // Password Toggle Logic (same as before)
         const togglePassword = document.getElementById('togglePassword');
         const passwordInput = document.getElementById('t2');
         const eyeIcon = document.getElementById('eyeIcon');
-
         if (togglePassword) {
             togglePassword.addEventListener('click', function () {
                 const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
@@ -471,29 +506,25 @@
                 eyeIcon.classList.toggle('fa-eye-slash');
             });
         }
-
+        
+        // Quick Access / Session Logic (same as before)
         if (btnDirectLogin) {
             btnDirectLogin.addEventListener('click', function () {
                 btnDirectLogin.disabled = true;
                 btnDirectLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
-
-                fetch('/VerifySavedLogin', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                })
+                fetch('/VerifySavedLogin', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                     .then(response => response.json())
                     .then(data => {
                         if (data.status === 'success') {
                             showToast('Authenticated! Redirecting...', 'success');
                             setTimeout(() => window.location.href = '/Train', 500);
                         } else {
-                            showToast('Saved credentials invalid. Please login manually.', 'error');
+                            showToast('Saved credentials invalid.', 'error');
                             setTimeout(() => location.reload(), 1500);
                         }
                     })
-                    .catch(err => {
-                        console.error('Error:', err);
-                        showToast('Connection error. Please try again.', 'error');
+                    .catch(e => {
+                        showToast('Connection error.', 'error');
                         btnDirectLogin.disabled = false;
                         btnDirectLogin.innerHTML = '<i class="fas fa-rocket me-2"></i>Quick Access';
                     });
@@ -501,15 +532,11 @@
         }
 
         if (btnResetCreds) {
-            btnResetCreds.addEventListener('click', function () {
-                showToast('Clearing session data...', 'info');
-                fetch('/ResetCredentials', { method: 'POST' })
-                    .then(() => {
-                        showToast('Session cleared!', 'success');
-                        setTimeout(() => location.reload(), 800);
-                    });
+            btnResetCreds.addEventListener('click', function() {
+                fetch('/ResetCredentials', { method: 'POST' }).then(() => location.reload());
             });
         }
     });
 </script>
+
 {% endblock %}
