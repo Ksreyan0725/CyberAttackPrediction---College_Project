@@ -19,6 +19,23 @@
 </p>
 
 ---
+---
+
+## 🏛️ Academic Institutional Details
+
+- **Institution**: Roland Institute of Computer & Management Studies, Berhampur
+- **Program**: Bachelor of Computer Applications (BCA) — Final Year
+- **Session**: 2023–2026
+- **Guide**: Mr. Rasmi Roy Badakumar
+
+### 👥 The Development Team
+
+- **Kumar Sreyan Pattanayak** (Roll: 23PBCA1355)
+- **Ankita Pati** (Roll: 23PBCA1335)
+- **Subhashree Pathy** (Roll: 23PBCA1386)
+- **Tanmaya Ranjan Jena** (Roll: 23PBCA1391)
+
+---
 
 ## 🌟 Executive Summary
 
@@ -95,16 +112,6 @@ This project includes all necessary software. Follow these **3 simple steps** to
 4. **Run the Application**:
    Launch via `Start_WebApp_Venv.bat` or `python CyberAttackPrediction/Main.py`.
 
----
-
-- 🌟 [**Documentation Overview**](/documentation) — The primary interactive summary and project guide.
-- 📂 [**Repository Explorer**](/explorer) — Interactive technical browser for all source code and notebooks.
-- 📖 [**Full Project Manual**](docs/PROJECT_GUIDE.md) — Comprehensive 2000+ line technical manual and Viva Q&A.
-- 🎓 [**Academic Readiness**](docs/BeReady.md) — The interactive BCA syllabus and readiness checklist.
-- 🎨 [**Design Walkthrough**](docs/UI_Refinement_Walkthrough.md) — Documentation of the premium design system.
-
----
-
 ## 🏗️ Detailed Project Structure (Clickable)
 
 *Explore the project files directly!*
@@ -149,23 +156,6 @@ This project includes all necessary software. Follow these **3 simple steps** to
 - 📜 [install_deps.ps1](install_deps.ps1) (Automated dependency installation script)
 - 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Old)
 
----
-
-## 🏛️ Academic Institutional Details
-
-- **Institution**: Roland Institute of Computer & Management Studies, Berhampur
-- **Program**: Bachelor of Computer Applications (BCA) — Final Year
-- **Session**: 2023–2026
-- **Guide**: Mr. Rasmi Roy Badakumar
-
-### 👥 The Development Team
-
-- **Kumar Sreyan Pattanayak** (Roll: 23PBCA1355)
-- **Ankita Pati** (Roll: 23PBCA1335)
-- **Subhashree Pathy** (Roll: 23PBCA1386)
-- **Tanmaya Ranjan Jena** (Roll: 23PBCA1391)
-
----
 <p align="center">
   Built with ❤️ for Academic Excellence — 2026
 </p>
