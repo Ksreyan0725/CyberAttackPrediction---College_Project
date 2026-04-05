@@ -69,7 +69,8 @@
         0% {
             opacity: 0;
             transform: translateZ(-400px) translateY(10px);
-            filter: blur(12px);
+            /* Reduced blur for smoother GPU compositing performance */
+            filter: blur(6px);
         }
 
         100% {
@@ -102,11 +103,15 @@
         max-width: 900px;
         /* Forced width to stabilize during reveal - browser measurement fix */
         width: 900px !important;
+        /* Height synchronization with Signup.html twin - refined to be more compact */
+        min-height: 400px;
         background: transparent;
         display: flex;
         flex-direction: row;
         animation: emergeFromDeep 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         will-change: transform, opacity, filter;
+        /* Optimization: Limit scope of animation to prevent repainting the entire viewport */
+        contain: layout paint;
         transform-origin: center center;
         transform-style: preserve-3d;
         backface-visibility: hidden;
@@ -231,16 +236,50 @@
         font-size: 0.9rem;
     }
 
+    /* Input Group Multi-Segment Hardening */
     .input-group-text {
         background: var(--input-bg);
         border: 1px solid var(--glass-border);
         border-right: none;
         color: var(--primary-color);
-        border-radius: 12px 0 0 12px;
     }
 
-    .form-control {
-        border-radius: 0 12px 12px 0;
+    .input-group .form-control {
+        border-radius: 0;
+    }
+
+    .input-group> :first-child.form-control,
+    .input-group> :first-child.input-group-text {
+        border-radius: 12px 0 0 12px !important;
+    }
+
+    .input-group> :last-child.form-control,
+    .input-group> :last-child.btn {
+        border-radius: 0 12px 12px 0 !important;
+    }
+
+    /* Fixed Width Password Toggle segment */
+    #togglePassword {
+        width: 45px;
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        border-left: none;
+        color: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    #togglePassword:hover {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary-color);
+    }
+
+    #eyeIcon {
+        width: 16px;
+        text-align: center;
+        display: inline-block;
     }
 
     .btn-primary {
@@ -252,23 +291,108 @@
         box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
     }
 
-    /* Speed Login Custom Styles */
-    .speed-login-box {
-        text-align: center;
-        padding: 1rem;
+    /* Recovery System & Depth Animations */
+    @keyframes emergeTab {
+        0% {
+            opacity: 0;
+            transform: translateY(-20px) translate3d(-50%, 0, -10px);
+            filter: blur(8px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(100%) translate3d(-50%, 0, 5px);
+            filter: blur(0px);
+        }
     }
 
-    .user-avatar-circle {
-        width: 80px;
-        height: 80px;
-        background: rgba(59, 130, 246, 0.1);
-        border: 2px solid var(--primary-color);
-        border-radius: 50%;
-        display: flex;
+    .recovery-container {
+        position: absolute;
+        bottom: 25px; /* Aligned to bottom edge of the panel */
+        left: 50%;
+        transform: translate3d(-50%, 0, -10px);
+        width: 85%;
+        padding-top: 15px;
+        z-index: -1; /* Behind the card */
+        display: none;
+        pointer-events: none;
+    }
+
+    .recovery-container.active {
+        display: block;
+        pointer-events: all;
+        animation: emergeTab 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+
+    #btnShowRecovery {
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 15px 35px rgba(var(--info-rgb), 0.3);
+        background: rgba(var(--info-rgb), 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(var(--info-rgb), 0.2);
+        color: var(--info-color);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    #btnShowRecovery:hover {
+        transform: translateZ(15px) translateY(5px);
+        box-shadow: 0 25px 50px rgba(var(--info-rgb), 0.4);
+        background: rgba(var(--info-rgb), 0.2);
+    }
+
+    /* Glassmorphic Modal */
+    .recovery-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 9999;
+        display: none;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.5rem;
-        color: var(--primary-color);
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .recovery-modal-overlay.active {
+        display: flex;
+        opacity: 1;
+    }
+
+    .recovery-modal {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(40px);
+        -webkit-backdrop-filter: blur(40px);
+        padding: 2.5rem;
+        border-radius: 24px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        transform: scale(0.9) translateY(20px);
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .light-mode .recovery-modal {
+        background: rgba(255, 255, 255, 0.8);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        color: #212529;
+    }
+
+    .recovery-modal-overlay.active .recovery-modal {
+        transform: scale(1) translateY(0);
+    }
+
+    .is-invalid-glow {
+        border-color: var(--danger-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(var(--danger-rgb), 0.25) !important;
     }
 
     @media (max-width: 900px) {
@@ -309,39 +433,23 @@
     <div class="login-wrapper">
         <!-- Left: Informational Panel -->
         <div class="info-panel"
-            style="padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
-            <div class="brand-section" style="margin: 0 auto; padding: 0; width: 100%;">
-                <div class="brand-logo bg-transparent border-0 p-0 mb-4 animate-reveal"
-                    style="width: 70px; height: 70px; margin: 0 auto; padding: 0; cursor: default; animation-delay: 0.6s;">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100"
-                        style="filter: drop-shadow(0 8px 16px rgba(0,0,0,0.4));">
-                        <defs>
-                            <linearGradient id="logoGradLog" x1="0" y1="0" x2="100" y2="100"
-                                gradientUnits="userSpaceOnUse">
-                                <stop offset="0" stop-color="var(--primary-color)" />
-                                <stop offset="1" stop-color="var(--info-color)" />
-                            </linearGradient>
-                        </defs>
-                        <path d="M50 5 L0 25 L0 50 C0 75 30 90 50 95 C70 90 100 75 100 50 L100 25 Z" fill="none"
-                            stroke="url(#logoGradLog)" stroke-width="4" stroke-linejoin="round" />
+            style="padding: 3.5rem 3rem; display: flex; flex-direction: column; justify-content: center; text-align: center;">
+            <div class="brand-section">
+                <div class="brand-logo bg-transparent border-0 p-0 mb-3 animate-reveal"
+                    style="width: 70px; height: 70px; margin: 0 auto; animation-delay: 0.6s;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="w-100 h-100">
+                        <path d="M50 5 L10 25 L10 50 C10 75 30 90 50 95 C70 90 90 75 90 50 L90 25 Z" fill="none"
+                            stroke="var(--primary-color)" stroke-width="4" stroke-linejoin="round" />
                         <circle cx="50" cy="40" r="8" fill="var(--text-main)" />
-                        <circle cx="35" cy="60" r="6" fill="var(--text-main)" opacity="0.8" />
-                        <circle cx="65" cy="60" r="6" fill="var(--text-main)" opacity="0.8" />
                         <path d="M50 48 L38 56 M50 48 L62 56 M50 48 L50 75" stroke="var(--text-main)" stroke-width="4"
                             stroke-linecap="round" fill="none" opacity="0.6" />
                     </svg>
                 </div>
                 <h1 class="brand-title animate-reveal"
-                    style="margin: 0 auto 0.5rem auto; padding: 0; text-align: center; animation-delay: 0.75s;">
-                    CyberShield AI</h1>
+                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 1.25rem auto;">Sign In to CyberShield AI</h1>
                 <div class="typing-container mb-4 animate-reveal"
-                    style="height: 95px; animation-delay: 0.9s; width: 100%; max-width: 440px; margin: 0 auto; display: block; text-align: left; padding: 0;">
-                    <p id="typingText" class="dynamic-muted mb-0"
-                        style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.4; font-size: 0.95rem; margin: 0; padding: 0;">
-                        <!-- Cursor is injected here via script to follow wrap -->
-                        <span id="cursor" class="text-primary fw-bold ms-1"
-                            style="display: none; vertical-align: baseline;">|</span>
-                    </p>
+                    style="height: 160px; width: 100%; max-width: 220px; margin: 0 auto; text-align: center; animation-delay: 0.9s; overflow: hidden; display: flex; align-items: flex-start; justify-content: center;">
+                    <p id="typingText" class="dynamic-muted mb-0" style="display: block; text-align: center; white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 1.15rem; font-weight: 500; opacity: 0.9;"><span id="cursor" class="text-primary fw-bold ms-1" style="display: none; vertical-align: baseline;">|</span></p>
                 </div>
 
                 <div class="mt-5 animate-reveal"
@@ -354,7 +462,8 @@
         </div>
 
         <!-- Right: Login Panel -->
-        <div class="form-panel liquid-glass">
+        <div class="form-panel liquid-glass"
+            style="padding: 2.5rem 2.25rem; display: flex; flex-direction: column; justify-content: center;">
             {% if has_saved %}
             <!-- Direct Login View -->
             <div id="directLoginArea" class="speed-login-box">
@@ -412,11 +521,18 @@
                             Keep me logged in on this machine
                         </label>
                     </div>
-
-                    <div class="d-grid mt-4 animate-reveal" style="animation-delay: 1.2s;">
-                        <button type="submit" class="btn btn-primary shadow-sm py-2">
-                            <i class="fas fa-lock-open me-2"></i>Authenticate
+                    <div class="d-grid mt-4 animate-reveal position-relative" style="animation-delay: 1.2s; z-index: 5;">
+                        <button type="submit" id="btnAuthenticate" class="btn btn-primary shadow-sm py-2">
+                            <i class="fas fa-lock me-2" id="authIcon"></i>Authenticate
                         </button>
+                        
+                        <!-- Layout-Neutral Security Tab (Detached Flow) -->
+                        <div id="recoveryActionContainer" class="recovery-container text-center">
+                            <button type="button" id="btnShowRecovery" class="btn btn-outline-info btn-sm rounded-pill w-100 py-2">
+                                <i class="fas fa-key me-2"></i>Forgotten Keys? Reset Access
+                            </button>
+                        </div>
+
                         <div class="text-center mt-3">
                             <p class="xx-small dynamic-muted">Don't have an account? <a href="/Signup"
                                     class="text-primary fw-bold text-decoration-none">Sign up here</a></p>
@@ -425,118 +541,288 @@
                 </form>
             </div>
         </div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-    // Refined AJAX Login Handler
-    async function handleLogin(e) {
-        e.preventDefault();
-        const form = e.target;
-        const btn = form.querySelector('button[type="submit"]');
-        const username = form.t1.value.trim();
-        const password = form.t2.value.trim();
-        const remember = form.remember.checked;
+        <!-- Glassmorphic Recovery Modal -->
+        <div id="recoveryOverlay" class="recovery-modal-overlay">
+            <div class="recovery-modal">
+                <div class="text-center mb-4">
+                    <div class="icon-box mb-3" style="font-size: 2.5rem; color: var(--info-color);">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="dynamic-text fw-bold">Security Recovery</h4>
+                    <p class="xx-small dynamic-muted">Refresh your authentication key encryption</p>
+                </div>
 
-        if (!username || !password) {
-            showToast("Username and Password are required", "error");
-            return;
-        }
+                <form id="recoveryForm">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold dynamic-muted xx-small mb-1">CONFIRM USERNAME</label>
+                        <input type="text" id="recoveryUser" class="form-control" placeholder="Archive username"
+                            required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold dynamic-muted xx-small mb-1">NEW ACCESS KEY</label>
+                        <input type="password" id="recoveryPass" class="form-control" placeholder="New strong key"
+                            required>
+                    </div>
 
-        // Visual Feedback (Loading state)
-        const originalBtnContent = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+                    <div id="recoverySuccessOptions" class="d-none animate-reveal">
+                        <div class="alert alert-success bg-opacity-10 border-success text-success xx-small mb-4">
+                            Encryption updated successfully. Choose redirection path:
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" id="btnRecoveryDirect" class="btn btn-success shadow-sm">
+                                <i class="fas fa-rocket me-2"></i>Direct Entry (Sync)
+                            </button>
+                            <button type="button" id="btnRecoveryManual" class="btn btn-outline-light btn-sm">
+                                Manual Credential Entry
+                            </button>
+                        </div>
+                    </div>
 
-        try {
-            const formData = new FormData();
-            formData.append('t1', username);
-            formData.append('t2', password);
-            if (remember) formData.append('remember', 'on');
+                    <div id="recoveryInitialActions" class="d-grid">
+                        <button type="submit" class="btn btn-info shadow-sm">
+                            <i class="fas fa-sync-alt me-2"></i>Update Keys
+                        </button>
+                        <button type="button" id="btnCloseRecovery"
+                            class="btn btn-link xx-small text-muted text-decoration-none mt-2">Abort</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endblock %}
 
-            const res = await fetch('/UserLoginAction', {
-                method: 'POST',
-                body: formData
-            });
+        {% block extra_js %}
+        <script>
+            // Refined AJAX Login Handler & Failure Tracking
+            let failedAttempts = 0;
 
-            const data = await res.json();
+            async function handleLogin(e) {
+                e.preventDefault();
+                const form = e.target;
+                const btn = form.querySelector('button[type="submit"]');
+                const usernameField = form.t1;
+                const passwordField = form.t2;
+                const remember = form.remember.checked;
 
-            if (data.status === 'success') {
-                showToast(data.message, "success");
-                // Smooth transition delay to let toast be seen
-                setTimeout(() => window.location.href = data.redirect, 800);
-            } else {
-                showToast(data.message, "error");
-                // Re-enable button on error WITHOUT reload
-                btn.disabled = false;
-                btn.innerHTML = originalBtnContent;
-                form.t2.value = ''; // Clear password field for security
-                form.t2.focus();
-            }
-        } catch (error) {
-            showToast("Connection failed. Check your mainframe link.", "error");
-            btn.disabled = false;
-            btn.innerHTML = originalBtnContent;
-        }
-    }
+                // Reset highlights
+                usernameField.classList.remove('is-invalid-glow');
+                passwordField.classList.remove('is-invalid-glow');
 
-    document.addEventListener('DOMContentLoaded', function () {
-        // Use Global Typing Animation Utility
-        const typingSummary = "Secure. Persistent. Proactive. Save your login securely to skip authentication on your next visit.";
-        initTypingEffect('typingText', typingSummary, 35, 100);
+                if (!usernameField.value.trim() || !passwordField.value.trim()) {
+                    showToast("Username and Password are required", "error");
+                    if (!usernameField.value.trim()) usernameField.classList.add('is-invalid-glow');
+                    if (!passwordField.value.trim()) passwordField.classList.add('is-invalid-glow');
+                    return;
+                }
 
-        const btnDirectLogin = document.getElementById('btnDirectLogin');
-        const btnResetCreds = document.getElementById('btnResetCreds');
-        const loginForm = document.querySelector('form[name="f1"]');
-        
-        // Attach AJAZ interceptor
-        if (loginForm) {
-            loginForm.addEventListener('submit', handleLogin);
-        }
+                const originalBtnContent = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
 
-        // Password Toggle Logic (same as before)
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('t2');
-        const eyeIcon = document.getElementById('eyeIcon');
-        if (togglePassword) {
-            togglePassword.addEventListener('click', function () {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                eyeIcon.classList.toggle('fa-eye');
-                eyeIcon.classList.toggle('fa-eye-slash');
-            });
-        }
-        
-        // Quick Access / Session Logic (same as before)
-        if (btnDirectLogin) {
-            btnDirectLogin.addEventListener('click', function () {
-                btnDirectLogin.disabled = true;
-                btnDirectLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
-                fetch('/VerifySavedLogin', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success') {
-                            showToast('Authenticated! Redirecting...', 'success');
-                            setTimeout(() => window.location.href = '/Train', 500);
-                        } else {
-                            showToast('Saved credentials invalid.', 'error');
-                            setTimeout(() => location.reload(), 1500);
+                try {
+                    const formData = new FormData();
+                    formData.append('t1', usernameField.value.trim());
+                    formData.append('t2', passwordField.value.trim());
+                    if (remember) formData.append('remember', 'on');
+
+                    const res = await fetch('/UserLoginAction', { method: 'POST', body: formData });
+                    const data = await res.json();
+
+                    if (data.status === 'success') {
+                        btn.innerHTML = '<i class="fas fa-lock-open me-2"></i>Authorized';
+                        btn.classList.replace('btn-primary', 'btn-success');
+                        showToast(data.message, "success");
+                        setTimeout(() => window.location.href = data.redirect, 800);
+                    } else {
+                        failedAttempts++;
+                        showToast(data.message, "error");
+
+                        // UX Hardening: Precise Clear/Focus Logic
+                        if (data.error_type === "invalid_username") {
+                            // If Identity is missing, the combo is fully invalidated
+                            usernameField.value = '';
+                            passwordField.value = '';
+                            usernameField.classList.add('is-invalid-glow');
+                            usernameField.focus();
+                        } else if (data.error_type === "invalid_password") {
+                            // Specify target field for remediation
+                            passwordField.value = '';
+                            passwordField.classList.add('is-invalid-glow');
+                            passwordField.focus();
                         }
-                    })
-                    .catch(e => {
-                        showToast('Connection error.', 'error');
-                        btnDirectLogin.disabled = false;
-                        btnDirectLogin.innerHTML = '<i class="fas fa-rocket me-2"></i>Quick Access';
+
+                        // If failures trigger recovery
+                        if (failedAttempts >= 3) {
+                            const rContainer = document.getElementById('recoveryActionContainer');
+                            rContainer.classList.add('active');
+                        }
+
+                        btn.disabled = false;
+                        btn.innerHTML = originalBtnContent;
+                    }
+                } catch (error) {
+                    showToast("Connection failed. Check your mainframe link.", "error");
+                    btn.disabled = false;
+                    btn.innerHTML = originalBtnContent;
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                // Use Global Typing Animation Utility
+                const typingSummary = "Sign in to your account to start predicting and monitoring cyber attacks with generative AI insights.";
+                const typingEl = document.getElementById('typingText');
+                if (typingEl) {
+                    const cursor = typingEl.querySelector('#cursor');
+                    let charIdx = 0;
+                    setTimeout(() => {
+                        if (cursor) cursor.style.display = 'inline';
+                        function type() {
+                            if (charIdx < typingSummary.length) {
+                                typingEl.insertBefore(document.createTextNode(typingSummary.charAt(charIdx)), cursor);
+                                charIdx++;
+                                setTimeout(type, 22);
+                            } else if (cursor) {
+                                cursor.classList.add('animate__flash', 'animate__animated', 'animate__infinite');
+                            }
+                        }
+                        type();
+                    }, 100);
+                }
+
+                const btnDirectLogin = document.getElementById('btnDirectLogin');
+                const btnResetCreds = document.getElementById('btnResetCreds');
+                const loginForm = document.querySelector('form[name="f1"]');
+
+                // Attach AJAZ interceptor
+                if (loginForm) {
+                    loginForm.addEventListener('submit', handleLogin);
+                }
+
+                // Password Toggle Logic (same as before)
+                const togglePassword = document.getElementById('togglePassword');
+                const passwordInput = document.getElementById('t2');
+                const eyeIcon = document.getElementById('eyeIcon');
+                if (togglePassword) {
+                    togglePassword.addEventListener('click', function () {
+                        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                        passwordInput.setAttribute('type', type);
+                        eyeIcon.classList.toggle('fa-eye');
+                        eyeIcon.classList.toggle('fa-eye-slash');
                     });
-            });
-        }
+                }
 
-        if (btnResetCreds) {
-            btnResetCreds.addEventListener('click', function() {
-                fetch('/ResetCredentials', { method: 'POST' }).then(() => location.reload());
-            });
-        }
-    });
-</script>
+                // Quick Access / Session Logic (same as before)
+                if (btnDirectLogin) {
+                    btnDirectLogin.addEventListener('click', function () {
+                        btnDirectLogin.disabled = true;
+                        btnDirectLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
+                        fetch('/VerifySavedLogin', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.status === 'success') {
+                                    showToast('Authenticated! Redirecting...', 'success');
+                                    setTimeout(() => window.location.href = '/Train', 500);
+                                } else {
+                                    showToast('Saved credentials invalid.', 'error');
+                                    setTimeout(() => location.reload(), 1500);
+                                }
+                            })
+                            .catch(e => {
+                                showToast('Connection error.', 'error');
+                                btnDirectLogin.disabled = false;
+                                btnDirectLogin.innerHTML = '<i class="fas fa-rocket me-2"></i>Quick Access';
+                            });
+                    });
+                }
 
-{% endblock %}
+                if (btnResetCreds) {
+                    btnResetCreds.addEventListener('click', function () {
+                        fetch('/ResetCredentials', { method: 'POST' }).then(() => location.reload());
+                    });
+                }
+
+                // Recovery Modal Control Logic
+                const recoveryOverlay = document.getElementById('recoveryOverlay');
+                const btnShowRecovery = document.getElementById('btnShowRecovery');
+                const btnCloseRecovery = document.getElementById('btnCloseRecovery');
+                const recoveryForm = document.getElementById('recoveryForm');
+
+                if (btnShowRecovery) {
+                    btnShowRecovery.addEventListener('click', () => recoveryOverlay.classList.add('active'));
+                }
+
+                if (btnCloseRecovery) {
+                    btnCloseRecovery.addEventListener('click', () => recoveryOverlay.classList.remove('active'));
+                }
+
+                if (recoveryForm) {
+                    recoveryForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        const username = document.getElementById('recoveryUser').value.trim();
+                        const newPass = document.getElementById('recoveryPass').value.trim();
+                        const submitBtn = recoveryForm.querySelector('button[type="submit"]');
+
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Syncing Archives...';
+
+                        try {
+                            const res = await fetch('/ResetPasswordAction', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ username, new_password: newPass })
+                            });
+                            const data = await res.json();
+
+                            if (data.status === 'success') {
+                                document.getElementById('recoveryInitialActions').classList.add('d-none');
+                                document.getElementById('recoverySuccessOptions').classList.remove('d-none');
+                            } else {
+                                showToast(data.message, "error");
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Update Keys';
+                            }
+                        } catch (err) {
+                            showToast("Mainframe link interrupted.", "error");
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i>Update Keys';
+                        }
+                    });
+                }
+
+                // Post-Recovery Flows
+                const btnRecoveryDirect = document.getElementById('btnRecoveryDirect');
+                const btnRecoveryManual = document.getElementById('btnRecoveryManual');
+
+                if (btnRecoveryDirect) {
+                    btnRecoveryDirect.addEventListener('click', async () => {
+                        const username = document.getElementById('recoveryUser').value.trim();
+                        const newPass = document.getElementById('recoveryPass').value.trim();
+
+                        btnRecoveryDirect.disabled = true;
+                        btnRecoveryDirect.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Entering...';
+
+                        try {
+                            const res = await fetch('/ResetPasswordAction', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ username, new_password: newPass, auto_login: true })
+                            });
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                window.location.href = data.redirect;
+                            }
+                        } catch (err) {
+                            location.href = '/UserLogin';
+                        }
+                    });
+                }
+
+                if (btnRecoveryManual) {
+                    btnRecoveryManual.addEventListener('click', () => {
+                        location.reload(); // Returns to fresh login page
+                    });
+                }
+            });
+        </script>
+
+        {% endblock %}

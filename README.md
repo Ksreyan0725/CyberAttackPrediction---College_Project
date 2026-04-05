@@ -50,6 +50,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
 1. **Install Python**: Open the [📁 Software/](Software/) folder and run `python-3.11.9-amd64.exe`.
 2. **Install Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically install all AI libraries.
 3. **One-Click Start**: Run [⚙️ Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) directly from the root to launch the dashboard.
+4. **Optimized Logs**: Server output is throttled to 5s intervals for a cleaner developer terminal experience.
 
 > [!TIP]
 > **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
@@ -70,6 +71,10 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - Converts technical classification results into plain-English advice for security administrators.
 - **🔄 Synchronized System Reset**
   - Total data-wipe capability: Clears both LocalStorage and Server Sessions for a 100% fresh environment.
+- **⚡ GPU Transition Hardening**
+  - Smooth, 60fps entry animations with 6px Gaussian blur and hardware-accelerated compositor layers.
+- **📂 Automated Rescue System**
+  - Integrated 404 Intelligent Recovery engine for seamless server-sync restoration.
 
 ---
 
@@ -129,6 +134,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
     - [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results & Explanation Dashboard)
     - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Human-Readable Explanations)
     - [Train.html](CyberAttackPrediction/templates/Train.html) (AI Model Training & Management Page)
+    - [404.html](CyberAttackPrediction/templates/404.html) (Cinematic Recovery & Support Portal)
   - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
   - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
   - 🐍 [**Main.py**](CyberAttackPrediction/Main.py) (Heart of the Project)

@@ -66,6 +66,64 @@
         background: #f8fafc;
         border-color: #e2e8f0;
     }
+    .floating-explorer-btn {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 999;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        pointer-events: none;
+    }
+    .floating-explorer-btn.visible {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+    }
+    .floating-explorer-btn .btn {
+        padding: 1rem 2rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+        background: var(--primary-color);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+    .floating-explorer-btn .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Accordion UI Hardening - Reset active/focus states */
+    .accordion-button:focus {
+        box-shadow: none !important;
+        border-color: var(--glass-border) !important;
+    }
+    
+    .accordion-button:not(.collapsed) {
+        background: rgba(59, 130, 246, 0.05) !important;
+        color: var(--text-main) !important;
+        box-shadow: none !important;
+        border-bottom: 1px solid var(--glass-border) !important;
+    }
+
+    .accordion-item {
+        border: 1px solid var(--glass-border) !important;
+        margin-bottom: 0.5rem;
+        border-radius: 12px !important;
+        overflow: hidden;
+    }
+
+    .accordion-button {
+        padding: 1.25rem;
+        font-weight: 600;
+    }
 </style>
 {% endblock %}
 
@@ -78,7 +136,7 @@
             <a href="#overview" class="btn btn-outline-info px-4 rounded-pill">
                 <i class="fas fa-book-reader me-2"></i>Read Overview
             </a>
-            <a href="{{ url_for('explorer') }}" class="btn btn-primary px-4 rounded-pill shadow-sm">
+            <a href="{{ url_for('explorer') }}" id="hero-explorer-btn" class="btn btn-primary px-4 rounded-pill shadow-sm">
                 <i class="fas fa-folder-open me-2"></i>Open Project Explorer
             </a>
         </div>
@@ -86,33 +144,8 @@
 </div>
 
 <div class="container py-5 mt-n5">
-    <div class="row g-5">
-        <!-- Sidebar Navigation -->
-        <div class="col-lg-3 d-none d-lg-block">
-            <div class="glass-card sticky-toc">
-                <h4 class="fw-bold mb-3 dynamic-text">Reference</h4>
-                <div class="mb-4">
-                    <a href="{{ url_for('explorer') }}" class="btn btn-sm btn-outline-primary w-100 rounded-pill">
-                        <i class="fas fa-folder-open me-2"></i>Documentation Site
-                    </a>
-                </div>
-                <h4 class="fw-bold mb-3 dynamic-text">On This Page</h4>
-                <nav>
-                    <a href="#overview" class="toc-link">Project Overview</a>
-                    <a href="#security-guard" class="toc-link">The Security Guard Analogy</a>
-                    <a href="#architecture" class="toc-link">System Architecture</a>
-                    <a href="#ml-models" class="toc-link">Machine Learning Models</a>
-                    <a href="#genai" class="toc-link">Generative AI Insights</a>
-                    <a href="#advanced-security" class="toc-link">Advanced Security</a>
-                    <a href="#features" class="toc-link">Network Features</a>
-                    <a href="#attacks" class="toc-link">Attack Taxonomy</a>
-                    <a href="#viva" class="toc-link">Viva Preparation</a>
-                </nav>
-            </div>
-        </div>
-
-        <!-- Main Content -->
-        <div class="col-lg-9 reveal-premium" style="margin-left: auto;">
+        <!-- Main Content (Centered, Sidebar Removed) -->
+        <div class="col-lg-10 mx-auto reveal-premium">
             <div class="glass-card p-5 border-0">
                 
                 <!-- Overview -->
@@ -195,21 +228,47 @@
                     </div>
                 </section>
 
+                <!-- Infrastructure & Security Hardening -->
+                <section id="security-hardening" class="doc-section">
+                    <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-shield-virus me-3"></i>Infrastructure & Security Hardening</h3>
+                    <p class="dynamic-muted mb-4">A critical part of the college project defense is demonstrating robust system architecture. We have implemented several production-grade security layers:</p>
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-4">
+                            <div class="p-4 glass-card feature-card h-100 border-primary border-opacity-25">
+                                <h5 class="fw-bold text-primary"><i class="fas fa-route me-2"></i>Auth Guards</h5>
+                                <p class="small dynamic-muted">Authenticated users are automatically bridged to the dashboard from <code>/UserLogin</code> and <code>/Signup</code>, preventing session loops.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 glass-card feature-card h-100 border-info border-opacity-25">
+                                <h5 class="fw-bold text-info"><i class="fas fa-key me-2"></i>Identity Recovery</h5>
+                                <p class="small dynamic-muted">Integrated <strong>Forgotten Keys</strong> modal and <code>/ResetPasswordAction</code> for secure account restoration.</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-4 glass-card feature-card h-100 border-success border-opacity-25">
+                                <h5 class="fw-bold text-success"><i class="fas fa-layer-group me-2"></i>Layering Guard</h5>
+                                <p class="small dynamic-muted">Z-Index (9999) enforced navigation layering to ensure interactive elements are never masked by dashboard content.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- Advanced Security -->
                 <section id="advanced-security" class="doc-section">
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-user-lock me-3"></i>Advanced Multi-User Security</h3>
-                    <p class="dynamic-muted mb-4">The system features a production-grade authentication layer to protect administrative functions and user data.</p>
+                    <p class="dynamic-muted mb-4">The core system features a production-grade authentication layer to protect administrative functions and user data.</p>
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="p-4 glass-card h-100">
                                 <h5 class="fw-bold text-primary"><i class="fas fa-key me-2"></i>Password Hashing</h5>
-                                <p class="small dynamic-muted">Uses <strong>PBKDF2 with SHA256</strong> to hash passwords. Even if the database is exposed, original passwords remain unreadable and secure.</p>
+                                <p class="small dynamic-muted">Uses <strong>PBKDF2 with SHA256</strong> to hash passwords. Even if the database is exposed, original passwords remain unreadable.</p>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="p-4 glass-card h-100">
                                 <h5 class="fw-bold text-warning"><i class="fas fa-crown me-2"></i>Ultimate Admin Bypass</h5>
-                                <p class="small dynamic-muted">A hardcoded <code>admin</code> account providing master access, indicated by a special <strong>MASTER</strong> badge in the interface.</p>
+                                <p class="small dynamic-muted">A hardcoded <code>admin</code> account providing master access, indicated by a special <strong>MASTER</strong> badge.</p>
                             </div>
                         </div>
                     </div>
@@ -220,37 +279,135 @@
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-list-ol me-3"></i>Dataset Features (41 Columns)</h3>
                     <p class="dynamic-muted mb-4">The AI doesn't just "see" an attack; it looks at 41 different clues. Here are the core categories:</p>
                     <div class="accordion accordion-flush bg-transparent" id="featureAccordion">
-                        <div class="accordion-item bg-transparent border-glass">
+                        <!-- Category 1: Basic Features -->
+                        <div class="accordion-item bg-transparent">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#basicFeatures">
-                                    <i class="fas fa-network-wired me-2"></i> Basic Features (The ID Card)
+                                    <i class="fas fa-network-wired me-2"></i> Basic Features (9 Segment Clues)
                                 </button>
                             </h2>
                             <div id="basicFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
                                 <div class="accordion-body dynamic-muted">
-                                    <ul class="list-unstyled">
-                                        <li><strong>Duration:</strong> Length of the connection (in seconds).</li>
-                                        <li><strong>Protocol_type:</strong> Type of protocol (TCP, UDP, ICMP).</li>
-                                        <li><strong>Service:</strong> Network service on the destination (HTTP, FTP, etc.).</li>
-                                        <li><strong>Flag:</strong> Status of the connection (Normal, Rejected, Error).</li>
-                                    </ul>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Duration:</strong> Length of connection.</li>
+                                                <li><strong>Protocol_type:</strong> TCP, UDP, ICMP.</li>
+                                                <li><strong>Service:</strong> Target service (HTTP, etc.).</li>
+                                                <li><strong>Flag:</strong> Connection status.</li>
+                                                <li><strong>Src_bytes:</strong> Bytes from source.</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Dst_bytes:</strong> Bytes from destination.</li>
+                                                <li><strong>Land:</strong> Same source/destination IP/port.</li>
+                                                <li><strong>Wrong_fragment:</strong> Bad packet fragments.</li>
+                                                <li><strong>Urgent:</strong> Number of urgent packets.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="accordion-item bg-transparent border-glass">
+
+                        <!-- Category 2: Content Features -->
+                        <div class="accordion-item bg-transparent">
                             <h2 class="accordion-header">
                                 <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#contentFeatures">
-                                    <i class="fas fa-box-open me-2"></i> Content Features (The Suitcase)
+                                    <i class="fas fa-box-open me-2"></i> Content Features (13 Payload Clues)
                                 </button>
                             </h2>
                             <div id="contentFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
                                 <div class="accordion-body dynamic-muted">
-                                    <ul class="list-unstyled">
-                                        <li><strong>Src_bytes:</strong> Data bytes sent from source to destination.</li>
-                                        <li><strong>Dst_bytes:</strong> Data bytes sent from destination to source.</li>
-                                        <li><strong>Logged_in:</strong> 1 if successfully logged in; 0 otherwise.</li>
-                                        <li><strong>Num_failed_logins:</strong> Number of failed login attempts.</li>
-                                    </ul>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Hot:</strong> Number of "hot" indicators.</li>
+                                                <li><strong>Num_failed_logins:</strong> Failed attempts.</li>
+                                                <li><strong>Logged_in:</strong> 1 if logged in, else 0.</li>
+                                                <li><strong>Num_compromised:</strong> Compromised states.</li>
+                                                <li><strong>Root_shell:</strong> Root shell obtained.</li>
+                                                <li><strong>Su_attempted:</strong> "su root" command used.</li>
+                                                <li><strong>Num_root:</strong> Number of "root" accesses.</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Num_file_creations:</strong> File ops.</li>
+                                                <li><strong>Num_shells:</strong> Number of shell prompts.</li>
+                                                <li><strong>Num_access_files:</strong> Control files.</li>
+                                                <li><strong>Num_outbound_cmds:</strong> Outbound FTP cmds.</li>
+                                                <li><strong>Is_host_login:</strong> Host login status.</li>
+                                                <li><strong>Is_guest_login:</strong> Guest login status.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category 3: Traffic Features -->
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#trafficFeatures">
+                                    <i class="fas fa-chart-line me-2"></i> Traffic Features (9 Flow Clues)
+                                </button>
+                            </h2>
+                            <div id="trafficFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
+                                <div class="accordion-body dynamic-muted">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Count:</strong> Connections to same host.</li>
+                                                <li><strong>Srv_count:</strong> Same service connections.</li>
+                                                <li><strong>Serror_rate:</strong> % of "SYN" errors.</li>
+                                                <li><strong>Srv_serror_rate:</strong> Service SYN errors.</li>
+                                                <li><strong>Rerror_rate:</strong> % of "REJ" errors.</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Srv_rerror_rate:</strong> Service REJ errors.</li>
+                                                <li><strong>Same_srv_rate:</strong> % to same service.</li>
+                                                <li><strong>Diff_srv_rate:</strong> % to diff services.</li>
+                                                <li><strong>Srv_diff_host_rate:</strong> % to diff hosts.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Category 4: Host Features -->
+                        <div class="accordion-item bg-transparent">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed bg-transparent dynamic-text" type="button" data-bs-toggle="collapse" data-bs-target="#hostFeatures">
+                                    <i class="fas fa-bullseye me-2"></i> Host Features (10 Target Clues)
+                                </button>
+                            </h2>
+                            <div id="hostFeatures" class="accordion-collapse collapse" data-bs-parent="#featureAccordion">
+                                <div class="accordion-body dynamic-muted">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Dst_host_count:</strong> Host count.</li>
+                                                <li><strong>Dst_host_srv_count:</strong> Service count.</li>
+                                                <li><strong>Dst_host_same_srv_rate:</strong> % same srv.</li>
+                                                <li><strong>Dst_host_diff_srv_rate:</strong> % diff srv.</li>
+                                                <li><strong>Dst_host_same_src_port_rate:</strong> % same port.</li>
+                                            </ul>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <ul class="list-unstyled mb-0">
+                                                <li><strong>Dst_host_srv_diff_host_rate:</strong> % diff host.</li>
+                                                <li><strong>Dst_host_serror_rate:</strong> Host SYN errors.</li>
+                                                <li><strong>Dst_host_srv_serror_rate:</strong> Srv SYN errors.</li>
+                                                <li><strong>Dst_host_rerror_rate:</strong> Host REJ errors.</li>
+                                                <li><strong>Dst_host_srv_rerror_rate:</strong> Srv REJ errors.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -415,6 +572,14 @@
     </div>
 </div>
 
+<!-- Floating Action Button -->
+<div class="floating-explorer-btn" id="fab-explorer">
+    <a href="{{ url_for('explorer') }}" class="btn btn-primary">
+        <i class="fas fa-folder-open"></i>
+        <span>Open Project Explorer</span>
+    </a>
+</div>
+
 <style>
     .mt-n5 { margin-top: -60px !important; }
     .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
@@ -445,5 +610,29 @@
             }
         });
     });
+
+    // Floating Button Logic using Intersection Observer
+    const heroBtn = document.getElementById('hero-explorer-btn');
+    const fab = document.getElementById('fab-explorer');
+
+    const observerOptions = {
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) {
+                // Main button is pushed out, show FAB
+                fab.classList.add('visible');
+            } else {
+                // Main button is visible, hide FAB
+                fab.classList.remove('visible');
+            }
+        });
+    }, observerOptions);
+
+    if (heroBtn) {
+        observer.observe(heroBtn);
+    }
 </script>
 {% endblock %}

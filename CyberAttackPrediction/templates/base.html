@@ -10,8 +10,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Bootstrap 5 JS (with Popper) - Moved to head with defer for correct script execution order -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    
+    <!-- Premium Typography: Inter for UI, Outfit for Headers -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Global Security: CSRF Protection & Multi-tab Watchdog -->
+    <meta name="csrf-token" content="{{ session['csrf_token'] }}">
 
     <!-- Smart Theme & Storage Management -->
     <script>
@@ -27,7 +37,97 @@
                 document.documentElement.classList.add('page-visited');
             }
         })();
-    </script>
+
+        // --- Consolidated Global Heartbeat (Multi-Session Aware) ---
+        (function() {
+            let wasOffline = false;
+            let checkInProgress = false;
+
+            async function checkPulse() {
+                if (checkInProgress) return;
+                checkInProgress = true;
+
+                const statusPill = document.getElementById('globalSystemStatus');
+                const statusText = statusPill?.querySelector('.status-text');
+                
+                try {
+                    const response = await fetch('/api/heartbeat', { 
+                        method: 'GET',
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache' }
+                    });
+                    
+                        // --- GLOBAL UI SYNCHRONIZATION ---
+                        const trainingPill = document.getElementById('trainingStatus');
+                        const trainingText = trainingPill?.querySelector('.status-text') || document.getElementById('statusText');
+                        const trainingDot = trainingPill?.querySelector('.status-dot');
+
+                        if (response.ok) {
+                            const data = await response.json();
+                            const isBusy = data.status === 'busy';
+
+                            // 1. Update Navbar Status Pill
+                            if (statusPill) {
+                                if (isBusy) {
+                                    statusPill.className = 'system-status-pill status-busy me-2';
+                                    if (statusText) statusText.textContent = 'System Busy';
+                                } else {
+                                    statusPill.className = 'system-status-pill status-ready me-2';
+                                    if (statusText) statusText.textContent = 'System Ready';
+                                }
+                            }
+
+                            // 2. Update Training Dashboard Badge (if on Train.html)
+                            if (trainingPill) {
+                                // Skip update if local UI just started a job (to avoid race-condition flicker)
+                                const startBtn = document.getElementById('startTrainingBtn');
+                                if (!startBtn || !startBtn.disabled) {
+                                    if (isBusy) {
+                                        trainingPill.className = 'status-badge status-running d-flex align-items-center';
+                                        if (trainingText) trainingText.textContent = 'System Processing...';
+                                        if (trainingDot) trainingDot.className = 'status-dot dot-busy';
+                                    } else if (!trainingPill.classList.contains('status-success')) {
+                                        // Only revert if we aren't displaying a successful completion
+                                        trainingPill.className = 'status-badge status-idle d-flex align-items-center';
+                                        if (trainingText) trainingText.textContent = 'System Ready';
+                                        if (trainingDot) trainingDot.className = 'status-dot dot-ready';
+                                    }
+                                }
+                            }
+
+                            // 3. RELOAD LOGIC: Handle recovery reload
+                            if (wasOffline) {
+                                console.log('[System] Server recovered. Performing auto-refresh...');
+                                setTimeout(() => {
+                                    if (typeof reloadWithScroll === 'function') reloadWithScroll();
+                                    else window.location.reload();
+                                }, 500);
+                            }
+                            wasOffline = false;
+                        }
+                    } catch (err) {
+                        wasOffline = true;
+                        if (statusPill) {
+                            statusPill.className = 'system-status-pill status-offline me-2';
+                            if (statusText) statusText.textContent = 'Server Offline';
+                        }
+                        // Update Training Dashboard Badge to Offline if it exists
+                        const trainingPill = document.getElementById('trainingStatus');
+                        if (trainingPill) {
+                            trainingPill.className = 'status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center';
+                            const trainingText = trainingPill.querySelector('.status-text') || document.getElementById('statusText');
+                            if (trainingText) trainingText.textContent = 'Server Offline';
+                        }
+                    } finally {
+                        checkInProgress = false;
+                    }
+                }
+
+                // Consolidate logs: reduced frequency to 5s for cleaner terminal output
+                setInterval(checkPulse, 5000);
+                document.addEventListener('DOMContentLoaded', checkPulse);
+            })();
+        </script>
 
     <script>
         // Global Premium Toast System (Smart Stacking & Deduplication)
@@ -43,14 +143,6 @@
                 return; // Skip if same message within 3s
             }
             lastToastInfo = { message, time: currentTime };
-
-            // 2. Concurrency Limit: Max 3 visible toasts
-            const activeToasts = container.querySelectorAll('.premium-toast:not(.hide)');
-            if (activeToasts.length >= 3) {
-                const oldest = activeToasts[0];
-                oldest.classList.add('hide');
-                setTimeout(() => oldest.remove(), 500);
-            }
 
             const toast = document.createElement('div');
             toast.className = `premium-toast toast-${type}`;
@@ -101,6 +193,39 @@
                 el.remove(); // Clean up
             });
         });
+
+        // --- Multi-tab Security Persistence & Watchdog ---
+        (function() {
+            // CSRF Global AJAX Setup: Automatically inject token into all headers
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
+            // Re-setup jQuery AJAX with global CSRF header
+            const setupAjax = () => {
+                if (window.jQuery && csrfToken) {
+                    $.ajaxSetup({
+                        headers: { 'X-CSRF-Token': csrfToken }
+                    });
+                } else {
+                    setTimeout(setupAjax, 100); // Retry if jQuery loading is deferred
+                }
+            };
+            setupAjax();
+
+            // Session Synchronization Logic: Listen for logout in other tabs
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'cybershield_logout') {
+                    window.location.href = '/UserLogin?reason=sync_logout';
+                }
+            });
+
+            // Capture logout clicks to notify other tabs (using event delegation)
+            document.addEventListener('click', (e) => {
+                const logoutLink = e.target.closest('a[href*="/Logout"]');
+                if (logoutLink) {
+                    localStorage.setItem('cybershield_logout', Date.now());
+                }
+            });
+        })();
     </script>
 
     <style>
@@ -133,6 +258,8 @@
             --dropdown-bg: rgba(10, 25, 31, 0.5);
             --primary-light: rgba(var(--primary-rgb), 0.15);
             --bg-card-soft: rgba(255, 255, 255, 0.04);
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --input-text: #ffffff;
 
             --brand-final-opacity: 0.85;
             --brand-text-gradient: linear-gradient(to right, var(--primary-color), var(--info-color), var(--primary-color));
@@ -161,6 +288,8 @@
             --text-muted: #475569;
             --glass-bg: rgba(0, 0, 0, 0.02);
             --glass-border: rgba(0, 0, 0, 0.12);
+            --input-bg: #ffffff;
+            --input-text: #212529;
             --accent-primary: #007bff;
             --accent-glow: rgba(0, 123, 255, 0.15);
             --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -228,11 +357,17 @@
         body {
             background: var(--bg-gradient);
             background-attachment: fixed;
-            font-family: 'Inter', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             color: var(--text-main);
             line-height: 1.6;
             margin: 0;
             padding: 0;
+            transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
         }
 
         /* Trae-Style Reveal Layout */
@@ -398,7 +533,8 @@
         @keyframes revealTraeFinal {
             0% {
                 opacity: 0;
-                filter: blur(10px);
+                /* Reduced blur for global GPU performance optimization */
+                filter: blur(6px);
                 transform: translateY(20px);
             }
 
@@ -493,8 +629,8 @@
         /* --- Navbar System (Merged & Optimized) --- */
         .navbar {
             top: 16px !important;
-            width: 95%;
-            max-width: 1200px;
+            width: 90%;
+            max-width: 1100px;
             margin: 0 auto;
             left: 0;
             right: 0;
@@ -505,8 +641,11 @@
             -webkit-backdrop-filter: blur(8px) saturate(145%);
             padding: 0.45rem 2rem !important;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
-            z-index: 1000;
-            overflow: hidden; /* Added to clip the progress bar to the rounded corners */
+            z-index: 9999 !important;
+            overflow: visible !important; /* Fixed: Allow dropdowns to render outside the navbar capsule */
+            /* GPU Isolation: Prevent flickering during heavy page-load animations */
+            transform: translate3d(0, 0, 0);
+            backface-visibility: hidden;
             will-change: transform;
         }
 
@@ -649,27 +788,58 @@
 
         .glass-tab-btn.active i { transform: scale(1.15); }
 
-        /* System Health Pulse */
-        .pulse-glow { position: relative; padding-left: 28px; }
-        .pulse-glow::before {
-            content: '';
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #22c55e;
-            border-radius: 50%;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            box-shadow: 0 0 12px rgba(34, 197, 94, 0.8);
-            animation: statusPulse 2s infinite;
+        /* --- Global System Health Status (Consolidated) --- */
+        .system-status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 14px;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            white-space: nowrap;
         }
 
-        @keyframes statusPulse {
-            0% { transform: translateY(-50%) scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.6); }
-            70% { transform: translateY(-50%) scale(1.1); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: translateY(-50%) scale(0.9); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: relative;
         }
+
+        /* Status: READY (Green) */
+        .status-ready .status-dot { background: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
+        .status-ready .status-dot::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; background: #22c55e; animation: statusPulseGreen 2s infinite;
+        }
+        .status-ready { color: #22c55e !important; border-color: rgba(34, 197, 94, 0.3); }
+
+        /* Status: BUSY/TRAINING (Yellow/Purple) */
+        .status-busy .status-dot { background: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
+        .status-busy .status-dot::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; background: #a855f7; animation: statusPulsePurple 2s infinite;
+        }
+        .status-busy { color: #a855f7 !important; border-color: rgba(168, 85, 247, 0.3); }
+
+        /* Status: OFFLINE (Red) */
+        .status-offline .status-dot { background: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
+        .status-offline .status-dot::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            border-radius: 50%; background: #ef4444; animation: statusPulseRed 2s infinite;
+        }
+        .status-offline { color: #ef4444 !important; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
+
+        @keyframes statusPulseGreen { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes statusPulsePurple { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+        @keyframes statusPulseRed { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
 
         .guide-step {
             border-left: 2px solid var(--glass-border);
@@ -1108,24 +1278,22 @@
             color: var(--primary-color) !important;
         }
 
-        /* --- High-End Dropdown Animations --- */
+        /* --- High-End Dropdown Animations (Popper-Safe) --- */
         .navbar .dropdown-menu {
-            display: block;
             visibility: hidden;
             opacity: 0;
-            margin-top: 15px !important;
-            transition: opacity 0.3s ease, margin-top 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
             pointer-events: none;
-            right: 0;
-            /* Match dropdown-menu-end behavior statically */
-            left: auto;
+            z-index: 9999 !important; /* Force extreme layering */
         }
 
         .navbar .dropdown-menu.show {
             visibility: visible;
             opacity: 1;
-            margin-top: 8px !important;
+            transform: translateY(0);
             pointer-events: auto;
+            display: block !important; /* Force block state when show class is present */
         }
 
         /* Hover enhancement for desktop if desired, but we follow Bootstrap's click behavior */
@@ -1285,48 +1453,135 @@
         }
 
         /* Floating Fullscreen Button - Matched to Navbar Pill */
-        .fullscreen-floating-btn {
+        /* Consolidated Fullscreen Mission Control Toggle */
+        #fullscreen-floating-toggle {
             position: fixed;
-            top: 16px;
-            /* Matches navbar exactly */
-            right: 16px;
-            /* Pinned symmetrically to the right margin */
-            z-index: 1050;
-            /* Render strictly above navbar */
-            border-radius: 50%;
-            /* Perfect circle matched to navbar height */
+            top: 1.5rem;
+            right: 1.5rem;
+            z-index: 10000 !important;
             width: 48px;
-            /* Explicit structural height guarantees a perfect match */
             height: 48px;
+            border-radius: 50% !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: var(--navbar-bg);
-            /* Identical texture */
             backdrop-filter: blur(20px) saturate(180%);
             -webkit-backdrop-filter: blur(20px) saturate(180%);
             border: 1px solid var(--glass-border);
             color: var(--primary-color) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            font-size: 1.15rem;
+        }
+        
+        #fullscreen-floating-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            color: var(--info-color) !important;
+        }
+
+        #fullscreen-floating-toggle.spin-transition i {
+            animation: cinematic-spin 0.4s ease-in-out;
+        }
+
+        @keyframes cinematic-spin {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(0.5) rotate(180deg); opacity: 0.5; }
+            100% { transform: scale(1) rotate(360deg); }
+        }
+
+        /* Unified Fullscreen Root State */
+        html:fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+        }
+        
+        html:fullscreen body {
+            width: 100vw !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
+            position: relative !important;
+            margin: 0 !important;
+            background-color: var(--bg-main) !important;
+        }
+
+        /* Fullscreen Fallback Banner (Chrome Security Bypass) */
+        .fs-fallback-banner {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            z-index: 2147483647;
+            background: rgba(26, 26, 46, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 243, 255, 0.3);
+            color: #fff;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-family: 'Outfit', sans-serif;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.15rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease, border-color 0.3s ease;
-            cursor: pointer;
-        }
-
-        .fullscreen-floating-btn i {
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
-        }
-
-        .fullscreen-floating-btn.spin-transition i {
-            transform: scale(0.5) rotate(180deg);
+            gap: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 243, 255, 0.1);
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            pointer-events: none;
             opacity: 0;
+            white-space: nowrap;
         }
 
-        .fullscreen-floating-btn:hover {
-            transform: scale(1.1);
-            color: var(--info-color) !important;
-            box-shadow: 0 0 15px var(--primary-color);
-            border-color: var(--info-color);
+        .fs-fallback-banner.reveal {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .fs-fallback-banner i {
+            color: var(--primary-color);
+            animation: pulse-fs 2s infinite;
+        }
+
+        @keyframes pulse-fs {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Interaction & State Feedback System */
+        @keyframes state-shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+
+        @keyframes state-displace-left {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(-1.5px); }
+        }
+
+        @keyframes state-displace-right {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(1.5px); }
+        }
+
+        .state-feedback-active {
+            animation: state-shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+            z-index: 10;
+        }
+
+        .state-feedback-adjacent-left {
+            animation: state-displace-left 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        .state-feedback-adjacent-right {
+            animation: state-displace-right 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -1336,6 +1591,12 @@
     data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
     data-logout-url="{{ url_for('Logout') }}">
     <div class="nav-top-progress"></div>
+
+    <!-- Cinematic Fullscreen Fallback Banner -->
+    <div id="fs-fallback-banner" class="fs-fallback-banner">
+        <i class="fa-solid fa-desktop"></i>
+        <span>Immersive Mode restricted by browser. Press <strong>[F11]</strong> for total immersion.</span>
+    </div>
 
     <!-- Floating Fullscreen Toggle -->
     <button id="fullscreen-floating-toggle" class="fullscreen-floating-btn" data-bs-toggle="tooltip"
@@ -1354,13 +1615,11 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="z-index: 9999 !important;">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center fw-bold"
-                href="{% if request.endpoint in ['UserLogin', 'Signup'] %}javascript:void(0){% else %}{{ url_for('index') }}{% endif %}"
-                {% if request.endpoint in ['UserLogin', 'Signup' ]
-                %}style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: default;" {% else
-                %}style="letter-spacing: -0.5px; font-size: 1.25rem;" {% endif %}>
+                href="javascript:void(0);" onclick="reloadWithScroll()"
+                style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: pointer;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2"
                     style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                     <defs>
@@ -1409,7 +1668,7 @@
                     {% endif %}
                     <li class="nav-item dropdown ms-lg-3">
                         <a class="nav-link dropdown-toggle fw-bold d-flex align-items-center" href="#" id="userDropdown"
-                            role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-display="static"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false"
                             style="color: var(--primary-color) !important;">
                             <i class="fas fa-user-circle me-1 icon-user"></i> {{ session.get('user') }}
                             {% if session.get('is_ultimate') %}
@@ -1462,130 +1721,6 @@
                                 <i class="fas fa-moon"></i>
                             </div>
                         </div>
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function () {
-                                const fsBtn = document.getElementById('fullscreen-floating-toggle');
-                                if (fsBtn) {
-                                    const fsIcon = fsBtn.querySelector('i');
-                                    fsBtn.addEventListener('click', function (e) {
-                                        e.preventDefault();
-                                        // Dismiss tooltip immediately on click to prevent it from sticking
-                                        const tooltip = bootstrap.Tooltip.getInstance(fsBtn);
-                                        if (tooltip) tooltip.hide();
-
-                                        if (!document.fullscreenElement) {
-                                            document.documentElement.requestFullscreen().catch(err => {
-                                                console.warn(`Error attempting to enable fullscreen: ${err.message}`);
-                                            });
-                                        } else {
-                                            if (document.exitFullscreen) {
-                                                document.exitFullscreen();
-                                            }
-                                        }
-                                    });
-                                    document.addEventListener('fullscreenchange', function () {
-                                        // Cinematic spin animation to mask the OS resize jump
-                                        fsBtn.classList.add('spin-transition');
-
-                                        setTimeout(() => {
-                                            if (!document.fullscreenElement) {
-                                                fsIcon.classList.remove('fa-compress');
-                                                fsIcon.classList.add('fa-expand');
-                                            } else {
-                                                fsIcon.classList.remove('fa-expand');
-                                                fsIcon.classList.add('fa-compress');
-                                            }
-
-                                            // Release the spin after the swap
-                                            setTimeout(() => {
-                                                fsBtn.classList.remove('spin-transition');
-                                            }, 50);
-                                        }, 150); // Exact duration of the fade/spin-out
-                                    });
-                                }
-                            });
-                        </script>
-                        <script>
-                            (function () {
-                                const toggle = document.getElementById('theme-toggle');
-                                const icon = toggle?.querySelector('i');
-                                const html = document.documentElement;
-                                const navbar = toggle?.closest('.navbar');
-
-                                function getTheme() {
-                                    return localStorage.getItem('theme') || 'auto';
-                                }
-
-                                function updateTheme(theme, isUserClick = false) {
-                                    if (isUserClick) {
-                                        document.body.classList.add('theme-transitioning');
-                                    }
-
-                                    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                                    const effectivelyDark = theme === 'dark' || (theme === 'auto' && systemDark);
-
-                                    if (effectivelyDark) {
-                                        html.classList.remove('light-mode');
-                                        html.dataset.theme = 'dark';
-                                        if (navbar) {
-                                            navbar.classList.add('navbar-dark');
-                                            navbar.classList.remove('navbar-light');
-                                        }
-                                    } else {
-                                        html.classList.add('light-mode');
-                                        html.dataset.theme = 'light';
-                                        if (navbar) {
-                                            navbar.classList.add('navbar-light');
-                                            navbar.classList.remove('navbar-dark');
-                                        }
-                                    }
-
-                                    if (isUserClick) {
-                                        setTimeout(() => {
-                                            document.body.classList.remove('theme-transitioning');
-                                        }, 1400); // Matches the 1s transition + 0.4s max delay
-                                    }
-
-                                    // Update Icon and Title Safely
-                                    if (!icon || !toggle) return;
-
-                                    if (theme === 'dark') {
-                                        icon.className = 'fas fa-moon';
-                                        toggle.title = 'Theme: Dark Mode';
-                                    } else if (theme === 'light') {
-                                        icon.className = 'fas fa-sun';
-                                        toggle.title = 'Theme: Light Mode';
-                                    } else {
-                                        icon.className = 'fas fa-desktop';
-                                        toggle.title = 'Theme: System Sync';
-                                    }
-                                }
-
-                                // Initial Application
-                                updateTheme(getTheme());
-
-                                // Listen for System Changes
-                                window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
-                                    if (getTheme() === 'auto') updateTheme('auto');
-                                });
-
-                                // 3-State Toggle Click (Auto -> Light -> Dark -> Auto)
-                                toggle?.addEventListener('click', () => {
-                                    // Dismiss tooltip immediately on click to prevent it from sticking
-                                    const tooltip = bootstrap.Tooltip.getInstance(toggle);
-                                    if (tooltip) tooltip.hide();
-
-                                    const current = getTheme();
-                                    let next;
-                                    if (current === 'auto') next = 'light';
-                                    else if (current === 'light') next = 'dark';
-                                    else next = 'auto';
-
-                                    localStorage.setItem('theme', next);
-                                    updateTheme(next, true);
-                                });
-                            })();
-                        </script>
                     </li>
                 </ul>
             </div>
@@ -1626,10 +1761,8 @@
             </div>
         </div>
     </footer>
-    <!-- Bootstrap 5 JS Bundle -->
     <div id="toastContainer"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // LEGACY SCRIPTS REMOVED - Unified into CyberMaster.
 
@@ -1896,6 +2029,11 @@
             if (table) localStorage.setItem(getScrollKey('table-scroll'), table.scrollTop);
         }
 
+        function reloadWithScroll() {
+            saveScrollPositions();
+            window.location.reload();
+        }
+
         function restoreScrollPositions() {
             const main = document.querySelector('main');
             const log = document.getElementById('logWindow');
@@ -2059,6 +2197,275 @@
             document.getElementById('modalActionContainer').innerHTML = ''; // No extra buttons for info
             modal.show();
         }
+    </script>
+    <script>
+        /**
+         * Hardened Robust Cross-Browser Fullscreen API Wrapper
+         * Includes Viewport Sentinel for 'Phantom State' detection in Chrome.
+         */
+        (function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                const fsBtn = document.getElementById('fullscreen-floating-toggle');
+                if (!fsBtn) return;
+                const fsIcon = fsBtn.querySelector('i');
+                const banner = document.getElementById('fs-fallback-banner');
+
+                // Cross-Browser Property Helpers
+                const getFullscreenElement = () => {
+                    return document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.mozFullScreenElement || 
+                           document.msFullscreenElement;
+                };
+
+                const syncUI = (event) => {
+                    const isFs = !!getFullscreenElement();
+                    console.log("Fullscreen Debug: Syncing iconography. In Fullscreen:", isFs);
+                    
+                    fsBtn.classList.add('spin-transition');
+                    fsIcon.className = isFs ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
+                    
+                    if (!isFs && banner) {
+                        banner.classList.remove('reveal');
+                    }
+
+                    setTimeout(() => {
+                        fsBtn.classList.remove('spin-transition');
+                    }, 400);
+                };
+
+                const toggleFullscreen = () => {
+                    const el = document.documentElement;
+                    const isNowFs = !!getFullscreenElement();
+                    
+                    if (!isNowFs) {
+                        console.log("Fullscreen Debug: Native-First ENTER Request initiated.");
+                        let promise;
+                        
+                        // Prioritize native webkit for legacy/secure-policy bypass on localhost
+                        if (el.webkitRequestFullscreen) promise = el.webkitRequestFullscreen();
+                        else if (el.requestFullscreen) promise = el.requestFullscreen();
+                        else if (el.mozRequestFullScreen) promise = el.mozRequestFullScreen();
+                        else if (el.msRequestFullscreen) promise = el.msRequestFullscreen();
+
+                        // Viewport Sentinel: Detect if browser UI failed to hide (Phantom Fullscreen)
+                        setTimeout(() => {
+                            const h = window.innerHeight;
+                            const sh = window.screen.height;
+                            if (getFullscreenElement() && h < (sh - 100) && banner) {
+                                console.warn("Fullscreen Debug: Phantom State Detected. Showing fallback banner.");
+                                banner.classList.add('reveal');
+                            }
+                        }, 600);
+
+                        if (promise && promise.catch) {
+                            promise.catch(err => {
+                                console.error("Fullscreen Debug: ENTER Request failed:", err.message);
+                                if (banner) banner.classList.add('reveal');
+                            });
+                        }
+                    } else {
+                        console.log("Fullscreen Debug: EXIT Request initiated.");
+                        let promise;
+                        if (document.webkitExitFullscreen) promise = document.webkitExitFullscreen();
+                        else if (document.exitFullscreen) promise = document.exitFullscreen();
+                        else if (document.mozCancelFullScreen) promise = document.mozCancelFullScreen();
+                        else if (document.msExitFullscreen) promise = document.msExitFullscreen();
+                    }
+                };
+
+                fsBtn.addEventListener('click', (e) => {
+                    // Note: No preventDefault here to ensure pure gesture trust
+                    toggleFullscreen();
+                });
+
+                // Listen for all vendor-specific change events
+                ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
+                    .forEach(evt => document.addEventListener(evt, syncUI));
+                
+                console.log("Fullscreen Debug: Hardened Controller Ready.");
+            });
+        })();
+    </script>
+    <script>
+        /**
+         * Global State Feedback Animation
+         * Provides visual feedback when clicking navigation links to the current page.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Map to track active animation timeouts
+            const activeTimers = new Map();
+
+            // Aggressive Normalizer: Hostname + Pathname (lowercased, no trailing slashes)
+            const getNormalizedState = (val) => {
+                try {
+                    const url = new URL(val, window.location.origin);
+                    return (url.hostname + url.pathname).replace(/\/+$/, '').toLowerCase();
+                } catch (e) {
+                    return String(val).toLowerCase().replace(/\/+$/, '');
+                }
+            };
+
+            // Use Event Delegation to handle all current and future nav links
+            document.addEventListener('click', function (e) {
+                const link = e.target.closest('.nav-link, .navbar-brand');
+                if (!link) return;
+
+                // Ignore internal anchors or dropdown toggles
+                if (link.getAttribute('href') === '#' || link.classList.contains('dropdown-toggle')) return;
+                const rawHref = link.getAttribute('href');
+                if (!rawHref || rawHref.startsWith('javascript:')) return;
+
+                const linkState = getNormalizedState(link.href);
+                const currentState = getNormalizedState(window.location.href);
+
+                // DEBUG: Verify states in the console
+                console.log(`[State Feedback] Link State: ${linkState} | Current State: ${currentState}`);
+
+                // Check if the link points to the CURRENT state (page)
+                if (linkState === currentState) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // 1. Identify Target and Siblings
+                    const parentLi = link.closest('.nav-item') || link;
+                    const prevSibling = parentLi.previousElementSibling;
+                    const nextSibling = parentLi.nextElementSibling;
+                    const elements = [parentLi, prevSibling, nextSibling].filter(Boolean);
+
+                    // 2. Restart Animations
+                    elements.forEach(el => {
+                        el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right');
+                        if (activeTimers.has(el)) {
+                            clearTimeout(activeTimers.get(el));
+                            activeTimers.delete(el);
+                        }
+                    });
+
+                    // Force Reflow
+                    void parentLi.offsetWidth; 
+                    
+                    requestAnimationFrame(() => {
+                        parentLi.classList.add('state-feedback-active');
+                        if (prevSibling) prevSibling.classList.add('state-feedback-adjacent-left');
+                        if (nextSibling) nextSibling.classList.add('state-feedback-adjacent-right');
+
+                        // 3. Cleanup Registry
+                        elements.forEach(el => {
+                            const timer = setTimeout(() => {
+                                el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right');
+                                activeTimers.delete(el);
+                            }, 450);
+                            activeTimers.set(el, timer);
+                        });
+                    });
+                }
+            }, true); // Use capture phase to intercept early
+        });
+    </script>
+    <script>
+        /**
+         * Navigation & Dropdown Guard (Final Logic)
+         * Ensures high-priority visibility and monitors Bootstrap events.
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                // Monitor clicks directly
+                dropdown.addEventListener('click', function(e) {
+                    // Small delay to check if Bootstrap applied the .show class
+                    setTimeout(() => {
+                        const menu = this.nextElementSibling;
+                        if (menu && menu.classList.contains('show')) {
+                            console.log('%c[CyberShield] %cNavigation Active.', 'color: #10b981; font-weight: bold;', 'color: inherit;');
+                        }
+                    }, 100);
+                });
+            }
+        });
+    </script>
+    <script>
+        /**
+         * Optimized Premium Theme Toggle
+         * Moved to footer for Popper/Bootstrap compatibility.
+         */
+        (function () {
+            const toggle = document.getElementById('theme-toggle');
+            const icon = toggle?.querySelector('i');
+            const html = document.documentElement;
+            const navbar = toggle?.closest('.navbar');
+
+            function getTheme() {
+                return localStorage.getItem('theme') || 'auto';
+            }
+
+            function updateTheme(theme, isUserClick = false) {
+                if (isUserClick) {
+                    document.body.classList.add('theme-transitioning');
+                }
+
+                const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const effectivelyDark = theme === 'dark' || (theme === 'auto' && systemDark);
+
+                if (effectivelyDark) {
+                    html.classList.remove('light-mode');
+                    html.dataset.theme = 'dark';
+                    if (navbar) {
+                        navbar.classList.add('navbar-dark');
+                        navbar.classList.remove('navbar-light');
+                    }
+                } else {
+                    html.classList.add('light-mode');
+                    html.dataset.theme = 'light';
+                    if (navbar) {
+                        navbar.classList.add('navbar-light');
+                        navbar.classList.remove('navbar-dark');
+                    }
+                }
+
+                if (isUserClick) {
+                    setTimeout(() => {
+                        document.body.classList.remove('theme-transitioning');
+                    }, 1400); 
+                }
+
+                if (!icon || !toggle) return;
+
+                if (theme === 'dark') {
+                    icon.className = 'fas fa-moon';
+                    toggle.title = 'Theme: Dark Mode';
+                } else if (theme === 'light') {
+                    icon.className = 'fas fa-sun';
+                    toggle.title = 'Theme: Light Mode';
+                } else {
+                    icon.className = 'fas fa-desktop';
+                    toggle.title = 'Theme: System Sync';
+                }
+            }
+
+            updateTheme(getTheme());
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+                if (getTheme() === 'auto') updateTheme('auto');
+            });
+
+            toggle?.addEventListener('click', () => {
+                // Safely handle bootstrap dependency
+                if (typeof bootstrap !== 'undefined') {
+                    const tooltip = bootstrap.Tooltip.getInstance(toggle);
+                    if (tooltip) tooltip.hide();
+                }
+
+                const current = getTheme();
+                let next;
+                if (current === 'auto') next = 'light';
+                else if (current === 'light') next = 'dark';
+                else next = 'auto';
+
+                localStorage.setItem('theme', next);
+                updateTheme(next, true);
+            });
+        })();
     </script>
     {% block extra_js %}{% endblock %}
 </body>

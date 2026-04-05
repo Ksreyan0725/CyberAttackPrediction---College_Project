@@ -68,7 +68,8 @@
         0% {
             opacity: 0;
             transform: translateZ(-400px) translateY(10px);
-            filter: blur(12px);
+            /* Reduced blur for smoother GPU compositing performance across all pages */
+            filter: blur(6px);
         }
 
         100% {
@@ -106,6 +107,8 @@
         flex-direction: row;
         animation: emergeFromDeep 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         will-change: transform, opacity, filter;
+        /* Optimization: Limit scope of animation to prevent repainting the entire viewport */
+        contain: layout paint;
         transform-origin: center center;
         transform-style: preserve-3d;
         backface-visibility: hidden;
@@ -226,6 +229,81 @@
             border-radius: 0 0 30px 30px !important;
         }
     }
+
+    /* Modal Styling - Premium Cyber Card */
+    .modal-content {
+        background: rgba(15, 23, 42, 0.8) !important;
+        backdrop-filter: blur(25px) saturate(180%) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 24px !important;
+        color: white;
+    }
+
+    .credential-card {
+        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        margin: 1.5rem 0;
+    }
+
+    .credential-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent);
+    }
+
+    .card-label {
+        font-family: 'Space Mono', monospace;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 2px;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .card-value {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-main);
+        word-break: break-all;
+    }
+
+    .shield-success-icon {
+        font-size: 4rem;
+        color: #10b981;
+        margin-bottom: 1rem;
+        filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
+        animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes scaleIn {
+        0% { transform: scale(0); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .is-invalid-glow {
+        border-color: var(--danger-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(var(--danger-rgb), 0.25) !important;
+    }
+
+    .is-valid-glow {
+        border-color: var(--success-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(var(--success-rgb), 0.25) !important;
+    }
+
+    #usernameFeedback {
+        font-size: 0.65rem;
+        font-weight: 700;
+        margin-top: 4px;
+        transition: all 0.3s ease;
+    }
 </style>
 {% endblock %}
 
@@ -249,16 +327,11 @@
                     </svg>
                 </div>
                 <h1 class="brand-title animate-reveal"
-                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 0.5rem auto;">Join CyberShield AI
+                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 1.25rem auto;">Join CyberShield AI
                 </h1>
                 <div class="typing-container mb-4 animate-reveal"
-                    style="height: 95px; width: 100%; max-width: 440px; margin: 0 auto; text-align: left; animation-delay: 0.9s;">
-                    <p id="typingText" class="dynamic-muted mb-0"
-                        style="display: inline; white-space: pre-wrap; word-break: break-word; line-height: 1.4; font-size: 0.95rem;">
-                        <!-- Cursor is injected here via script to follow wrap -->
-                        <span id="cursor" class="text-primary fw-bold ms-1"
-                            style="display: none; vertical-align: baseline;">|</span>
-                    </p>
+                    style="height: 160px; width: 100%; max-width: 220px; margin: 0 auto; text-align: center; animation-delay: 0.9s; overflow: hidden; display: flex; align-items: flex-start; justify-content: center;">
+                    <p id="typingText" class="dynamic-muted mb-0" style="display: block; text-align: center; white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 1.15rem; font-weight: 500; opacity: 0.9;"><span id="cursor" class="text-primary fw-bold ms-1" style="display: none; vertical-align: baseline;">|</span></p>
                 </div>
             </div>
         </div>
@@ -270,26 +343,27 @@
                 <p class="xx-small dynamic-muted">Fill in your details to get started</p>
             </div>
 
-            <form action="/SignupAction" method="post" onsubmit="return validateSignup(this);">
+            <form id="signupForm" method="post">
                 <div class="mb-3 animate-reveal" style="animation-delay: 0.85s;">
                     <label class="form-label fw-bold dynamic-muted xx-small mb-1">USERNAME</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user-plus"></i></span>
-                        <input type="text" class="form-control" name="username" placeholder="Choose a username"
-                            required>
+                        <input type="text" class="form-control" name="username" id="username" placeholder="Choose a username"
+                            autocomplete="off" required>
                     </div>
+                    <div id="usernameFeedback" class="d-none"></div>
                 </div>
-                <div class="mb-3 animate-reveal" style="animation-delay: 1.0s;">
+                <div class="mb-4 animate-reveal" style="animation-delay: 1.0s;">
                     <label class="form-label fw-bold dynamic-muted xx-small mb-1">PASSWORD</label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-key"></i></span>
-                        <input type="password" class="form-control" name="password" id="p1" placeholder="••••••••"
+                        <input type="password" class="form-control" name="password" id="password" placeholder="••••••••"
                             required>
                     </div>
                 </div>
 
                 <div class="d-grid gap-2 animate-reveal" style="animation-delay: 1.3s;">
-                    <button type="submit" class="btn btn-primary shadow-sm py-2">
+                    <button type="submit" class="btn btn-primary shadow-sm py-2" id="submitBtn">
                         <i class="fas fa-user-check me-2"></i>Register Now
                     </button>
                     <div class="text-center mt-3 animate-reveal" style="animation-delay: 1.4s;">
@@ -300,21 +374,144 @@
             </form>
         </div>
     </div>
+</div>
+
+<!-- Premium Credential Card Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-5">
+                <div class="shield-success-icon">
+                    <i class="fas fa-shield-check"></i>
+                </div>
+                <h3 class="fw-bold mb-1">Access Granted!</h3>
+                <p class="text-muted small">Your CyberShield profile is active.</p>
+                
+                <div class="credential-card text-start">
+                    <div class="card-label">Identity ID</div>
+                    <div class="card-value" id="displayUsername">---</div>
+                    
+                    <div class="card-label">Encryption Key</div>
+                    <div class="card-value" id="displayPassword" style="font-family: 'Space Mono', monospace; color: #3b82f6;">••••••••</div>
+                </div>
+
+                <div class="d-grid gap-3">
+                    <button class="btn btn-primary py-3 fw-bold shadow-lg" id="btnSaveLogin">
+                        <i class="fas fa-sign-in-alt me-2"></i>SAVE & LOGIN
+                    </button>
+                    <button class="btn btn-link text-muted xx-small text-decoration-none" data-bs-dismiss="modal">
+                        CLOSE & VIEW SIGNUP
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const typingSummary = "Create your account to start predicting and monitoring cyber attacks with generative AI insights.";
-        initTypingEffect('typingText', typingSummary, 35, 100);
-    });
+        initTypingEffect('typingText', typingSummary, 22, 100);
 
-    function validateSignup(form) {
-        if (form.password.value.length < 6) {
-            showToast("Password must be at least 6 characters", "warning");
-            return false;
-        }
-        return true;
-    }
+        const signupForm = document.getElementById('signupForm');
+        const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+
+        const usernameInput = document.getElementById('username');
+        const usernameFeedback = document.getElementById('usernameFeedback');
+        let checkTimeout;
+
+        // Real-time Availability Poll
+        usernameInput.addEventListener('input', function() {
+            const username = this.value.trim();
+            clearTimeout(checkTimeout);
+            
+            if (username.length < 3) {
+                usernameFeedback.classList.add('d-none');
+                usernameInput.classList.remove('is-invalid-glow', 'is-valid-glow');
+                return;
+            }
+
+            checkTimeout = setTimeout(async () => {
+                try {
+                    const res = await fetch('/CheckUsername', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ username })
+                    });
+                    const data = await res.json();
+                    
+                    usernameFeedback.classList.remove('d-none');
+                    if (data.status === 'taken') {
+                        usernameFeedback.innerText = "ID ALREADY CLAIMED";
+                        usernameFeedback.className = "text-danger fw-bold";
+                        usernameInput.classList.replace('is-valid-glow', 'is-invalid-glow') || usernameInput.classList.add('is-invalid-glow');
+                    } else {
+                        usernameFeedback.innerText = "ID AVAILABLE";
+                        usernameFeedback.className = "text-success fw-bold";
+                        usernameInput.classList.replace('is-invalid-glow', 'is-valid-glow') || usernameInput.classList.add('is-valid-glow');
+                    }
+                } catch(e) {}
+            }, 400); 
+        });
+
+        signupForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Reset UI
+            usernameInput.classList.remove('is-invalid-glow');
+
+            if (password.length < 5) {
+                showToast("Encryption key too weak (min 5 chars)", "warning");
+                return;
+            }
+
+            // Disable button and show loading
+            const originalContent = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Syncing Archives...';
+
+            try {
+                const formData = new FormData(this);
+                const response = await fetch('/SignupAction', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Fill and show modal
+                    document.getElementById('displayUsername').innerText = data.user_data.username;
+                    document.getElementById('displayPassword').innerText = data.user_data.password;
+                    
+                    usernameInput.classList.add('is-valid-glow');
+                    successModal.show();
+                    
+                    document.getElementById('btnSaveLogin').onclick = () => {
+                        window.location.href = "/UserLogin?username=" + encodeURIComponent(data.user_data.username);
+                    };
+                } else {
+                    showToast(data.message, "danger");
+                    if (data.message.toLowerCase().includes("identity") || data.message.toLowerCase().includes("registered")) {
+                        usernameInput.classList.add('is-invalid-glow');
+                        usernameInput.focus();
+                    }
+                }
+            } catch (error) {
+                showToast("Archives link interrupted.", "danger");
+                console.error(error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalContent;
+            }
+        });
+    });
 </script>
-{% endblock %}
+{% endblock %}

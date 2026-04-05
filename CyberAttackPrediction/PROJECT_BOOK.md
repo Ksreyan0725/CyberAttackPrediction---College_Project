@@ -29,7 +29,7 @@ The project is organized into a modular structure to separate data analysis (Jup
   - `trained_rf_model.pkl`: Serialized model artifact (includes Scaler and Encoders).
   - `*.hdf5`: Binary weight files for deep learning components.
 - **`/templates`**:
-  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems).
+  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Includes a **'Dropdown Guard' diagnostic script** to ensure navigation lifecycle stability.
   - `AccountSettings.html`: The **CyberShield Command Center**. A high-security administrator dashboard with live system monitoring and user registry management.
   - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.
 
@@ -327,25 +327,30 @@ To ensure production-grade security, the application transitioned from a hardcod
 1. **AJAX Authentication Flow**:
     - **Mechanism**: The login portal uses a zero-reload `fetch()` architecture.
     - **Experience**: Failed attempts trigger a "Glass Toast" error instantly without interrupting UI animations or background effects.
+    - **Granular Auditing**: The system separates `invalid_username` and `invalid_password` error codes, allowing for precise identity conflict resolution.
     - **Security**: Validated via a JSON response from the server, which includes a secure redirect token for the project workflow.
 2. **Password Hashing (Werkzeug Security)**:
     - **Mechanism**: Passwords are never stored in plain text. Instead, we use `generate_password_hash` with the **pbkdf2:sha256** and **scrypt** methods.
     - **Security**: This prevents attackers from reading passwords even if they gain access to the `users.json` database.
-3. **Persistent User Database (`users.json`)**:
+3. **Identity Recovery Flow (`/ResetPasswordAction`)**:
+    - **Mechanism**: A dedicated endpoint for secure credential updates.
+    - **Depth-Based Recovery**: If a user fails authentication 3 times, the system automatically triggers a **"Forgotten Keys?"** recovery modal.
+    - **Self-Healing**: This allows legitimate users to restore their identity via the UI, which then synchronizes the new hash with the server-side `users.json`.
+4. **Persistent User Database (`users.json`)**:
     - Stores user credentials in a JSON format.
     - **Self-Healing**: If the file is deleted, the system automatically recreates it and seeds the default admin account from the legacy `.env` configuration.
-4. **Ultimate Admin Bypass**:
+5. **Ultimate Admin Bypass**:
     - **Credentials**: `admin` / `admin`.
     - **Purpose**: Provides a master "overrule" account that bypasses standard database checks.
     - **Visual Indicator**: When logged in as the ultimate admin, a **MASTER** badge appears in the navigation bar.
-5. **Session Management**:
+6. **Session Management**:
     - Uses Flask's encrypted signed cookies (`secret_key`).
     - Includes inactivity protection and secure logout mechanisms.
     - **Inactivity Timeout**: Set to 1 hour of idle time.
-6. **Local "Quick Access" Storage**:
+7. **Local "Quick Access" Storage**:
     - The `saved_creds.json` file hashes local sessions to enable one-click access while keeping the filesystem secure.
     - **Session Bypass**: Enabled when a valid token is detected, bypassing the full login UI and routing directly to the training workflow.
-7. **Master Admin User Registry**:
+8. **Master Admin User Registry**:
     - **Dashboard**: Accessible via the Command Center for users with `MASTER` status.
     - **Tools**: Includes high-level "Override Key" (Password Reset) and "Terminate" (Account Deletion) capabilities to manage the platform manually.
 
@@ -391,6 +396,15 @@ To ensure a "Best-in-Class" user experience, the web application implements seve
     - **Engine**: Powered by a high-performance **Intersection Observer**.
     - **Stability**: Unlike standard CSS animations that might re-trigger during layout shifts, these "Reveals" only play once per page session.
     - **UX**: This ensures the dashboard stays stable and "locked-in" even as the user opens/closes popups or interacts with filters.
+6. **GPU-Optimized Transitions & Layering Guard**:
+    - **Mechanism**: The navigation bar enforces a strict `z-index: 9999`, `overflow: visible !important`, and is isolated in its own GPU compositor layer via `transform: translate3d(0,0,0)`.
+    - **Stability**: This prevents "flicker" or background layout repaints during heavy entry animations. The `emergeFromDeep` animation has been hardened with a high-performance **6px blur** and a strict `contain: layout paint` policy.
+    - **Script Consistency**: The application uses a unified Bootstrap 5 bundle strategy, eliminating redundant script loads that previously caused event listener race conditions.
+7. **Terminal-Friendly Watchdog Logic**:
+    - **Performance**: The global system heartbeat frequency was optimized from 1s to **5s**.
+    - **Benefit**: This significantly reduces developer terminal log noise while maintaining rock-solid synchronization of the "System Ready" status across all open browser tabs.
+8. **Synchronized Identity Twin Layouts**:
+    - **Consistency**: The `UserLogin.html` and `Signup.html` pages are now architectural twins, sharing identical `branding-section` logic, `22ms` typing rhythms, and compact `min-height: 400px` containers for a premium, unified identity experience.
 
 ---
 

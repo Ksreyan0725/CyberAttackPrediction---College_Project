@@ -204,6 +204,47 @@
         border-color: rgba(var(--info-rgb), 0.2);
         color: var(--info-color);
     }
+
+    /* Dynamic Status Dot - Premium Pulsating Indicators */
+    .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 8px;
+        position: relative;
+    }
+
+    /* Pulsating Green (Ready) */
+    .dot-ready {
+        background-color: #2ecc71;
+        box-shadow: 0 0 0 rgba(46, 204, 113, 0.4);
+        animation: pulse-ready 2s infinite;
+    }
+
+    /* Strobing Yellow (Processing/Busy) */
+    .dot-busy {
+        background-color: #f1c40f;
+        box-shadow: 0 0 0 rgba(241, 196, 15, 0.4);
+        animation: pulse-busy 1s infinite alternate;
+    }
+
+    /* Static Red (Offline/Error) */
+    .dot-offline {
+        background-color: #e74c3c;
+        box-shadow: 0 0 5px rgba(231, 76, 60, 0.5);
+    }
+
+    @keyframes pulse-ready {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    }
+
+    @keyframes pulse-busy {
+        from { transform: scale(0.8); opacity: 0.6; }
+        to { transform: scale(1.1); opacity: 1; }
+    }
 </style>
 {% endblock %}
 
@@ -216,8 +257,9 @@
                     <h2 class="h4 mb-1 dynamic-text"><i class="fas fa-brain me-2 text-primary"></i>Model Training Portal</h2>
                     <p class="xx-small dynamic-muted mb-0">Re-calibrate your AI defenses with the latest traffic patterns.</p>
                 </div>
-                <div id="trainingStatus" class="status-badge status-idle">
-                    <i class="fas fa-circle me-1 small"></i> System Ready
+                <div id="trainingStatus" class="status-badge status-idle d-flex align-items-center">
+                    <span class="status-dot dot-ready"></span>
+                    <span id="statusText">System Ready</span>
                 </div>
             </div>
 

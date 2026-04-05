@@ -12,7 +12,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
-
+import secrets
 #=================flask code starts here
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -28,7 +28,7 @@ from nbconvert import HTMLExporter
 # Load environment variables
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret')
 
 # Global variables to store loaded models/scalers
@@ -37,6 +37,41 @@ scaler = None
 labels = None
 label_encoder = None
 feature_columns = None
+system_status = "ready" # Track if training is in progress
+
+# --- Global Security Middlewares ---
+@app.before_request
+def security_pre_check():
+    """Generates CSRF tokens and enforces security validation on sensitive routes."""
+    # 1. Ensure CSRF token exists for the session
+    if 'csrf_token' not in session:
+        session['csrf_token'] = secrets.token_hex(32)
+
+    # 2. CSRF Validation for all state-changing requests (POST/PUT/DELETE)
+    if request.method in ['POST', 'PUT', 'DELETE']:
+        # Exempt specific public routes if necessary (None currently)
+        exempt_routes = ['/UserLoginAction', '/SignupAction'] # Optional: allow initial auth without token if needed
+        if request.path in exempt_routes:
+             return
+             
+        # Check header or form data for the token
+        token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
+        if not token or token != session.get('csrf_token'):
+            return jsonify({"status": "error", "message": "Security Violation: CSRF Token Invalid or Missing"}), 403
+
+@app.after_request
+def apply_security_headers(response):
+    """Hardens the response headers to prevent information leakage and caching."""
+    # Prevent caching of sensitive authenticated routes
+    if 'user' in session:
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    
+    # Standard security headers
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    return response
 
 def load_ml_model():
     """Loads the pre-trained model and preprocessing tools from disk."""
@@ -111,13 +146,32 @@ def predictView():
 
 @app.route('/api/clear-session', methods=['POST'])
 def clear_session():
-    """API endpoint to clear specific session results for system reset."""
+    """API endpoint to clear all app results and terminate session for system reset."""
     if not session.get('user'):
         return jsonify({"status": "error", "message": "Unauthorized"}), 401
         
+    # Clear all state results (but NOT filesystem credentials as requested)
     session.pop('last_result', None)
+    session.pop('train_result', None)
     session.pop('last_page_type', None)
-    return jsonify({"status": "success", "message": "Session data cleared successfully"})
+    
+    # Also log the user out as requested for a total state reset
+    session.pop('user', None)
+    session.pop('is_ultimate', None)
+    
+    return jsonify({"status": "success", "message": "System data cleared and session terminated."})
+
+@app.route('/api/heartbeat')
+def heartbeat():
+    """Silent Heartbeat for Smart Launch and System Status Sync."""
+    global browser_timer
+    
+    # If a heartbeat arrives, an active tab exists - cancel the startup browser launch
+    if browser_timer and browser_timer.is_alive():
+        print("[Smart Launch] Active tab detected via heartbeat. Cancelling automated launch.")
+        browser_timer.cancel()
+        
+    return jsonify({"status": system_status, "health": "online"})
 
 # --- Security & User Management ---
 USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
@@ -156,6 +210,8 @@ def save_users(users):
 
 @app.route('/UserLogin', methods=['GET', 'POST'])
 def UserLogin():
+    if 'user' in session:
+        return redirect(url_for('train_view'))
     base_dir = os.path.dirname(os.path.abspath(__file__))
     creds_file = os.path.join(base_dir, "saved_creds.json")
     has_saved = os.path.exists(creds_file)
@@ -199,6 +255,21 @@ def ResetCredentials():
         os.remove(creds_file)
     return jsonify({"status": "success"})
 
+@app.route('/CheckUsername', methods=['POST'])
+def CheckUsername():
+    """Real-time identity verification for signup process."""
+    data = request.get_json()
+    username = data.get('username', '').strip()
+    
+    if not username:
+        return jsonify({"status": "available", "valid": False})
+        
+    users = load_users()
+    if username in users or username.lower() == "admin":
+        return jsonify({"status": "taken", "message": "Identity ID already registered in Archives!"})
+    
+    return jsonify({"status": "available", "message": "Identity available for registration."})
+
 @app.route('/UserLoginAction', methods=['POST'])
 def UserLoginAction():
     username = request.form.get('t1')
@@ -219,7 +290,10 @@ def UserLoginAction():
     users = load_users()
     user_data = users.get(username)
     
-    if user_data and check_password_hash(user_data['password'], password):
+    if not user_data:
+        return jsonify({"status": "error", "error_type": "invalid_username", "message": "Identification failed: Username not found."}), 401
+
+    if check_password_hash(user_data['password'], password):
         session['user'] = user_data['username']
         
         # Save credentials locally if "Remember Me" is checked
@@ -229,28 +303,45 @@ def UserLoginAction():
                 json.dump({"user": username, "pass": password}, f)
             session['remembered'] = True
         
-        return jsonify({"status": "success", "message": f"Welcome back, {username}!", "redirect": url_for('train_view')})
+        return jsonify({"status": "success", "message": f"Welcome, {username}!", "redirect": url_for('train_view')})
     else:
-        return jsonify({"status": "error", "message": "Invalid username or password"}), 401
+        return jsonify({"status": "error", "error_type": "invalid_password", "message": "Identification failed: Incorrect password key."}), 401
+
+@app.route('/ResetPasswordAction', methods=['POST'])
+def ResetPasswordAction():
+    data = request.get_json()
+    username = data.get('username')
+    new_password = data.get('new_password')
+    auto_login = data.get('auto_login', False)
+    
+    users = load_users()
+    if username not in users:
+        return jsonify({"status": "error", "message": "User not found in Archives"}), 404
+        
+    users[username]['password'] = generate_password_hash(new_password)
+    save_users(users)
+    
+    if auto_login:
+        session['user'] = username
+        return jsonify({"status": "success", "message": "Identity restored. Synchronizing session...", "redirect": url_for('train_view')})
+    
+    return jsonify({"status": "success", "message": "Security keys updated. Proceed to manual login."})
 
 @app.route('/Signup')
 def Signup():
+    if 'user' in session:
+        return redirect(url_for('train_view'))
     return render_template('Signup.html')
 
 @app.route('/SignupAction', methods=['POST'])
 def SignupAction():
     username = request.form.get('username')
     password = request.form.get('password')
-    confirm_password = request.form.get('confirm_password')
     
-    if password != confirm_password:
-        flash("Passwords do not match!", "danger")
-        return redirect(url_for('Signup'))
-        
     users = load_users()
-    if username in users:
-        flash("Username already exists!", "danger")
-        return redirect(url_for('Signup'))
+    # Check for both existing users and the reserved master admin identity
+    if username in users or username.lower() == "admin":
+        return jsonify({"status": "error", "message": "Identity ID already registered in Archives!"}), 400
         
     users[username] = {
         "username": username,
@@ -258,8 +349,11 @@ def SignupAction():
         "role": "user"
     }
     save_users(users)
-    flash("Account created! Please login.", "success")
-    return redirect(url_for('UserLogin'))
+    return jsonify({
+        "status": "success", 
+        "message": "Account created successfully!",
+        "user_data": {"username": username, "password": password}
+    })
 
 @app.route('/Account')
 def Account():
@@ -473,7 +567,8 @@ def get_genai_insight(attack_type):
     return insights.get(attack_type.lower(), "AI suggests this is a known signature. Monitor for unusual lateral movement in the network.")
 
 def open_browser():
-    webbrowser.open_new("http://127.0.0.1:2026/")
+    """Enterprise-grade browser launcher."""
+    webbrowser.open("http://127.0.0.1:2026/")
 
 @app.route('/documentation')
 def documentation():
@@ -549,6 +644,7 @@ def DownloadSample():
     dataset_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Dataset")
     return send_from_directory(dataset_dir, "sample_train.csv", as_attachment=True)
 
+
 @app.route('/TrainAction', methods=['POST'])
 def TrainAction():
     if 'user' not in session:
@@ -572,18 +668,39 @@ def TrainAction():
                 return jsonify({"status": "error", "message": f"Failed to save training file: {str(e)}"})
     
     # Call training with optional path
-    result = run_training(dataset_path=custom_path)
-    
-    # If training was successful, reload the model in memory and persist in session
-    if result.get('status') == 'success':
-        load_ml_model()
-        session['train_result'] = result
+    global system_status
+    system_status = "busy"
+    try:
+        result = run_training(dataset_path=custom_path)
         
-    return jsonify(result)
+        # If training was successful, reload the model in memory and persist in session
+        if result.get('status') == 'success':
+            load_ml_model()
+            session['train_result'] = result
+            
+        return jsonify(result)
+    finally:
+        system_status = "ready"
+
+
+@app.errorhandler(404)
+def handle_404(e):
+    """Premium 404 error handler for CyberShield."""
+    return render_template('404.html'), 404
 
 if __name__ == '__main__':
-    # Automatically open browser after 1.5 seconds
-    if not os.environ.get("WERKZEUG_RUN_MAIN"):
-        Timer(1.5, open_browser).start()
+    import sys
+    
+    # Heartbeat-Aware Smart Launch:
+    # Start a 3.0s timer. If a heartbeat arrives from an existing tab, cancel it.
+    # Otherwise, open a fresh dashboard.
+    # IN DEBUG MODE: We MUST run this in the CHILD process (WERKZEUG_RUN_MAIN=true)
+    # because that is the process that handles the /api/heartbeat route.
+    if '--no-browser' not in sys.argv:
+        # Run if we are the main process (in prod) or the reloader child (in debug)
+        if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
+            print("[Smart Launch] Starting pulse detector (3.0s)...")
+            browser_timer = Timer(3.0, open_browser)
+            browser_timer.start()
     
     app.run(debug=True, port=2026)

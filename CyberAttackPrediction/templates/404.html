@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}System Error - 404{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex align-items-center justify-content-center p-4">
+    <!-- Premium 404 Card: Theme Aware Glassmorphism -->
+    <div class="card border-glass shadow-lg animate__animated animate__zoomIn" 
+         style="max-width: 600px; background: var(--glass-bg); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); border-color: var(--glass-border);">
+        <div class="card-body p-5 text-center">
+            <!-- Animated Glitch Icon -->
+            <div class="mb-4 d-inline-block">
+                <div class="position-relative">
+                    <i class="fas fa-exclamation-triangle text-danger display-1 animate__animated animate__pulse animate__infinite"></i>
+                    <i class="fas fa-search position-absolute top-50 start-50 translate-middle text-info opacity-50" style="font-size: 2.2rem;"></i>
+                </div>
+            </div>
+
+            <h1 class="display-3 fw-bold mb-2 outfit-font" style="color: var(--text-main);">404</h1>
+            <h3 class="text-info mb-4 opacity-100">SYSTEM BREACH: DATA NOT FOUND</h3>
+            
+            <p class="mb-4 px-lg-5" style="color: var(--text-muted);">
+                The requested coordinate could not be located in the CyberShield database. 
+                This may happen if the server is restarting or the link is broken.
+            </p>
+
+            <!-- Auto-Recovery Status: Theme Aware -->
+            <div class="p-3 rounded-4 mb-4 border-glass" style="background: var(--bg-card-soft); border-color: var(--glass-border);">
+                <div id="recoveryStatus" class="d-flex align-items-center justify-content-center small fw-medium">
+                    <div class="spinner-grow spinner-grow-sm me-2 text-info" role="status"></div>
+                    <span class="text-info opacity-75">MONITORING SERVER INTEGRITY...</span>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="{{ url_for('index') }}" class="btn btn-outline-info px-4 py-2 rounded-pill shadow-sm">
+                    <i class="fas fa-home me-2"></i>Dashboard Home
+                </a>
+                <button onclick="window.location.reload()" class="btn btn-glass-themed px-4 py-2 rounded-pill">
+                    <i class="fas fa-redo me-2"></i>Manual Retry
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/**
+ * Auto-Recovery Logic:
+ * Regularly pings the heartbeat API. If the server is back online (e.g., after a crash/restart loop),
+ * it automatically redirects the user back to the home page.
+ */
+(function() {
+    const statusEl = document.getElementById('recoveryStatus');
+    let retryCount = 0;
+
+    async function checkServer() {
+        try {
+            const response = await fetch('/api/heartbeat');
+            if (response.ok) {
+                statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i><span class="text-success fw-bold">SYSTEM RESTORED! REDIRECTING...</span>';
+                // Wait a moment for UX
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 1200);
+                return;
+            }
+        } catch (e) {
+            retryCount++;
+            if (retryCount % 5 === 0) console.log("Retrying CyberShield link...");
+        }
+        setTimeout(checkServer, 2000);
+    }
+    setTimeout(checkServer, 1000);
+})();
+</script>
+
+<style>
+    .btn-glass-themed {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--text-main);
+        transition: all 0.3s ease;
+    }
+    .btn-glass-themed:hover {
+        background: var(--primary-light);
+        color: var(--accent-primary);
+        border-color: var(--accent-primary);
+        transform: translateY(-2px);
+    }
+    /* Ensure the 404 container doesn't have double-bg from base.html */
+    body {
+        background-attachment: fixed;
+    }
+</style>
+{% endblock %}
