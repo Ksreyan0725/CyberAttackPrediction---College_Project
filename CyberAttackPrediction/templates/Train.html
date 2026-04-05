@@ -526,6 +526,9 @@
             try {
                 const response = await fetch("{{ url_for('TrainAction') }}", {
                     method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
                     body: formData
                 });
                 

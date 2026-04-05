@@ -1,0 +1,345 @@
+{% extends "base.html" %}
+
+{% block title %}CyberShield | Legal Hub{% endblock %}
+
+{% block content %}
+<style>
+    /* Premium Legal Hub Styles */
+    .legal-container {
+        display: flex;
+        gap: 2.5rem;
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 2rem;
+        min-height: 80vh;
+        animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Sidebar Navigation */
+    .legal-sidebar {
+        width: 320px;
+        flex-shrink: 0;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(20px);
+        border-radius: var(--premium-radius, 24px);
+        padding: 2rem;
+        height: fit-content;
+        position: sticky;
+        top: 100px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        overflow: hidden; /* Edge fix */
+    }
+
+    .legal-nav-header {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.15rem;
+        color: var(--accent-primary);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        opacity: 0.8;
+    }
+
+    .legal-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 16px;
+        color: var(--text-main);
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 0.5rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+    }
+
+    .legal-nav-item i {
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+        transition: transform 0.4s ease;
+    }
+
+    .legal-nav-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateX(5px);
+        color: var(--accent-primary);
+    }
+
+    .legal-nav-item.active {
+        background: var(--accent-gradient);
+        color: white;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .legal-nav-item.active i {
+        transform: scale(1.2);
+    }
+
+    /* Content Viewer */
+    .legal-content-viewer {
+        flex-grow: 1;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(25px);
+        border-radius: var(--premium-radius, 32px);
+        padding: 3.5rem;
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden; /* Edge fix */
+    }
+
+    .content-section {
+        display: none;
+        animation: fadeIn 0.6s ease;
+    }
+
+    .content-section.active {
+        display: block;
+    }
+
+    /* Content Styling */
+    .legal-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 2rem;
+        background: var(--accent-gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.02em;
+    }
+
+    .legal-text {
+        line-height: 1.8;
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    .legal-text h3 {
+        color: var(--text-main);
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .legal-text p {
+        margin-bottom: 1.5rem;
+    }
+
+    .legal-text ul {
+        margin-bottom: 1.5rem;
+        padding-left: 1.5rem;
+    }
+
+    .legal-text li {
+        margin-bottom: 0.75rem;
+    }
+
+    /* Contact Form specifics */
+    .contact-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .contact-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        padding: 2rem;
+        border-radius: 20px;
+        transition: all 0.4s ease;
+    }
+
+    .contact-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-8px);
+    }
+
+    .contact-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--accent-gradient);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(40px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+        .legal-container {
+            flex-direction: column;
+        }
+        .legal-sidebar {
+            width: 100%;
+            position: relative;
+            top: 0;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            padding: 1.5rem;
+        }
+        .legal-nav-item {
+            margin-bottom: 0;
+            padding: 1rem;
+            justify-content: center;
+        }
+        .legal-nav-item span {
+            display: none;
+        }
+    }
+</style>
+
+<div class="legal-container">
+    <!-- Sidebar Navigation -->
+    <aside class="legal-sidebar">
+        <div class="legal-nav-header">Governance</div>
+        
+        <div class="legal-nav-item {% if section == 'terms' %}active{% endif %}" onclick="switchSection('terms')">
+            <i class="fas fa-file-contract"></i>
+            <span>Terms of Service</span>
+        </div>
+
+        <div class="legal-nav-item {% if section == 'privacy' %}active{% endif %}" onclick="switchSection('privacy')">
+            <i class="fas fa-user-shield"></i>
+            <span>Privacy Policy</span>
+        </div>
+
+        <div class="legal-nav-header" style="margin-top: 2rem;">Connectivity</div>
+        
+        <div class="legal-nav-item {% if section == 'contact' %}active{% endif %}" onclick="switchSection('contact')">
+            <i class="fas fa-headset"></i>
+            <span>Contact Support</span>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="legal-content-viewer">
+        <!-- Terms Section -->
+        <section id="terms-section" class="content-section {% if section == 'terms' %}active{% endif %}">
+            <h1 class="legal-title">Terms of Service</h1>
+            <div class="legal-text">
+                <p>Welcome to <strong>CyberShield AI</strong>. By accessing our platform, you agree to be bound by these Terms of Service. Please read them carefully.</p>
+                
+                <h3>1. Acceptance of Terms</h3>
+                <p>By using the CyberShield platform, including its predictive analysis and machine learning tools, you acknowledge that you have read, understood, and agree to be bound by these terms.</p>
+
+                <h3>2. Intellectual Property</h3>
+                <p>All software, neural network architectures, and predictive models presented on this platform are the exclusive intellectual property of CyberShield AI. Unauthorized reproduction or reverse engineering is strictly prohibited.</p>
+
+                <h3>3. Use Restrictions</h3>
+                <p>You agree not to use CyberShield for any unlawful purpose or to conduct unauthorized penetration testing against third-party systems using our exported models.</p>
+
+                <h3>4. Limitation of Liability</h3>
+                <p>CyberShield AI provides predictive analysis on an "as-is" basis. We do not guarantee 100% detection accuracy and are not liable for any security breaches that occur despite our analysis.</p>
+            </div>
+        </section>
+
+        <!-- Privacy Section -->
+        <section id="privacy-section" class="content-section {% if section == 'privacy' %}active{% endif %}">
+            <h1 class="legal-title">Privacy Policy</h1>
+            <div class="legal-text">
+                <p>Your privacy and data security are our top priorities at CyberShield. This policy outlines how we handle your information.</p>
+                
+                <h3>1. Information We Collect</h3>
+                <p>We collect minimal personal data required for authentication. Uploaded datasets are processed in memory and are not stored permanently unless explicitly requested by the user.</p>
+
+                <h3>2. Data Encryption</h3>
+                <p>All sensitive credentials and session data are protected using industry-standard hashing (PBKDF2) and AES encryption during transmission.</p>
+
+                <h3>3. Cookies</h3>
+                <p>CyberShield uses technical cookies only to manage your security session and maintain your authenticated state. We do not use tracking or advertising cookies.</p>
+
+                <h3>4. Global Standards</h3>
+                <p>We aim to comply with GDPR and CCPA standards regarding user data rights and portability.</p>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact-section" class="content-section {% if section == 'contact' %}active{% endif %}">
+            <h1 class="legal-title">Contact Support</h1>
+            <div class="legal-text">
+                <p>Have technical questions about our ML models or need support with your account? Our team is standing by.</p>
+                
+                <div class="contact-grid">
+                    <div class="contact-card">
+                        <div class="contact-icon"><i class="fas fa-envelope-open-text"></i></div>
+                        <h3>Email Support</h3>
+                        <p>Direct access to our senior security analysts.</p>
+                        <a href="mailto:support@cybershield.ai" class="btn btn-outline-primary rounded-pill w-100">support@cybershield.ai</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon"><i class="fas fa-terminal"></i></div>
+                        <h3>Developer API</h3>
+                        <p>Documentation for custom integrations and SDKs.</p>
+                        <a href="/explorer?doc=README.md" class="btn btn-outline-info rounded-pill w-100">View Docs</a>
+                    </div>
+
+                    <div class="contact-card">
+                        <div class="contact-icon"><i class="fas fa-globe"></i></div>
+                        <h3>Global Headquarters</h3>
+                        <p>Visit us at our technical research facility.</p>
+                        <p class="small text-muted mb-0">101 Silicon Valley, San Francisco, CA</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    function switchSection(sectionId) {
+        // Update URL without reload (aesthetic touch)
+        const newPath = sectionId === 'terms' ? '/TermsOfService' : 
+                        sectionId === 'privacy' ? '/PrivacyPolicy' : '/Contact';
+        window.history.pushState({}, '', newPath);
+
+        // Update active classes for items
+        document.querySelectorAll('.legal-nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Find the item that corresponds to this section
+        const items = document.querySelectorAll('.legal-nav-item');
+        // Terms is item 0, Privacy is item 1, Contact is item 2
+        const termsItem = Array.from(items).find(i => i.innerText.includes('Terms'));
+        const privacyItem = Array.from(items).find(i => i.innerText.includes('Privacy'));
+        const contactItem = Array.from(items).find(i => i.innerText.includes('Contact'));
+
+        if (sectionId === 'terms') termsItem.classList.add('active');
+        else if (sectionId === 'privacy') privacyItem.classList.add('active');
+        else if (sectionId === 'contact') contactItem.classList.add('active');
+
+        // Toggle sections
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        document.getElementById(sectionId + '-section').classList.add('active');
+
+        // Scroll to top of content for mobile
+        if (window.innerWidth < 992) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+</script>
+{% endblock %}

@@ -29,11 +29,12 @@
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
+        border-radius: var(--premium-radius, 24px);
         padding: 1.5rem;
         position: sticky;
         top: 100px;
         box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        overflow: hidden; /* Edge fix */
     }
 
     .user-profile-mini {
@@ -106,10 +107,11 @@
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
         border: 1px solid rgba(255, 255, 255, 0.05);
-        border-radius: 24px;
+        border-radius: var(--premium-radius, 24px);
         padding: 2.5rem;
         min-height: 600px;
         box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        overflow: hidden; /* Edge fix */
     }
 
     .tab-content {
@@ -267,6 +269,7 @@
                     </div>
 
                     <form action="/UpdateAccountAction" method="post" onsubmit="return validateProfileUpdate(this);">
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
                         <div class="row g-4">
                             <div class="col-12">
                                 <label class="xx-small fw-bold dynamic-muted text-uppercase mb-2">Primary Username</label>
@@ -553,7 +556,14 @@
 
     async function adminTerminateUser(username) {
         if (!confirm(`CONFIRM TERMINATION: Deleting user [${username}] will revoke all system access immediately.`)) return;
-        const res = await fetch('/AdminDeleteUser', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username}) });
+        const res = await fetch('/AdminDeleteUser', { 
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }, 
+            body: JSON.stringify({username}) 
+        });
         const data = await res.json();
         if (data.status === 'success') { showToast(data.message, "success"); fetchRegistryUsers(); }
         else showToast(data.message, "error");
@@ -562,7 +572,14 @@
     async function adminResetKey(username) {
         const newPass = prompt(`RESET PROTOCOL: Enter new secure access key for [${username}]`, "sre2024");
         if (!newPass) return;
-        const res = await fetch('/AdminResetPassword', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({username, password: newPass}) });
+        const res = await fetch('/AdminResetPassword', { 
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            }, 
+            body: JSON.stringify({username, password: newPass}) 
+        });
         const data = await res.json();
         if (data.status === 'success') showToast(data.message, "success");
         else showToast(data.message, "error");

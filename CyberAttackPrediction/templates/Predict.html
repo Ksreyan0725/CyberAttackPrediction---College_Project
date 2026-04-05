@@ -258,6 +258,7 @@
                 </div>
 
                     <form name="f1" method="post" action="/PredictAction" enctype="multipart/form-data" id="prediction-form">
+                        <input type="hidden" name="csrf_token" value="{{ session['csrf_token'] }}">
                         <div class="form-group-spacing mb-3">
                             <div class="upload-box py-3" id="drop-zone">
                                 <input type="file" name="t1" id="file-input" class="d-none" accept=".csv">

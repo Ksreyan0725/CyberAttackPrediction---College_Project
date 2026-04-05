@@ -682,22 +682,29 @@ def TrainAction():
     finally:
         system_status = "ready"
 
-
 @app.errorhandler(404)
 def handle_404(e):
     """Premium 404 error handler for CyberShield."""
     return render_template('404.html'), 404
 
+# --- Legal & Contact Routes ---
+@app.route('/Contact')
+def contact():
+    return render_template('Legal.html', section='contact')
+
+@app.route('/TermsOfService')
+def terms():
+    return render_template('Legal.html', section='terms')
+
+@app.route('/PrivacyPolicy')
+def privacy():
+    return render_template('Legal.html', section='privacy')
+
 if __name__ == '__main__':
     import sys
     
     # Heartbeat-Aware Smart Launch:
-    # Start a 3.0s timer. If a heartbeat arrives from an existing tab, cancel it.
-    # Otherwise, open a fresh dashboard.
-    # IN DEBUG MODE: We MUST run this in the CHILD process (WERKZEUG_RUN_MAIN=true)
-    # because that is the process that handles the /api/heartbeat route.
     if '--no-browser' not in sys.argv:
-        # Run if we are the main process (in prod) or the reloader child (in debug)
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
             print("[Smart Launch] Starting pulse detector (3.0s)...")
             browser_timer = Timer(3.0, open_browser)

@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ session['csrf_token'] }}">
     <title>{% block title %}Cyber Attack Prediction{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='images/favicon.svg') }}">
     <!-- Bootstrap 5 CSS -->
@@ -14,12 +15,14 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     <!-- Animate.css -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-    
+
     <!-- Premium Typography: Inter for UI, Outfit for Headers -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Global Security: CSRF Protection & Multi-tab Watchdog -->
     <meta name="csrf-token" content="{{ session['csrf_token'] }}">
 
@@ -39,7 +42,7 @@
         })();
 
         // --- Consolidated Global Heartbeat (Multi-Session Aware) ---
-        (function() {
+        (function () {
             let wasOffline = false;
             let checkInProgress = false;
 
@@ -49,85 +52,85 @@
 
                 const statusPill = document.getElementById('globalSystemStatus');
                 const statusText = statusPill?.querySelector('.status-text');
-                
+
                 try {
-                    const response = await fetch('/api/heartbeat', { 
+                    const response = await fetch('/api/heartbeat', {
                         method: 'GET',
                         cache: 'no-store',
                         headers: { 'Cache-Control': 'no-cache' }
                     });
-                    
-                        // --- GLOBAL UI SYNCHRONIZATION ---
-                        const trainingPill = document.getElementById('trainingStatus');
-                        const trainingText = trainingPill?.querySelector('.status-text') || document.getElementById('statusText');
-                        const trainingDot = trainingPill?.querySelector('.status-dot');
 
-                        if (response.ok) {
-                            const data = await response.json();
-                            const isBusy = data.status === 'busy';
+                    // --- GLOBAL UI SYNCHRONIZATION ---
+                    const trainingPill = document.getElementById('trainingStatus');
+                    const trainingText = trainingPill?.querySelector('.status-text') || document.getElementById('statusText');
+                    const trainingDot = trainingPill?.querySelector('.status-dot');
 
-                            // 1. Update Navbar Status Pill
-                            if (statusPill) {
-                                if (isBusy) {
-                                    statusPill.className = 'system-status-pill status-busy me-2';
-                                    if (statusText) statusText.textContent = 'System Busy';
-                                } else {
-                                    statusPill.className = 'system-status-pill status-ready me-2';
-                                    if (statusText) statusText.textContent = 'System Ready';
-                                }
-                            }
+                    if (response.ok) {
+                        const data = await response.json();
+                        const isBusy = data.status === 'busy';
 
-                            // 2. Update Training Dashboard Badge (if on Train.html)
-                            if (trainingPill) {
-                                // Skip update if local UI just started a job (to avoid race-condition flicker)
-                                const startBtn = document.getElementById('startTrainingBtn');
-                                if (!startBtn || !startBtn.disabled) {
-                                    if (isBusy) {
-                                        trainingPill.className = 'status-badge status-running d-flex align-items-center';
-                                        if (trainingText) trainingText.textContent = 'System Processing...';
-                                        if (trainingDot) trainingDot.className = 'status-dot dot-busy';
-                                    } else if (!trainingPill.classList.contains('status-success')) {
-                                        // Only revert if we aren't displaying a successful completion
-                                        trainingPill.className = 'status-badge status-idle d-flex align-items-center';
-                                        if (trainingText) trainingText.textContent = 'System Ready';
-                                        if (trainingDot) trainingDot.className = 'status-dot dot-ready';
-                                    }
-                                }
-                            }
-
-                            // 3. RELOAD LOGIC: Handle recovery reload
-                            if (wasOffline) {
-                                console.log('[System] Server recovered. Performing auto-refresh...');
-                                setTimeout(() => {
-                                    if (typeof reloadWithScroll === 'function') reloadWithScroll();
-                                    else window.location.reload();
-                                }, 500);
-                            }
-                            wasOffline = false;
-                        }
-                    } catch (err) {
-                        wasOffline = true;
+                        // 1. Update Navbar Status Pill
                         if (statusPill) {
-                            statusPill.className = 'system-status-pill status-offline me-2';
-                            if (statusText) statusText.textContent = 'Server Offline';
+                            if (isBusy) {
+                                statusPill.className = 'system-status-pill status-busy me-2';
+                                if (statusText) statusText.textContent = 'System Busy';
+                            } else {
+                                statusPill.className = 'system-status-pill status-ready me-2';
+                                if (statusText) statusText.textContent = 'System Ready';
+                            }
                         }
-                        // Update Training Dashboard Badge to Offline if it exists
-                        const trainingPill = document.getElementById('trainingStatus');
-                        if (trainingPill) {
-                            trainingPill.className = 'status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center';
-                            const trainingText = trainingPill.querySelector('.status-text') || document.getElementById('statusText');
-                            if (trainingText) trainingText.textContent = 'Server Offline';
-                        }
-                    } finally {
-                        checkInProgress = false;
-                    }
-                }
 
-                // Consolidate logs: reduced frequency to 5s for cleaner terminal output
-                setInterval(checkPulse, 5000);
-                document.addEventListener('DOMContentLoaded', checkPulse);
-            })();
-        </script>
+                        // 2. Update Training Dashboard Badge (if on Train.html)
+                        if (trainingPill) {
+                            // Skip update if local UI just started a job (to avoid race-condition flicker)
+                            const startBtn = document.getElementById('startTrainingBtn');
+                            if (!startBtn || !startBtn.disabled) {
+                                if (isBusy) {
+                                    trainingPill.className = 'status-badge status-running d-flex align-items-center';
+                                    if (trainingText) trainingText.textContent = 'System Processing...';
+                                    if (trainingDot) trainingDot.className = 'status-dot dot-busy';
+                                } else if (!trainingPill.classList.contains('status-success')) {
+                                    // Only revert if we aren't displaying a successful completion
+                                    trainingPill.className = 'status-badge status-idle d-flex align-items-center';
+                                    if (trainingText) trainingText.textContent = 'System Ready';
+                                    if (trainingDot) trainingDot.className = 'status-dot dot-ready';
+                                }
+                            }
+                        }
+
+                        // 3. RELOAD LOGIC: Handle recovery reload
+                        if (wasOffline) {
+                            console.log('[System] Server recovered. Performing auto-refresh...');
+                            setTimeout(() => {
+                                if (typeof reloadWithScroll === 'function') reloadWithScroll();
+                                else window.location.reload();
+                            }, 500);
+                        }
+                        wasOffline = false;
+                    }
+                } catch (err) {
+                    wasOffline = true;
+                    if (statusPill) {
+                        statusPill.className = 'system-status-pill status-offline me-2';
+                        if (statusText) statusText.textContent = 'Server Offline';
+                    }
+                    // Update Training Dashboard Badge to Offline if it exists
+                    const trainingPill = document.getElementById('trainingStatus');
+                    if (trainingPill) {
+                        trainingPill.className = 'status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center';
+                        const trainingText = trainingPill.querySelector('.status-text') || document.getElementById('statusText');
+                        if (trainingText) trainingText.textContent = 'Server Offline';
+                    }
+                } finally {
+                    checkInProgress = false;
+                }
+            }
+
+            // Consolidate logs: reduced frequency to 5s for cleaner terminal output
+            setInterval(checkPulse, 5000);
+            document.addEventListener('DOMContentLoaded', checkPulse);
+        })();
+    </script>
 
     <script>
         // Global Premium Toast System (Smart Stacking & Deduplication)
@@ -195,10 +198,10 @@
         });
 
         // --- Multi-tab Security Persistence & Watchdog ---
-        (function() {
+        (function () {
             // CSRF Global AJAX Setup: Automatically inject token into all headers
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            
+
             // Re-setup jQuery AJAX with global CSRF header
             const setupAjax = () => {
                 if (window.jQuery && csrfToken) {
@@ -247,6 +250,7 @@
             --bg-gradient: radial-gradient(circle at top right, #0a191f, #000000);
             --surface-bg: radial-gradient(circle at top right, #0a191f, #000000);
             --footer-bg: transparent;
+            --premium-radius: 24px;
             --brand-text-color: rgba(255, 255, 255, 0.04);
             --text-main: #e0e0e0;
             --text-muted: #94a3b8;
@@ -365,7 +369,12 @@
             transition: background 0.4s ease, color 0.4s ease;
         }
 
-        h1, h2, h3, h4, h5, h6 {
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
         }
@@ -386,7 +395,8 @@
             margin-bottom: 350px;
             box-shadow: 0 15px 50px var(--card-shadow);
             transition: background 0.4s ease, color 0.4s ease;
-            /* Ensure the surface covers the fixed footer until the end */
+            /* Edge Fix: Ensure content doesn't bleed over potentially rounded corners */
+            overflow: hidden;
         }
 
         .footer {
@@ -407,6 +417,16 @@
             overflow: hidden;
             pointer-events: auto;
             transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .footer-link {
@@ -469,7 +489,7 @@
             white-space: nowrap;
             /* SUPER-SMOOTH EXIT: Primarily use opacity for performance */
             transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-                        transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+                transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
             opacity: 0;
             transform: translateY(10px) scale(0.98);
             will-change: transform, opacity;
@@ -494,8 +514,8 @@
         .footer-content {
             opacity: 0;
             transform: translateY(20px);
-            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), 
-                        opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+                opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform, opacity;
         }
 
@@ -616,15 +636,26 @@
         }
 
         /* --- Global Utility Helpers (Unified) --- */
-        .bg-primary-light { background-color: rgba(var(--primary-rgb), 0.1) !important; }
-        .bg-danger-light { background-color: rgba(var(--danger-rgb), 0.1) !important; }
-        .bg-success-light { background-color: rgba(var(--success-rgb), 0.1) !important; }
+        .bg-primary-light {
+            background-color: rgba(var(--primary-rgb), 0.1) !important;
+        }
 
-        .hover-lift { 
-            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        .bg-danger-light {
+            background-color: rgba(var(--danger-rgb), 0.1) !important;
+        }
+
+        .bg-success-light {
+            background-color: rgba(var(--success-rgb), 0.1) !important;
+        }
+
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             will-change: transform;
         }
-        .hover-lift:hover { transform: translateY(-8px); }
+
+        .hover-lift:hover {
+            transform: translateY(-8px);
+        }
 
         /* --- Navbar System (Merged & Optimized) --- */
         .navbar {
@@ -642,7 +673,8 @@
             padding: 0.45rem 2rem !important;
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s ease !important;
             z-index: 9999 !important;
-            overflow: visible !important; /* Fixed: Allow dropdowns to render outside the navbar capsule */
+            overflow: visible !important;
+            /* Fixed: Allow dropdowns to render outside the navbar capsule */
             /* GPU Isolation: Prevent flickering during heavy page-load animations */
             transform: translate3d(0, 0, 0);
             backface-visibility: hidden;
@@ -664,8 +696,14 @@
             will-change: width, opacity;
         }
 
-        .navbar-brand, .nav-link { color: var(--text-main) !important; }
-        .navbar.navbar-hidden { transform: translateY(calc(-100% - 24px)) !important; }
+        .navbar-brand,
+        .nav-link {
+            color: var(--text-main) !important;
+        }
+
+        .navbar.navbar-hidden {
+            transform: translateY(calc(-100% - 24px)) !important;
+        }
 
         .navbar-brand {
             font-weight: 800;
@@ -690,23 +728,73 @@
         }
 
         /* --- Master Reveal System (Consolidated) --- */
-        @keyframes reveal-premium { 0% { opacity: 0; transform: translateY(24px) scale(0.97); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
-        @keyframes reveal-depth { 0% { opacity: 0; transform: perspective(800px) translateZ(-50px) translateY(12px); } 100% { opacity: 1; transform: perspective(800px) translateZ(0) translateY(0); } }
-        @keyframes reveal-soft { 0% { opacity: 0; transform: scale(0.96) translateY(8px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        @keyframes reveal-premium {
+            0% {
+                opacity: 0;
+                transform: translateY(24px) scale(0.97);
+            }
 
-        .reveal-premium, .reveal-depth, .reveal-soft {
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes reveal-depth {
+            0% {
+                opacity: 0;
+                transform: perspective(800px) translateZ(-50px) translateY(12px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: perspective(800px) translateZ(0) translateY(0);
+            }
+        }
+
+        @keyframes reveal-soft {
+            0% {
+                opacity: 0;
+                transform: scale(0.96) translateY(8px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .reveal-premium,
+        .reveal-depth,
+        .reveal-soft {
             opacity: 0;
             will-change: transform, opacity;
         }
 
-        .revealed.reveal-premium { animation: reveal-premium 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
-        .revealed.reveal-depth { animation: reveal-depth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
-        .revealed.reveal-soft { animation: reveal-soft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important; }
+        .revealed.reveal-premium {
+            animation: reveal-premium 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+        }
+
+        .revealed.reveal-depth {
+            animation: reveal-depth 1s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+        }
+
+        .revealed.reveal-soft {
+            animation: reveal-soft 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+        }
 
         /* Staggered Delay Tokens */
-        .delay-100 { animation-delay: 0.1s !important; }
-        .delay-200 { animation-delay: 0.2s !important; }
-        .delay-300 { animation-delay: 0.3s !important; }
+        .delay-100 {
+            animation-delay: 0.1s !important;
+        }
+
+        .delay-200 {
+            animation-delay: 0.2s !important;
+        }
+
+        .delay-300 {
+            animation-delay: 0.3s !important;
+        }
 
         /* Skeleton Loading Effect */
         .skeleton-box {
@@ -733,7 +821,9 @@
         }
 
         @media (max-width: 992px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .dashboard-card {
@@ -786,7 +876,9 @@
             opacity: 1;
         }
 
-        .glass-tab-btn.active i { transform: scale(1.15); }
+        .glass-tab-btn.active i {
+            transform: scale(1.15);
+        }
 
         /* --- Global System Health Status (Consolidated) --- */
         .system-status-pill {
@@ -814,32 +906,110 @@
         }
 
         /* Status: READY (Green) */
-        .status-ready .status-dot { background: #22c55e; box-shadow: 0 0 10px rgba(34, 197, 94, 0.6); }
-        .status-ready .status-dot::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background: #22c55e; animation: statusPulseGreen 2s infinite;
+        .status-ready .status-dot {
+            background: #22c55e;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
         }
-        .status-ready { color: #22c55e !important; border-color: rgba(34, 197, 94, 0.3); }
+
+        .status-ready .status-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: statusPulseGreen 2s infinite;
+        }
+
+        .status-ready {
+            color: #22c55e !important;
+            border-color: rgba(34, 197, 94, 0.3);
+        }
 
         /* Status: BUSY/TRAINING (Yellow/Purple) */
-        .status-busy .status-dot { background: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); }
-        .status-busy .status-dot::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background: #a855f7; animation: statusPulsePurple 2s infinite;
+        .status-busy .status-dot {
+            background: #a855f7;
+            box-shadow: 0 0 10px rgba(168, 85, 247, 0.6);
         }
-        .status-busy { color: #a855f7 !important; border-color: rgba(168, 85, 247, 0.3); }
+
+        .status-busy .status-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #a855f7;
+            animation: statusPulsePurple 2s infinite;
+        }
+
+        .status-busy {
+            color: #a855f7 !important;
+            border-color: rgba(168, 85, 247, 0.3);
+        }
 
         /* Status: OFFLINE (Red) */
-        .status-offline .status-dot { background: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.6); }
-        .status-offline .status-dot::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background: #ef4444; animation: statusPulseRed 2s infinite;
+        .status-offline .status-dot {
+            background: #ef4444;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
         }
-        .status-offline { color: #ef4444 !important; border-color: rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.05); }
 
-        @keyframes statusPulseGreen { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
-        @keyframes statusPulsePurple { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
-        @keyframes statusPulseRed { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(2.5); opacity: 0; } }
+        .status-offline .status-dot::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #ef4444;
+            animation: statusPulseRed 2s infinite;
+        }
+
+        .status-offline {
+            color: #ef4444 !important;
+            border-color: rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        @keyframes statusPulseGreen {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes statusPulsePurple {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes statusPulseRed {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            100% {
+                transform: scale(2.5);
+                opacity: 0;
+            }
+        }
 
         .guide-step {
             border-left: 2px solid var(--glass-border);
@@ -1285,7 +1455,8 @@
             transform: translateY(10px);
             transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
             pointer-events: none;
-            z-index: 9999 !important; /* Force extreme layering */
+            z-index: 9999 !important;
+            /* Force extreme layering */
         }
 
         .navbar .dropdown-menu.show {
@@ -1293,7 +1464,8 @@
             opacity: 1;
             transform: translateY(0);
             pointer-events: auto;
-            display: block !important; /* Force block state when show class is present */
+            display: block !important;
+            /* Force block state when show class is present */
         }
 
         /* Hover enhancement for desktop if desired, but we follow Bootstrap's click behavior */
@@ -1476,7 +1648,7 @@
             cursor: pointer;
             font-size: 1.15rem;
         }
-        
+
         #fullscreen-floating-toggle:hover {
             background: rgba(255, 255, 255, 0.15);
             transform: scale(1.1) rotate(5deg);
@@ -1489,9 +1661,18 @@
         }
 
         @keyframes cinematic-spin {
-            0% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(0.5) rotate(180deg); opacity: 0.5; }
-            100% { transform: scale(1) rotate(360deg); }
+            0% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(0.5) rotate(180deg);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1) rotate(360deg);
+            }
         }
 
         /* Unified Fullscreen Root State */
@@ -1502,7 +1683,7 @@
             padding: 0 !important;
             overflow: hidden !important;
         }
-        
+
         html:fullscreen body {
             width: 100vw !important;
             height: 100vh !important;
@@ -1549,26 +1730,63 @@
         }
 
         @keyframes pulse-fs {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.2); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         /* Interaction & State Feedback System */
         @keyframes state-shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-3px); }
-            40%, 80% { transform: translateX(3px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            20%,
+            60% {
+                transform: translateX(-3px);
+            }
+
+            40%,
+            80% {
+                transform: translateX(3px);
+            }
         }
 
         @keyframes state-displace-left {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(-1.5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(-1.5px);
+            }
         }
 
         @keyframes state-displace-right {
-            0%, 100% { transform: translateX(0); }
-            50% { transform: translateX(1.5px); }
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            50% {
+                transform: translateX(1.5px);
+            }
         }
 
         .state-feedback-active {
@@ -1617,9 +1835,8 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="z-index: 9999 !important;">
         <div class="container">
-            <a class="navbar-brand d-flex align-items-center fw-bold"
-                href="javascript:void(0);" onclick="reloadWithScroll()"
-                style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: pointer;">
+            <a class="navbar-brand d-flex align-items-center fw-bold" href="javascript:void(0);"
+                onclick="reloadWithScroll()" style="letter-spacing: -0.5px; font-size: 1.25rem; cursor: pointer;">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="28" height="28" class="me-2"
                     style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));">
                     <defs>
@@ -1752,14 +1969,17 @@
                     <p class="mb-0 small opacity-75">&copy; 2026 Cyber Attack Prediction | Powered by ML & GenAI</p>
                 </div>
                 <div class="col-md-4 text-end">
-                    <a href="#" class="footer-link mx-2">Terms</a>
-                    <a href="#" class="footer-link mx-2">Privacy</a>
-                    <a href="#" class="footer-link mx-2">Contact</a>
+                    <div class="footer-links d-flex flex-column gap-2">
+                        <a href="{{ url_for('contact') }}"><i class="fas fa-headset text-primary small"></i> Contact Support</a>
+                        <a href="{{ url_for('terms') }}"><i class="fas fa-file-contract text-info small"></i> Terms of Service</a>
+                        <a href="{{ url_for('privacy') }}"><i class="fas fa-user-shield text-success small"></i> Privacy Policy</a>
+                    </div>
                 </div>
-            <div class="mt-2">
-                <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top ↑</button>
+                <div class="mt-2">
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="footer-btn">Back to Top
+                        ↑</button>
+                </div>
             </div>
-        </div>
     </footer>
     <div id="toastContainer"></div>
 
@@ -1873,13 +2093,13 @@
                     if (link && link.href && !link.target && !link.href.includes('#') && !link.href.includes('javascript:') && link.origin === location.origin) {
                         e.preventDefault();
                         const targetUrl = link.href;
-                        
+
                         // Fill to data-end instantly for visual feedback
                         if (this.elements.progress) {
                             this.elements.progress.style.opacity = '1';
                             this.elements.progress.style.width = '100%';
                         }
-                        
+
                         // Synthetic delay to allow the 100% fill to finish
                         setTimeout(() => {
                             window.location.href = targetUrl;
@@ -1901,7 +2121,7 @@
                 const top = window.pageYOffset || document.documentElement.scrollTop;
                 const docHeight = this.state.docHeight;
                 const winHeight = this.state.winHeight;
-                
+
                 // 1. Smart Navbar Visibility
                 if (this.elements.navbar) {
                     const shouldHide = top > 100 && top > this.state.lastScroll;
@@ -2204,7 +2424,7 @@
          * Includes Viewport Sentinel for 'Phantom State' detection in Chrome.
          */
         (function () {
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const fsBtn = document.getElementById('fullscreen-floating-toggle');
                 if (!fsBtn) return;
                 const fsIcon = fsBtn.querySelector('i');
@@ -2212,19 +2432,19 @@
 
                 // Cross-Browser Property Helpers
                 const getFullscreenElement = () => {
-                    return document.fullscreenElement || 
-                           document.webkitFullscreenElement || 
-                           document.mozFullScreenElement || 
-                           document.msFullscreenElement;
+                    return document.fullscreenElement ||
+                        document.webkitFullscreenElement ||
+                        document.mozFullScreenElement ||
+                        document.msFullscreenElement;
                 };
 
                 const syncUI = (event) => {
                     const isFs = !!getFullscreenElement();
                     console.log("Fullscreen Debug: Syncing iconography. In Fullscreen:", isFs);
-                    
+
                     fsBtn.classList.add('spin-transition');
                     fsIcon.className = isFs ? 'fa-solid fa-compress' : 'fa-solid fa-expand';
-                    
+
                     if (!isFs && banner) {
                         banner.classList.remove('reveal');
                     }
@@ -2237,11 +2457,11 @@
                 const toggleFullscreen = () => {
                     const el = document.documentElement;
                     const isNowFs = !!getFullscreenElement();
-                    
+
                     if (!isNowFs) {
                         console.log("Fullscreen Debug: Native-First ENTER Request initiated.");
                         let promise;
-                        
+
                         // Prioritize native webkit for legacy/secure-policy bypass on localhost
                         if (el.webkitRequestFullscreen) promise = el.webkitRequestFullscreen();
                         else if (el.requestFullscreen) promise = el.requestFullscreen();
@@ -2282,7 +2502,7 @@
                 // Listen for all vendor-specific change events
                 ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange']
                     .forEach(evt => document.addEventListener(evt, syncUI));
-                
+
                 console.log("Fullscreen Debug: Hardened Controller Ready.");
             });
         })();
@@ -2343,8 +2563,8 @@
                     });
 
                     // Force Reflow
-                    void parentLi.offsetWidth; 
-                    
+                    void parentLi.offsetWidth;
+
                     requestAnimationFrame(() => {
                         parentLi.classList.add('state-feedback-active');
                         if (prevSibling) prevSibling.classList.add('state-feedback-adjacent-left');
@@ -2372,7 +2592,7 @@
             const dropdown = document.getElementById('userDropdown');
             if (dropdown) {
                 // Monitor clicks directly
-                dropdown.addEventListener('click', function(e) {
+                dropdown.addEventListener('click', function (e) {
                     // Small delay to check if Bootstrap applied the .show class
                     setTimeout(() => {
                         const menu = this.nextElementSibling;
@@ -2426,7 +2646,7 @@
                 if (isUserClick) {
                     setTimeout(() => {
                         document.body.classList.remove('theme-transitioning');
-                    }, 1400); 
+                    }, 1400);
                 }
 
                 if (!icon || !toggle) return;
