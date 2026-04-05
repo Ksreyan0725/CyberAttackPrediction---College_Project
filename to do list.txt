@@ -1,4 +1,3 @@
-some ui related fixes needed ..
 
 check for final ui related issues ..
 
@@ -6,12 +5,9 @@ final check for all the features ..
 
 final commit ..
 
-
 ==================================================================================
 
 
-
-Enhance the account.html page by improving account management features. Add and refine controls such as feature buttons, theme options, server status indicators, and other relevant settings.
 
 Ensure all functionalities are fully working, properly integrated, and user-friendly. Review and fix any broken or incomplete features.
 

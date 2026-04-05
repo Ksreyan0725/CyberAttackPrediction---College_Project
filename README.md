@@ -50,7 +50,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
 1. **Install Python**: Open the [📁 Software/](Software/) folder and run `python-3.11.9-amd64.exe`.
 2. **Install Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically install all AI libraries.
 3. **One-Click Start**: Run [⚙️ Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) directly from the root to launch the dashboard.
-4. **Optimized Logs**: Server output is throttled to 5s intervals for a cleaner developer terminal experience.
+4. **Silent Pulse Monitoring**: Heartbeat logs are silenced for a focused developer experience.
 
 > [!TIP]
 > **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
@@ -61,8 +61,14 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 - **🚀 Dual-Docs Experience**
   - Seamless navigation between a **High-Level Interactive Overview** and a **Surgical Repository Explorer**.
+- **🛡️ CSRF Cyber-Hardening**
+  - Global `X-CSRF-Token` protection and secure header enforcement across all endpoints.
+- **⚖️ Unified Legal Hub**
+  - Consolidated, tabbed compliance interface for Terms, Privacy, and Security Contact.
+- **🤫 Silent Pulse Monitoring**
+  - Backend heartbeat noise is filtered out for a professional, clinical terminal output.
 - **💎 Liquid Glass Design System**
-  - A state-of-the-art UI featuring 80px Gaussian blur, translucency, and refractive background animations.
+  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.45s)**, and a cinematic **Reveal Footer**.
 - **🧠 Stacking Ensemble AI**
   - Uses a multi-model architecture (Random Forest, KNN, MLP) for **98%+ Accuracy**.
 - **🔍 XAI (Explainable AI)**
@@ -134,6 +140,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
     - [UserScreen.html](CyberAttackPrediction/templates/UserScreen.html) (Results & Explanation Dashboard)
     - [HowItWorks.html](CyberAttackPrediction/templates/HowItWorks.html) (GenAI Human-Readable Explanations)
     - [Train.html](CyberAttackPrediction/templates/Train.html) (AI Model Training & Management Page)
+    - [Legal.html](CyberAttackPrediction/templates/Legal.html) (Unified Hub for Terms, Privacy, and Security Compliance)
     - [404.html](CyberAttackPrediction/templates/404.html) (Cinematic Recovery & Support Portal)
   - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
   - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
@@ -145,7 +152,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - 📁 [**scripts**](CyberAttackPrediction/scripts/) (Internal Maintenance & Surgical Fix Utilities)
   - 📃 [SCREEENS.pdf](CyberAttackPrediction/SCREEENS.pdf) (Project Screenshots)
   - 📄 [DatasetLink.txt](CyberAttackPrediction/DatasetLink.txt) (Dataset mirror link)
-- 📄 [users.json](CyberAttackPrediction/users.json) (Salted/Hashed User Database)
+- 📄 [users.json](CyberAttackPrediction/users.json) (Secure, Bcrypt-Hashed User Registry)
   - 📄 [saved_creds.json](CyberAttackPrediction/saved_creds.json) (Local Session Cache)
   - 📄 [.env](CyberAttackPrediction/.env) (Environment Config / Secret Keys)
   - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (List of needed libraries)

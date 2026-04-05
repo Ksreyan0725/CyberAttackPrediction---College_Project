@@ -24,6 +24,16 @@ from pygments.lexers import get_lexer_for_filename
 from pygments.formatters import HtmlFormatter
 import nbformat
 from nbconvert import HTMLExporter
+import logging
+
+# Silence repetitive Heartbeat logs for a cleaner terminal experience
+class HeartbeatFilter(logging.Filter):
+    def filter(self, record):
+        # Exclude any log record containing the heartbeat URI
+        return "/api/heartbeat" not in record.getMessage()
+
+log = logging.getLogger('werkzeug')
+log.addFilter(HeartbeatFilter())
 
 # Load environment variables
 load_dotenv()
@@ -168,7 +178,6 @@ def heartbeat():
     
     # If a heartbeat arrives, an active tab exists - cancel the startup browser launch
     if browser_timer and browser_timer.is_alive():
-        print("[Smart Launch] Active tab detected via heartbeat. Cancelling automated launch.")
         browser_timer.cancel()
         
     return jsonify({"status": system_status, "health": "online"})

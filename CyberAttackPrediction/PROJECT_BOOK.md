@@ -29,8 +29,9 @@ The project is organized into a modular structure to separate data analysis (Jup
   - `trained_rf_model.pkl`: Serialized model artifact (includes Scaler and Encoders).
   - `*.hdf5`: Binary weight files for deep learning components.
 - **`/templates`**:
-  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Includes a **'Dropdown Guard' diagnostic script** to ensure navigation lifecycle stability.
+  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Includes a **'Reveal Footer' architecture** for a cinematic scroll experience and a **'Dropdown Guard' diagnostic script** for navigation stability.
   - `AccountSettings.html`: The **CyberShield Command Center**. A high-security administrator dashboard with live system monitoring and user registry management.
+  - `Legal.html`: The **Unified Legal Hub**. Consolidates Terms, Privacy, and Security Contact into a tabbed, high-performance interface.
   - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.
 
 - **`/static`**:
@@ -350,7 +351,11 @@ To ensure production-grade security, the application transitioned from a hardcod
 7. **Local "Quick Access" Storage**:
     - The `saved_creds.json` file hashes local sessions to enable one-click access while keeping the filesystem secure.
     - **Session Bypass**: Enabled when a valid token is detected, bypassing the full login UI and routing directly to the training workflow.
-8. **Master Admin User Registry**:
+8. **Global CSRF Cyber-Hardening**:
+    - **Mechanism**: Implemented a global `security_pre_check` and `apply_security_headers` middleware in `Main.py`.
+    - **Protection**: Enforces strict `X-CSRF-Token` validation on all `POST`, `PUT`, and `DELETE` requests to prevent cross-site request forgery attacks.
+    - **Reliability**: Uses a secure token rotation policy synchronized with the Flask session backend.
+9. **Master Admin User Registry**:
     - **Dashboard**: Accessible via the Command Center for users with `MASTER` status.
     - **Tools**: Includes high-level "Override Key" (Password Reset) and "Terminate" (Account Deletion) capabilities to manage the platform manually.
 
@@ -400,11 +405,15 @@ To ensure a "Best-in-Class" user experience, the web application implements seve
     - **Mechanism**: The navigation bar enforces a strict `z-index: 9999`, `overflow: visible !important`, and is isolated in its own GPU compositor layer via `transform: translate3d(0,0,0)`.
     - **Stability**: This prevents "flicker" or background layout repaints during heavy entry animations. The `emergeFromDeep` animation has been hardened with a high-performance **6px blur** and a strict `contain: layout paint` policy.
     - **Script Consistency**: The application uses a unified Bootstrap 5 bundle strategy, eliminating redundant script loads that previously caused event listener race conditions.
-7. **Terminal-Friendly Watchdog Logic**:
-    - **Performance**: The global system heartbeat frequency was optimized from 1s to **5s**.
-    - **Benefit**: This significantly reduces developer terminal log noise while maintaining rock-solid synchronization of the "System Ready" status across all open browser tabs.
-8. **Synchronized Identity Twin Layouts**:
-    - **Consistency**: The `UserLogin.html` and `Signup.html` pages are now architectural twins, sharing identical `branding-section` logic, `22ms` typing rhythms, and compact `min-height: 400px` containers for a premium, unified identity experience.
+7. **Silent Terminal Pulse Monitoring**:
+    - **Performance**: Transitioned from a 5s heartbeat throttle to a **HeartbeatFilter** in the Werkzeug logger.
+    - **Benefit**: This completely removes `/api/heartbeat` logs from the terminal output, ensuring a 100% silent, focused experience for researchers.
+8. **Staggered Reveal Stacking (Footer Logic)**:
+    - **Animation**: Footer link elements are reveal-animated sequentially using staggered `transition-delay` values (0.1s to 0.45s).
+    - **Reveal Gap**: Implemented a 350px virtual gap at the page bottom to trigger the cinematic reveal of the footer links *after* the main content has been cleared.
+9. **Theme-Aware Terminal Log Hardening**:
+    - **Visibility**: Integrated `.dynamic-text` utility classes in `base.html` that automatically swap colors between Dark/Light modes.
+    - **Reliability**: Ensures live training logs in `Train.html` are always legible, regardless of the active UI theme.
 
 ---
 
