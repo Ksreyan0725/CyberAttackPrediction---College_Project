@@ -234,7 +234,7 @@
 <div class="hero-section text-center reveal-soft">
     <div class="container">
         <h1 class="display-4 fw-bold mb-3 dynamic-text">Project Documentation</h1>
-        <p class="lead opacity-75 dynamic-text mb-4">A comprehensive guide to the Cyber Attack Prediction System</p>
+        <p id="scroll-trigger-text" class="lead opacity-75 dynamic-text mb-4">A comprehensive guide to the Cyber Attack Prediction System</p>
         <div class="d-flex justify-content-center gap-3">
             <a href="#overview" class="btn btn-shine-glow pulse-btn text-white px-5 py-3 rounded-pill fw-bold">
                 <i class="fas fa-book-open me-2"></i>READ OVERVIEW
@@ -773,6 +773,29 @@
         const heroRect = heroSection.getBoundingClientRect();
         if (heroRect.bottom < 0) {
             fab.classList.add('visible');
+        }
+
+        // 4. Intelligent Nudge: Auto-scroll Handshake
+        let scrollHandshakeDone = false;
+        const scrollTrigger = document.getElementById('scroll-trigger-text');
+        
+        if (scrollTrigger) {
+            const nudgeObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    // Trigger when subtitle starts leaving viewport AND user is scrolling down
+                    if (!entry.isIntersecting && !scrollHandshakeDone && window.scrollY > 50) {
+                        scrollHandshakeDone = true;
+                        const target = document.querySelector('#overview');
+                        if (target) {
+                            window.scrollTo({
+                                top: target.offsetTop - 100,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
+                });
+            }, { threshold: 0 });
+            nudgeObserver.observe(scrollTrigger);
         }
     });
 </script>
