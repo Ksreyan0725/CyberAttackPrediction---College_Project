@@ -48,9 +48,9 @@
 This project includes all necessary software. Follow these **3 simple steps** to launch the application for your viva:
 
 1. **Install Python**: Open the [📁 Software/](Software/) folder and run `python-3.11.9-amd64.exe`.
-2. **Install Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically install all AI libraries.
-3. **One-Click Start**: Run [⚙️ Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) directly from the root to launch the dashboard.
-4. **Silent Pulse Monitoring**: Heartbeat logs are silenced for a focused developer experience.
+2. **Setup Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically prepare the environment.
+3. **Unified Launch**: Run [🐍 launcher.py](launcher.py) to access the **Command Center**. Choose **Mode 1** for the Web Dashboard or **Mode 2** for Jupyter research.
+4. **Active Session Guard**: Start scripts now feature **Venv Persistence**, keeping your environment active even after the application exits.
 
 > [!TIP]
 > **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
@@ -164,10 +164,11 @@ This project includes all necessary software. Follow these **3 simple steps** to
 - 📁 [**backups**](backups/) (Original zip files & legacy installers)
 - 📁 [**docs/**](docs/) (Documentation, Study Guides, & Manuals)
 - 📁 [**Project materials**](Project%20materials/) (Graphics, Roadmaps, and Reference images)
-- ⚙️ [**Start_WebApp_Venv.bat**](Start_WebApp_Venv.bat) (Quick launcher for Web App)
-- ⚙️ [**Start_Jupyter_Venv.bat**](Start_Jupyter_Venv.bat) (Launcher for Jupyter Notebook research)
+- 🐍 [**launcher.py**](launcher.py) (Unified Command Center: Web App + Jupyter)
+- ⚙️ [**Start_WebApp_Venv.bat**](Start_WebApp_Venv.bat) (Venv-Persistent Web Launcher)
+- ⚙️ [**Start_Jupyter_Venv.bat**](Start_Jupyter_Venv.bat) (Venv-Persistent Jupyter Launcher)
 - 📜 [install_deps.ps1](install_deps.ps1) (Automated dependency installation script)
-- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Old)
+- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Archive)
 
 <p align="center">
   Built with ❤️ for Academic Excellence — 2026
