@@ -467,9 +467,17 @@
         }
 
         /* Sequential Link Stagger (on top of column delay) */
-        .footer-content.run-animation .footer-links a:nth-child(1) { transition-delay: 0.4s; }
-        .footer-content.run-animation .footer-links a:nth-child(2) { transition-delay: 0.5s; }
-        .footer-content.run-animation .footer-links a:nth-child(3) { transition-delay: 0.6s; }
+        .footer-content.run-animation .footer-links a:nth-child(1) {
+            transition-delay: 0.4s;
+        }
+
+        .footer-content.run-animation .footer-links a:nth-child(2) {
+            transition-delay: 0.5s;
+        }
+
+        .footer-content.run-animation .footer-links a:nth-child(3) {
+            transition-delay: 0.6s;
+        }
 
         .footer-link {
             color: var(--text-main);
@@ -519,41 +527,42 @@
             left: 0;
             width: 100%;
             text-align: center;
-            transform: none;
+            z-index: 1;
+            /* Below footer content but above surface */
+            pointer-events: auto;
+            user-select: none;
+            opacity: 0.25;
+            filter: blur(30px);
+            transform: translateY(30px) scale(1.05);
+            transition: filter 1.2s cubic-bezier(0.23, 1, 0.32, 1),
+                transform 1.2s cubic-bezier(0.23, 1, 0.32, 1),
+                opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+            will-change: transform, filter, opacity;
+            backface-visibility: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .huge-brand-text span {
+            display: inline-block;
             font-size: 8.5vw;
             font-weight: 900;
             letter-spacing: -0.2vw;
             line-height: 0.8;
-            pointer-events: auto;
-            /* Restored for Spotlight Interaction */
-            /* REVEAL FIX: Must be at the absolute back (z-index: 1) */
-            z-index: 1;
-            /* Stays below footer-content but above base layers */
-            user-select: none;
             text-transform: uppercase;
             white-space: nowrap;
-            /* SUPER-SMOOTH EXIT: Primarily use opacity for performance */
-            transition: opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
-                transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            opacity: 0;
-            transform: translateY(10px) scale(0.98);
-            will-change: transform, opacity;
-            backface-visibility: hidden;
-            -webkit-font-smoothing: antialiased;
-
-            /* VIBRANT BASELINE: Guaranteed visibility regardless of theme */
             background: var(--brand-text-gradient);
             background-size: 200% auto;
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
             color: var(--primary-color);
+            transition: background 0.3s ease;
         }
 
-        /* Smooth Reveal State: GPU Optimized */
         .huge-brand-text.run-animation {
-            opacity: 0.85 !important;
-            transform: translateY(0) scale(1) !important;
+            opacity: 0.85;
+            filter: blur(0);
+            transform: translateY(0) scale(1);
         }
 
         .footer-content {
@@ -581,16 +590,12 @@
             /* Glowing Laser Cyan Core */
         }
 
-        .huge-brand-text:hover {
-            opacity: 1;
-            filter: blur(0);
+        .huge-brand-text:hover span {
             background-image: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
                     var(--spotlight-color) 0%,
                     var(--primary-color) 25%,
                     var(--info-color) 60%,
-                    rgba(var(--primary-rgb), 0.1) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
+                    rgba(var(--primary-rgb), 0.1) 100%) !important;
             background-size: 150% 150%;
             background-position: center;
         }
@@ -649,9 +654,17 @@
         }
 
         /* Staggered Delay for Columns */
-        .footer-content.run-animation .col-md-4:nth-child(1) { transition-delay: 0.1s; }
-        .footer-content.run-animation .col-md-4:nth-child(2) { transition-delay: 0.2s; }
-        .footer-content.run-animation .col-md-4:nth-child(3) { transition-delay: 0.3s; }
+        .footer-content.run-animation .col-md-4:nth-child(1) {
+            transition-delay: 0.1s;
+        }
+
+        .footer-content.run-animation .col-md-4:nth-child(2) {
+            transition-delay: 0.2s;
+        }
+
+        .footer-content.run-animation .col-md-4:nth-child(3) {
+            transition-delay: 0.3s;
+        }
 
         .footer-content.run-animation .col-md-4 {
             opacity: 1;
@@ -2013,7 +2026,7 @@
 
     <!-- Trae Reveal Footer -->
     <footer class="footer">
-        <div class="huge-brand-text">CYBERSHIELD AI</div>
+        <div class="huge-brand-text"><span>CYBERSHIELD AI</span></div>
         <div class="container footer-content text-center">
             <div class="row align-items-center mb-4">
                 <div class="col-md-4 text-start">
@@ -2026,7 +2039,8 @@
                 <div class="col-md-4 text-end">
                     <div class="footer-links d-flex align-items-center justify-content-end gap-3">
                         <a href="{{ url_for('terms') }}"><i class="fas fa-file-contract text-info small"></i> Terms</a>
-                        <a href="{{ url_for('privacy') }}"><i class="fas fa-user-shield text-success small"></i> Privacy</a>
+                        <a href="{{ url_for('privacy') }}"><i class="fas fa-user-shield text-success small"></i>
+                            Privacy</a>
                         <a href="{{ url_for('contact') }}"><i class="fas fa-headset text-primary small"></i> Contact</a>
                     </div>
                 </div>
@@ -2183,9 +2197,9 @@
                     this.elements.navbar.classList.toggle('navbar-hidden', shouldHide);
                 }
 
-                // 2. Branding & Footer Sync (End Zone: 320px from bottom)
+                // 2. Branding & Footer Sync (Glow-Entry Trigger: 350px Footer Gap Start)
                 const scrollFromBottom = docHeight - (top + winHeight);
-                const isEndZone = scrollFromBottom < 320;
+                const isEndZone = scrollFromBottom < 350;
 
                 if (this.elements.brandText) {
                     this.elements.brandText.classList.toggle('run-animation', isEndZone);

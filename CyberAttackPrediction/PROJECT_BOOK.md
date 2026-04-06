@@ -409,9 +409,10 @@ To ensure a "Best-in-Class" user experience, the web application implements seve
 7. **Silent Terminal Pulse Monitoring**:
     - **Performance**: Transitioned from a 5s heartbeat throttle to a **HeartbeatFilter** in the Werkzeug logger.
     - **Benefit**: This completely removes `/api/heartbeat` logs from the terminal output, ensuring a 100% silent, focused experience for researchers.
-8. **Staggered Reveal Stacking (Footer Logic)**:
-    - **Animation**: Footer link elements are reveal-animated sequentially using staggered `transition-delay` values (0.1s to 0.6s).
-    - **Reveal Gap**: Implemented a 350px virtual gap at the page bottom to trigger the cinematic reveal of the footer links *after* the main content has been cleared.
+8. **Structural Wrapped Resolve (Cinematic Reveal Hardening)**:
+    - **Logic**: Implemented a structural `<span>` wrapper for the footer branding to decouple the `filter: blur()` from the `-webkit-background-clip: text` gradient.
+    - **Benefit**: Resolves a critical rendering conflict, ensuring the "CYBERSHIELD AI" unblurring (Focal Recovery) is strikingly visible and professionally managed during the cinematic scroll.
+    - **Trigger**: Precisely synchronized with a 350px virtual footer gap to ensure the resolution happens "on stage."
 9. **Theme-Aware Terminal Log Hardening**:
     - **Visibility**: Integrated `.dynamic-text` utility classes in `base.html` that automatically swap colors between Dark/Light modes.
     - **Reliability**: Ensures live training logs in `Train.html` are always legible, regardless of the active UI theme.
@@ -431,6 +432,21 @@ The CyberShield AI system operates on a strictly locked 3-phase technical lifecy
 3. **PHASE 03: THREAT INFERENCE (Real-Time Prediction)**
     - Final stage where new, unseen traffic is classified.
     - Results are visually interpreted via the glass-depth system.
+
+---
+
+## 13. Unified Launcher & Virtual Environment Guard
+
+To ensure "One-Click" reliability for examiners, the project includes an automated orchestration layer.
+
+1. **Integrated Launcher (`launcher.py`)**:
+    - **Direct Mode**: Boots the Flask WebApp and Jupyter Lab simultaneously with environment persistence.
+    - **External Mode**: Provides a menu-driven interface for surgical project maintenance (Retraining, Cleaning, Documentation).
+2. **Hardened Venv Guard (`Start_WebApp_Venv.bat`)**:
+    - **Mechanism**: Implements an automated virtual environment check during every boot.
+    - **Reliability**: If the `venv` is missing or corrupted, the script automatically triggers a rebuild from `requirements.txt`, ensuring a zero-failure presentation environment.
+3. **Persistent Shell Architecture**:
+    - Uses `pushd` and `cmd /k` triggers to keep terminal windows active for real-time monitoring post-launch, preventing accidental "silent crashes."
 
 ---
 
