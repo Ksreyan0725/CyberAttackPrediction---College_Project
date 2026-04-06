@@ -171,6 +171,17 @@ def clear_session():
     
     return jsonify({"status": "success", "message": "System data cleared and session terminated."})
 
+@app.route('/ClearResults', methods=['POST'])
+def ClearResults():
+    """Wipes the last analysis results and resets the dashboard state for a fresh start."""
+    if 'user' not in session:
+        return jsonify({"status": "error", "message": "Unauthorized"}), 401
+        
+    session.pop('last_result', None)
+    session.pop('last_page_type', None)
+    
+    return jsonify({"status": "success", "message": "Analysis results wiped successfully."})
+
 @app.route('/api/heartbeat')
 def heartbeat():
     """Silent Heartbeat for Smart Launch and System Status Sync."""

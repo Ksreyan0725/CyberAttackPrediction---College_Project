@@ -1,8 +1,22 @@
 @echo off
-setlocal
+:: SESSION PERSISTENCE HARDENING: No setlocal here so venv stays active after Ctrl+C.
 echo Starting the Web App (Main.py) using the .venv...
-call .venv\Scripts\activate.bat
-cd %~dp0CyberAttackPrediction
+
+:: Venv Guard: Avoid redundant activation if already in session
+if defined VIRTUAL_ENV (
+    echo [Session] Active environment detected. Skipping activation...
+) else (
+    if exist ".venv\Scripts\activate.bat" (
+        call .venv\Scripts\activate.bat
+    ) else (
+        echo [Error] Virtual environment not found in root!
+        pause
+        exit /b
+    )
+)
+
+:: Secure Workspace Shift
+pushd "%~dp0CyberAttackPrediction"
 
 :: Heartbeat-Aware Smart Launch:
 :: No .browser_lock needed anymore! The server (Main.py) will now dynamically 

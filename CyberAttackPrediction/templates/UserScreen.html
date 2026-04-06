@@ -173,6 +173,11 @@
                     <p class="xx-small dynamic-muted mb-0 opacity-75 mt-1">Detailed detection breakdown and AI insights</p>
                 </div>
                 <div class="d-flex gap-2">
+                    {% if msg %}
+                    <button id="clearResults" class="btn btn-outline-danger btn-sm rounded-pill px-3 x-small">
+                        <i class="fas fa-trash-alt me-1"></i> Clear Results
+                    </button>
+                    {% endif %}
                     <button id="toggleFullscreen" class="btn btn-glass btn-sm rounded-pill px-3 x-small btn-fullscreen d-none d-md-flex align-items-center">
                         <i class="fas fa-expand me-1"></i> Full Screen
                     </button>
@@ -187,7 +192,7 @@
                 <div class="row g-3">
                     <!-- Main Results Table -->
                     <div class="col-lg-9">
-                        <div id="resultsContent" class="table-container shadow-sm border border-glass">
+                        <div id="resultsContent" class="table-container liquid-glass shadow-sm border border-glass reveal-premium">
                             <div class="table-responsive">
                                 {{ msg|safe }}
                             </div>
@@ -259,7 +264,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-2 p-2 text-center border-glass rounded-3 reveal-depth anim-delay-400">
+                            <div class="mt-2 p-2 text-center border-glass rounded-3 reveal-premium" style="transition-delay: 0.5s;">
                                 <div class="xx-small dynamic-muted"><i class="fas fa-microchip me-1"></i>Ensemble RF + Generative AI</div>
                             </div>
                         </div>
@@ -283,6 +288,9 @@
         </div>
     </div>
 </div>
+
+<!-- Footer Reveal Gap -->
+<div class="reveal-gap"></div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -316,6 +324,38 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('fullscreenchange', function() {
             if (!document.fullscreenElement) {
                 fullscreenBtn.innerHTML = '<i class="fas fa-expand me-1"></i> Full Screen';
+            }
+        });
+    }
+
+    // Clear Results Logic
+    const clearBtn = document.getElementById('clearResults');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Are you sure you want to clear all analysis results? This will wipe your local session and the dashboard cache.')) {
+                // Add a subtle fade out to the current results before clearing
+                const card = document.querySelector('.result-card');
+                if (card) card.style.opacity = '0.5';
+                
+                fetch('/ClearResults', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Failed to clear results. Please try again.');
+                        if (card) card.style.opacity = '1';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please check your connection.');
+                    if (card) card.style.opacity = '1';
+                });
             }
         });
     }

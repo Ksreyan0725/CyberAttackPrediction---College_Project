@@ -391,9 +391,10 @@ To ensure a "Best-in-Class" user experience, the web application implements seve
 2. **Liquid-Glass Design System**:
     - **Visuals**: Uses 80px Gaussian blur with 50% opacity to create a "glassmorphic" depth effect.
     - **Performance**: Leverages GPU-accelerated backdrop filters for smooth rendering even on mobile devices.
-3. **Synchronized System Reset**:
-    - **Mechanism**: The "Clear System Data" action is a dual-sync operation. It clears both the **Browser LocalStorage** and the **Server Flask Session** simultaneously.
-    - **Consistency**: This ensures that analysis results (the "View Results" pill) are 100% removed from both ends, providing a truly fresh dashboard on reload.
+3. **Synchronized System Reset (`/ClearResults`)**:
+    - **Mechanism**: The "Clear Results" action utilizes a secure, CSRF-protected AJAX call to the dedicated `/ClearResults` endpoint.
+    - **Granular Clearing**: Unlike a total system wipe, this selectively pops only the `last_result` and `last_page_type` from the Flask session.
+    - **Consistency**: This ensures the "View Results" dashboard shortcut is removed without logging the user out, providing a fluid, professional reset experience.
 4. **Immersive Focus Lock (Modal System)**:
     - **UX Pattern**: When a settings or detail modal is active, the background dashboard is automatically **blurred** and **interactive-locked** (pointer-events disabled).
     - **Benefit**: This prevents accidental background clicks and eliminates distracting hover effects, focusing the user entirely on the current decision.
@@ -409,7 +410,7 @@ To ensure a "Best-in-Class" user experience, the web application implements seve
     - **Performance**: Transitioned from a 5s heartbeat throttle to a **HeartbeatFilter** in the Werkzeug logger.
     - **Benefit**: This completely removes `/api/heartbeat` logs from the terminal output, ensuring a 100% silent, focused experience for researchers.
 8. **Staggered Reveal Stacking (Footer Logic)**:
-    - **Animation**: Footer link elements are reveal-animated sequentially using staggered `transition-delay` values (0.1s to 0.45s).
+    - **Animation**: Footer link elements are reveal-animated sequentially using staggered `transition-delay` values (0.1s to 0.6s).
     - **Reveal Gap**: Implemented a 350px virtual gap at the page bottom to trigger the cinematic reveal of the footer links *after* the main content has been cleared.
 9. **Theme-Aware Terminal Log Hardening**:
     - **Visibility**: Integrated `.dynamic-text` utility classes in `base.html` that automatically swap colors between Dark/Light modes.

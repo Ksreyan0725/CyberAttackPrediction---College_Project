@@ -68,7 +68,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
 - **🤫 Silent Pulse Monitoring**
   - Backend heartbeat noise is filtered out for a professional, clinical terminal output.
 - **💎 Liquid Glass Design System**
-  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.45s)**, and a cinematic **Reveal Footer**.
+  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.6s)**, and a cinematic **Reveal Footer**.
 - **🧠 Stacking Ensemble AI**
   - Uses a multi-model architecture (Random Forest, KNN, MLP) for **98%+ Accuracy**.
 - **🔍 XAI (Explainable AI)**
