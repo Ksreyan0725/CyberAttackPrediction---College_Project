@@ -40,8 +40,28 @@ def run_training(dataset_path=None):
         if dataset.empty:
             return {"status": "error", "message": "The provided dataset is empty."}
             
-        if 'labels' not in dataset.columns:
-            return {"status": "error", "message": "Invalid Dataset: Missing required 'labels' column for training."}
+        # 🛡️ Layer 2: Adaptive Label Detection
+        expected_labels = ['labels', 'Label', 'class3', 'class', 'target', 'Outcome', 'attack_type']
+        target_col = None
+        
+        for col in expected_labels:
+            if col in dataset.columns:
+                target_col = col
+                break
+        
+        if not target_col:
+            # Fallback: Find any column containing 'label' or 'class' (case-insensitive)
+            for col in dataset.columns:
+                if any(kw in col.lower() for kw in ['label', 'class', 'target']):
+                    target_col = col
+                    break
+                    
+        if not target_col:
+            return {"status": "error", "message": f"Invalid Dataset: No attack signature column found. Expected one of {expected_labels}"}
+
+        # Standardize the target column internally
+        if target_col != 'labels':
+            dataset.rename(columns={target_col: 'labels'}, inplace=True)
 
         labels_list = np.unique(dataset['labels']).ravel()
 
@@ -56,6 +76,8 @@ def run_training(dataset_path=None):
             except Exception as e:
                 return {"status": "error", "message": f"Character encoding failed on column '{col}': {str(e)}"}
 
+        # 🛡️ Layer 4: Mathematical Sanitization
+        dataset.replace([np.inf, -np.inf], np.nan, inplace=True)
         dataset.fillna(0, inplace=True)
         
         # Verify classes are valid for classification
@@ -65,7 +87,7 @@ def run_training(dataset_path=None):
              
         dataset.drop(['labels'], axis=1, inplace=True)
 
-        # 🛡️ Layer 4: Mathematical Normalization
+        # 🛡️ Layer 5: Mathematical Normalization
         scaler = StandardScaler()
         try:
             X = scaler.fit_transform(dataset.values)
