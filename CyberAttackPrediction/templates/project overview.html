@@ -15,46 +15,6 @@
         background: var(--glass-bg);
         transform: translateY(-5px);
     }
-    .sticky-toc {
-        position: fixed;
-        left: 3rem;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 280px;
-        z-index: 1000;
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 2rem !important;
-        background: var(--navbar-bg) !important;
-        backdrop-filter: blur(20px);
-        border: 1px solid var(--glass-border);
-        border-radius: 24px;
-    }
-    [data-theme="light"] .sticky-toc {
-        background: rgba(255, 255, 255, 0.8) !important;
-        border: 1px solid rgba(0, 0, 0, 0.1);
-    }
-    .toc-link {
-        display: block;
-        padding: 0.6rem 1rem;
-        color: rgba(255, 255, 255, 0.6);
-        text-decoration: none;
-        border-left: 3px solid transparent;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-    }
-    [data-theme="light"] .toc-link {
-        color: rgba(0, 0, 0, 0.6);
-    }
-    .toc-link:hover, .toc-link.active {
-        color: #3b82f6;
-        border-left-color: #3b82f6;
-        background: rgba(59, 130, 246, 0.1);
-        padding-left: 1.5rem;
-    }
-    [data-theme="light"] .toc-link:hover, [data-theme="light"] .toc-link.active {
-        background: rgba(59, 130, 246, 0.05);
-    }
     .code-block {
         background: rgba(0,0,0,0.3);
         padding: 1.5rem;
@@ -67,35 +27,94 @@
         border-color: #e2e8f0;
     }
     .floating-explorer-btn {
+        position: fixed;
+        bottom: 2.5rem;
+        right: 2.5rem;
         opacity: 0;
-        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         pointer-events: none;
-        transform: scale(0.8);
+        transform: scale(0.5) translate(60px, 60px);
+        z-index: 9999;
+        background: transparent !important; /* Critical: Eliminate black edge artifact */
+        border: none !important;
+        padding: 0;
+        isolation: isolate; /* Force clean rendering of child shadow */
     }
+
     .floating-explorer-btn.visible {
-        transform: translateY(0);
+        transform: scale(1) translate(0, 0);
         opacity: 1;
         pointer-events: all;
     }
-    .floating-explorer-btn .btn {
-        padding: 0.65rem 1.1rem;
-        border-radius: 50px;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
-        background: var(--primary-color);
+    .floating-explorer-btn.sentinel-elevated {
+        transform: translateY(-330px) scale(1.1); /* Elevated above the 350px footer branding */
+    }
+    .floating-explorer-btn.sentinel-elevated .btn {
+        border-radius: 12px !important; /* Morph to Rectangle at bottom */
+        box-shadow: 0 20px 60px rgba(59, 130, 246, 0.6); /* Intensified glow matches new shape */
+    }
+
+    /* Premium Beautiful Buttons */
+    .btn-shine-glow {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        background: var(--glass-bg);
+        z-index: 1;
+    }
+    .btn-shine-glow::before {
+        content: '';
+        position: absolute;
+        top: 0; left: -100%;
+        width: 100%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+        transition: 0.5s;
+        z-index: -1;
+    }
+    .btn-shine-glow:hover::before {
+        left: 100%;
+    }
+    .btn-shine-glow:hover {
+        transform: translateY(-5px) scale(1.05);
+        border-color: var(--primary-color);
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+    
+    .pulse-btn {
+        animation: neonPulse 2.5s infinite ease-in-out;
+    }
+    @keyframes neonPulse {
+        0%, 100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        50% { box-shadow: 0 0 25px rgba(59, 130, 246, 0.5); }
+    }
+
+    .floating-explorer-btn .btn {
+        padding: 0.85rem 1rem; /* Restored compact padding for minimalist look */
+        border-radius: 51px; /* Precision rounding for a pixel-perfect pill */
+        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1);
+        background: rgba(59, 130, 246, 0.75) !important;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-weight: 600;
-        font-size: 0.9rem;
-        letter-spacing: 0.2px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        color: white !important;
+        isolation: isolate;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
+
+
     .floating-explorer-btn .btn:hover {
-        transform: scale(1.05);
-        box-shadow: 0 15px 40px rgba(59, 130, 246, 0.4);
+        transform: scale(1.1) rotate(-1deg);
+        box-shadow: 0 20px 45px rgba(59, 130, 246, 0.6);
     }
+
 
     /* Accordion UI Hardening - Reset active/focus states */
     .accordion-button:focus {
@@ -121,6 +140,93 @@
         padding: 1.25rem;
         font-weight: 600;
     }
+
+    /* Neural Flow Component */
+    .neural-flow-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    .flow-node {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.8rem;
+        z-index: 2;
+    }
+    .node-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    .flow-node:hover .node-icon {
+        transform: scale(1.1);
+        border-color: var(--primary-color);
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    .node-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: var(--text-muted);
+    }
+    .flow-line {
+        flex-grow: 1;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--glass-border), transparent);
+        position: relative;
+    }
+    .pulse {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: var(--primary-color);
+        border-radius: 50%;
+        filter: blur(2px);
+        top: -4px;
+        left: 0;
+        animation: flowPulse 2s infinite linear;
+    }
+    @keyframes flowPulse {
+        0% { left: 0; opacity: 0; }
+        50% { opacity: 1; }
+        100% { left: 100%; opacity: 0; }
+    }
+
+    /* Viva Hub Enhancements */
+    #vivaTab .nav-link {
+        border: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-muted);
+        transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    #vivaTab .nav-link.active {
+        background: var(--primary-color) !important;
+        color: white !important;
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        transform: translateY(-2px);
+    }
+    #vivaTab .nav-link:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--primary-color);
+    }
+
 </style>
 {% endblock %}
 
@@ -130,20 +236,25 @@
         <h1 class="display-4 fw-bold mb-3 dynamic-text">Project Documentation</h1>
         <p class="lead opacity-75 dynamic-text mb-4">A comprehensive guide to the Cyber Attack Prediction System</p>
         <div class="d-flex justify-content-center gap-3">
-            <a href="#overview" class="btn btn-outline-info px-4 rounded-pill">
-                <i class="fas fa-book-reader me-2"></i>Read Overview
+            <a href="#overview" class="btn btn-shine-glow pulse-btn text-white px-5 py-3 rounded-pill fw-bold">
+                <i class="fas fa-book-open me-2"></i>READ OVERVIEW
             </a>
-            <a href="{{ url_for('explorer') }}" id="hero-explorer-btn" class="btn btn-primary px-4 rounded-pill shadow-sm">
-                <i class="fas fa-folder-open me-2"></i>Open Project Explorer
+            <a href="{{ url_for('explorer') }}" id="hero-explorer-btn" class="btn btn-outline-info px-5 py-3 rounded-pill fw-bold">
+                <i class="fas fa-folder-open me-2"></i>PROJECT EXPLORER
             </a>
         </div>
     </div>
 </div>
 
+
 <div class="container py-5 mt-n5">
+    <div class="row">
+
+
         <!-- Main Content (Centered, Sidebar Removed) -->
         <div class="col-lg-10 mx-auto reveal-premium">
-            <div class="glass-card p-5 border-0">
+            <div class="glass-card p-5 border-0 glass-card-runway">
+
                 
                 <!-- Overview -->
                 <section id="overview" class="doc-section">
@@ -181,12 +292,30 @@
                 <!-- Architecture -->
                 <section id="architecture" class="doc-section">
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-sitemap me-3"></i>System Architecture</h3>
-                    <div class="code-block mb-4">
-                        <div class="text-info mb-2">// Data Flow Journey</div>
-                        <span class="text-white">User Upload</span> ➔ <span class="text-warning">Data Pre-processing</span> ➔ <span class="text-primary">ML Prediction</span> ➔ <span class="text-success">GenAI Explanation</span>
+                    <div class="neural-flow-container mb-5">
+                        <div class="flow-node">
+                            <div class="node-icon"><i class="fas fa-file-upload text-primary"></i></div>
+                            <div class="node-label">User Input</div>
+                        </div>
+                        <div class="flow-line"><div class="pulse"></div></div>
+                        <div class="flow-node">
+                            <div class="node-icon"><i class="fas fa-cogs text-warning"></i></div>
+                            <div class="node-label">Pre-Processing</div>
+                        </div>
+                        <div class="flow-line"><div class="pulse"></div></div>
+                        <div class="flow-node">
+                            <div class="node-icon"><i class="fas fa-brain text-info"></i></div>
+                            <div class="node-label">ML Engine</div>
+                        </div>
+                        <div class="flow-line"><div class="pulse"></div></div>
+                        <div class="flow-node">
+                            <div class="node-icon"><i class="fas fa-magic text-success"></i></div>
+                            <div class="node-label">GenAI Insight</div>
+                        </div>
                     </div>
-                    <p class="dynamic-muted">The system is built using Flask (Backend), Bootstrap 5 (Frontend), and Scikit-Learn (AI Engine). It processes 41 unique features for every single network connection attempt.</p>
+                    <p class="dynamic-muted">CyberShield AI uses an integrated pipeline that transforms raw network packets into human-readable security advisories. The system processes <strong>41 unique features</strong> using Random Forest (ML) and GPT-based summarization (GenAI).</p>
                 </section>
+
 
                 <!-- ML Models -->
                 <section id="ml-models" class="doc-section">
@@ -449,21 +578,22 @@
                     <!-- Tabbed Categorization -->
                     <ul class="nav nav-pills mb-4 gap-2 justify-content-center" id="vivaTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active small px-4 rounded-pill" id="gen-tab" data-bs-toggle="pill" data-bs-target="#viva-gen" type="button" role="tab">General</button>
+                            <button class="nav-link active small px-4 rounded-pill" id="gen-tab" data-bs-toggle="pill" data-bs-target="#viva-gen" type="button" role="tab"><i class="fas fa-info-circle me-1"></i>General</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small px-4 rounded-pill" id="ml-tab" data-bs-toggle="pill" data-bs-target="#viva-ml" type="button" role="tab">Machine Learning</button>
+                            <button class="nav-link small px-4 rounded-pill" id="ml-tab" data-bs-toggle="pill" data-bs-target="#viva-ml" type="button" role="tab"><i class="fas fa-robot me-1"></i>Machine Learning</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small px-4 rounded-pill" id="dl-tab" data-bs-toggle="pill" data-bs-target="#viva-dl" type="button" role="tab">Deep Learning</button>
+                            <button class="nav-link small px-4 rounded-pill" id="dl-tab" data-bs-toggle="pill" data-bs-target="#viva-dl" type="button" role="tab"><i class="fas fa-layer-group me-1"></i>Deep Learning</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small px-4 rounded-pill" id="ai-tab" data-bs-toggle="pill" data-bs-target="#viva-ai" type="button" role="tab">AI & GenAI</button>
+                            <button class="nav-link small px-4 rounded-pill" id="ai-tab" data-bs-toggle="pill" data-bs-target="#viva-ai" type="button" role="tab"><i class="fas fa-brain me-1"></i>AI & GenAI</button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link small px-4 rounded-pill" id="py-tab" data-bs-toggle="pill" data-bs-target="#viva-py" type="button" role="tab">Python & Jupyter</button>
+                            <button class="nav-link small px-4 rounded-pill" id="py-tab" data-bs-toggle="pill" data-bs-target="#viva-py" type="button" role="tab"><i class="fab fa-python me-1"></i>Python & Jupyter</button>
                         </li>
                     </ul>
+
 
                     <div class="tab-content border-0 p-0" id="vivaTabContent">
                         <!-- General -->
@@ -562,16 +692,7 @@
                     <a href="{{ url_for('UserLogin') }}" class="btn btn-primary btn-lg px-5">
                         Try It Now <i class="fas fa-arrow-right ms-2"></i>
                     </a>
-                    
-                    <!-- Pinned Action Button -->
-                    <div class="floating-explorer-btn" id="fab-explorer" style="position: absolute; right: 0;">
-                        <a href="{{ url_for('explorer') }}" class="btn btn-primary">
-                            <i class="fas fa-folder-open"></i>
-                            <span>Open Project Explorer</span>
-                        </a>
-                    </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -587,49 +708,72 @@
     [data-theme="light"] .accordion-button::after { filter: none; }
     .x-small { font-size: 0.85rem; }
     .xx-small { font-size: 0.75rem; }
-    .doc-section { scroll-margin-top: 100px; }
+    .doc-section { scroll-margin-top: 180px; } /* Increased for centered landing */
+    .glass-card-runway { padding-bottom: 250px !important; } /* Visual buffer for footer reveal */
 </style>
+{% endblock %}
+
+{% block fab_zone %}
+<!-- Truly Floating FAB - Placed at Body Root for absolute viewport stability -->
+<div class="floating-explorer-btn" id="fab-explorer">
+    <a href="{{ url_for('explorer') }}" class="btn btn-primary shadow-lg border-opacity-50 border-white">
+        <i class="fas fa-folder-open me-2"></i>
+        <span>Project Explorer</span>
+    </a>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
 <script>
-    // Highlight active link on scroll
-    window.addEventListener('scroll', event => {
-        let fromTop = window.scrollY + 150;
-        let mainNavLinks = document.querySelectorAll('.toc-link');
+    // Double Sentinel Logic for Floating Action Button
+    document.addEventListener('DOMContentLoaded', () => {
+        const heroSection = document.querySelector('.hero-section');
+        const fab = document.getElementById('fab-explorer');
+        const footerTrigger = document.getElementById('footer-reveal-trigger');
 
-        mainNavLinks.forEach(link => {
-            let section = document.querySelector(link.hash);
-            if (section && section.offsetTop <= fromTop && section.offsetTop + section.offsetHeight > fromTop) {
-                link.classList.add('active');
-            } else {
-                link.classList.remove('active');
-            }
-        });
+        if (!heroSection || !fab) return;
+
+        // 1. Reveal Observer (Show after Hero is gone)
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                // When hero is NOT intersecting (out of view), show FAB
+                if (!entry.isIntersecting) {
+                    fab.classList.add('visible');
+                } else {
+                    fab.classList.remove('visible');
+                }
+            });
+        }, { threshold: 0 });
+
+        revealObserver.observe(heroSection);
+
+        // 2. Sentinel Observer (Hide at Footer zone)
+        if (footerTrigger) {
+            const sentinelObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        fab.classList.add('sentinel-elevated');
+                    } else {
+                        fab.classList.remove('sentinel-elevated');
+                    }
+                });
+            }, {
+                threshold: 0,
+                rootMargin: '0px 0px 100px 0px' 
+            });
+
+
+
+
+            sentinelObserver.observe(footerTrigger);
+        }
+
+        // 3. Initial Load Check (In case of reload halfway down)
+        const heroRect = heroSection.getBoundingClientRect();
+        if (heroRect.bottom < 0) {
+            fab.classList.add('visible');
+        }
     });
-
-    // Floating Button Logic using Intersection Observer
-    const heroBtn = document.getElementById('hero-explorer-btn');
-    const fab = document.getElementById('fab-explorer');
-
-    const observerOptions = {
-        threshold: 0
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (!entry.isIntersecting) {
-                // Main button is pushed out, show FAB
-                fab.classList.add('visible');
-            } else {
-                // Main button is visible, hide FAB
-                fab.classList.remove('visible');
-            }
-        });
-    }, observerOptions);
-
-    if (heroBtn) {
-        observer.observe(heroBtn);
-    }
 </script>
 {% endblock %}
