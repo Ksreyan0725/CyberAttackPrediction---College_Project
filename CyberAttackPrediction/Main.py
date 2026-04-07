@@ -57,6 +57,10 @@ PULSE_DETECTED = False # Pulse Detection Flag
 browser_timer = None   # Global Browser Launch Timer
 
 # --- Global Security Middlewares ---
+@app.context_processor
+def inject_csrf_token():
+    return dict(csrf_token=lambda: session.get('csrf_token'))
+
 @app.before_request
 def security_pre_check():
     """Generates CSRF tokens and enforces security validation on sensitive routes."""
@@ -879,8 +883,8 @@ if __name__ == '__main__':
     # Heartbeat-Aware Smart Launch:
     if '--no-browser' not in sys.argv:
         if os.environ.get("WERKZEUG_RUN_MAIN") == "true" or not app.debug:
-            print("[Smart Launch] Starting pulse detector (3.0s)...")
-            browser_timer = Timer(3.0, open_browser)
+            print("[Smart Launch] Starting pulse detector (6.5s)...")
+            browser_timer = Timer(6.5, open_browser)
             browser_timer.start()
     
     app.run(debug=True, port=2026)

@@ -26,19 +26,33 @@
     <!-- Global Security: CSRF Protection & Multi-tab Watchdog -->
     <meta name="csrf-token" content="{{ session['csrf_token'] }}">
 
-    <!-- Anti-Flash Scroll Restore: runs before first paint to prevent scroll-jump FOUC -->
-    <script>(function(){if('scrollRestoration'in history)history.scrollRestoration='manual';var key=window.location.pathname+'-window-scroll',saved=localStorage.getItem(key);if(saved){var pos=parseInt(saved,10);if(pos>0)window.addEventListener('load',function(){window.scrollTo({top:pos,behavior:'instant'})},{once:true})}})();</script>
+    <!-- Invisible Scroll Restoration: Synchronous Pre-Paint Engine (2026 Premium) -->
+    <script>
+        (function () {
+            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+            const key = window.location.pathname + '-window-scroll';
+            const saved = localStorage.getItem(key);
+            const pos = saved ? parseInt(saved, 10) : 0;
+            
+            if (pos > 60) {
+                // Apply 'Cloak' to prevent top-of-page render jump
+                document.documentElement.style.visibility = 'hidden';
+                window.isRestoringScroll = true;
+            }
+        })();
+    </script>
 
     <!-- Smart Theme & Storage Management -->
     <script>(function(){const saved=localStorage.getItem('theme'),system=window.matchMedia('(prefers-color-scheme:dark)').matches,theme=saved||(system?'dark':'light');document.documentElement.setAttribute('data-theme',theme);if(sessionStorage.getItem('visited_'+window.location.pathname))document.documentElement.classList.add('page-visited')})();</script>
-    <script>(function(){let wasOffline=false,checkInProgress=false;async function checkPulse(){if(checkInProgress)return;checkInProgress=true;const statusPill=document.getElementById('globalSystemStatus'),statusText=statusPill?.querySelector('.status-text'),trainingPill=document.getElementById('trainingStatus'),trainingText=trainingPill?.querySelector('.status-text')||document.getElementById('statusText'),trainingDot=trainingPill?.querySelector('.status-dot');try{const response=await fetch('/api/heartbeat',{method:'GET',cache:'no-store',headers:{'Cache-Control':'no-cache'}});if(response.ok){const data=await response.json(),isBusy=data.status==='busy';if(statusPill){statusPill.className='system-status-pill status-'+(isBusy?'busy':'ready')+' me-2';if(statusText)statusText.textContent=isBusy?'System Busy':'System Ready'}if(trainingPill){const startBtn=document.getElementById('startTrainingBtn');if(!startBtn||!startBtn.disabled){if(isBusy){trainingPill.className='status-badge status-running d-flex align-items-center';if(trainingText)trainingText.textContent='System Processing...';if(trainingDot)trainingDot.className='status-dot dot-busy'}else if(!trainingPill.classList.contains('status-success')){trainingPill.className='status-badge status-idle d-flex align-items-center';if(trainingText)trainingText.textContent='System Ready';if(trainingDot)trainingDot.className='status-dot dot-ready'}}}if(wasOffline)setTimeout(()=>{if(typeof reloadWithScroll==='function')reloadWithScroll();else window.location.reload()},500);wasOffline=false}}catch(err){wasOffline=true;if(statusPill){statusPill.className='system-status-pill status-offline me-2';if(statusText)statusText.textContent='Server Offline'}if(trainingPill){trainingPill.className='status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center';if(trainingText)trainingText.textContent='Server Offline'}}finally{checkInProgress=false}}setInterval(checkPulse,5000);document.addEventListener('DOMContentLoaded',checkPulse)})();</script>
+    <script>(function(){let wasOffline=false,checkInProgress=false;async function checkPulse(){if(checkInProgress)return;checkInProgress=true;const statusPill=document.getElementById('globalSystemStatus'),statusText=statusPill?.querySelector('.status-text'),trainingPill=document.getElementById('trainingStatus'),trainingText=trainingPill?.querySelector('.status-text')||document.getElementById('statusText'),trainingDot=trainingPill?.querySelector('.status-dot');try{const response=await fetch('/api/heartbeat',{method:'GET',cache:'no-store',headers:{'Cache-Control':'no-cache'}});if(response.ok){const data=await response.json(),isBusy=data.status==='busy';if(statusPill){statusPill.className='system-status-pill status-'+(isBusy?'busy':'ready')+' me-2';if(statusText)statusText.textContent=isBusy?'System Busy':'System Ready'}if(trainingPill){const startBtn=document.getElementById('startTrainingBtn');if(!startBtn||!startBtn.disabled){if(isBusy){trainingPill.className='status-badge status-running d-flex align-items-center';if(trainingText)trainingText.textContent='System Processing...';if(trainingDot)trainingDot.className='status-dot dot-busy'}else if(!trainingPill.classList.contains('status-success')){trainingPill.className='status-badge status-idle d-flex align-items-center';if(trainingText)trainingText.textContent='System Ready';if(trainingDot)trainingDot.className='status-dot dot-ready'}}}if(wasOffline)setTimeout(()=>{if(typeof reloadWithScroll==='function')reloadWithScroll();else window.location.reload()},500);wasOffline=false}}catch(err){wasOffline=true;if(statusPill){statusPill.className='system-status-pill status-offline me-2';if(statusText)statusText.textContent='Server Offline'}if(trainingPill){trainingPill.className='status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center';if(trainingText)trainingText.textContent='Server Offline'}}finally{checkInProgress=false}}setInterval(checkPulse,3000);document.addEventListener('DOMContentLoaded',checkPulse)})();</script>
 
     <script>let lastToastInfo={message:'',time:0};function showToast(message,type='info',details=null){const container=document.getElementById('toastContainer');if(!container)return;const currentTime=Date.now();if(message===lastToastInfo.message&&(currentTime-lastToastInfo.time<3000))return;lastToastInfo={message,time:currentTime};const toast=document.createElement('div');toast.className=`premium-toast toast-${type}`;if(details)toast.classList.add('cursor-pointer');let icon='info-circle';if(type==='success')icon='check-circle';if(type==='error'||type==='danger')icon='exclamation-circle';if(type==='warning')icon='exclamation-triangle';const subtext=details?'<div class="xx-small opacity-75 mt-1 mt-n1"><i class="fas fa-search-plus me-1"></i>Click to view details</div>':'';toast.innerHTML=`<div class="toast-icon text-white"><i class="fas fa-${icon}"></i></div><div class="toast-body"><div class="small fw-bold dynamic-text">${message}</div>${subtext}</div><button type="button" class="btn-close ms-2 small" style="font-size:0.6rem;filter:var(--close-filter,none);" onclick="event.stopPropagation();this.parentElement.remove()"></button>`;if(details)toast.onclick=()=>showDetailModal(type.toUpperCase()+' DETAILS',`<div class="p-3 rounded-3 border-glass font-monospace text-break" style="background:var(--bg-card-soft);">${details}</div>`);container.appendChild(toast);toast.offsetHeight;toast.classList.add('show');setTimeout(()=>{if(toast.parentElement){toast.classList.add('hide');setTimeout(()=>toast.remove(),500)}},5000)}document.addEventListener('DOMContentLoaded',()=>{document.querySelectorAll('.flash-message-data').forEach(el=>{showToast(el.dataset.message,el.dataset.category);el.remove()})});(function(){const csrfToken=document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),setupAjax=()=>{if(window.jQuery&&csrfToken)$.ajaxSetup({headers:{'X-CSRF-Token':csrfToken}});else setTimeout(setupAjax,100)};setupAjax();window.addEventListener('storage',e=>{if(e.key==='cybershield_logout')window.location.href='/UserLogin?reason=sync_logout'});document.addEventListener('click',e=>{if(e.target.closest('a[href*="/Logout"]'))localStorage.setItem('cybershield_logout',Date.now())})})();</script>
 
     <style>
         :root{--primary-color:#007bff;--secondary-color:#64748b;--dark-color:#0f172a;--light-color:#f8fafc;--success-color:#20c997;--danger-color:#ff4757;--info-color:#00d2ff;--primary-rgb:0,123,255;--info-rgb:0,210,255;--success-rgb:32,201,151;--danger-rgb:255,71,87;--text-main-rgb:224,224,224;--bg-gradient:radial-gradient(circle at top right,#0a191f,#000000);--surface-bg:radial-gradient(circle at top right,#0a191f,#000000);--footer-bg:transparent;--premium-radius:24px;--brand-text-color:rgba(255,255,255,0.04);--text-main:#e0e0e0;--text-muted:#94a3b8;--glass-bg:rgba(255,255,255,0.03);--glass-border:rgba(255,255,255,0.12);--accent-primary:#00ffa3;--card-shadow:0 8px 32px rgba(0,0,0,0.5);--navbar-bg:rgba(0,0,0,0.15);--dropdown-bg:rgba(10,25,31,0.5);--primary-light:rgba(var(--primary-rgb),0.15);--bg-card-soft:rgba(255,255,255,0.04);--input-bg:rgba(255,255,255,0.05);--input-text:#ffffff;--code-bg:rgba(0,0,0,0.3);--code-color:var(--accent-primary);--card-header-bg:rgba(255,255,255,0.02);--brand-final-opacity:0.85;--brand-text-gradient:linear-gradient(to right,var(--primary-color),var(--info-color),var(--primary-color));--alert-bg-primary:rgba(var(--primary-rgb),0.15);--alert-text-primary:#60a5fa;--close-filter:invert(1) grayscale(100%) brightness(200%);--bg-base:#000000}
         .light-mode{--primary-color:#007bff;--primary-rgb:0,123,255;--info-color:#00d2ff;--info-rgb:0,210,255;--success-color:#20c997;--danger-color:#ff4757;--text-main-rgb:33,37,41;--bg-gradient:radial-gradient(circle at top right,#f8f9fa,#e9ecef);--surface-bg:radial-gradient(circle at top right,#fdfdfd,#f0f2f5);--footer-bg:transparent;--brand-text-color:rgba(0,0,0,0.08);--text-main:#212529;--text-muted:#475569;--glass-bg:rgba(0,0,0,0.02);--glass-border:rgba(0,0,0,0.12);--input-bg:#ffffff;--input-text:#212529;--accent-primary:#007bff;--accent-glow:rgba(0,123,255,0.15);--card-shadow:0 8px 32px rgba(0,0,0,0.1);--navbar-bg:rgba(255,255,255,0.15);--dropdown-bg:rgba(255,255,255,0.5);--primary-light:rgba(var(--primary-rgb),0.08);--bg-card-soft:rgba(0,0,0,0.03);--code-bg:rgba(0,0,0,0.05);--code-color:var(--primary-color);--card-header-bg:rgba(0,0,0,0.02);--alert-bg-primary:rgba(13,110,253,0.1);--alert-text-primary:#0d6efd;--brand-final-opacity:0.9;--brand-text-gradient:linear-gradient(to right,#004085,#007bff,#004085);--close-filter:none;--bg-base:#ffffff}
-        html{scroll-behavior:smooth!important}
+        /* Remove global smooth-scroll conflict (relying on JS for precision jumps) */
+        html { scroll-behavior: auto !important; }
         .theme-transitioning,.theme-transitioning *{transition:background-color 1s cubic-bezier(0.23,1,0.32,1),background 1s cubic-bezier(0.23,1,0.32,1),color 1s cubic-bezier(0.23,1,0.32,1),border-color 1s cubic-bezier(0.23,1,0.32,1),box-shadow 1s cubic-bezier(0.23,1,0.32,1),backdrop-filter 1s cubic-bezier(0.23,1,0.32,1),-webkit-backdrop-filter 1s cubic-bezier(0.23,1,0.32,1),fill 1s cubic-bezier(0.23,1,0.32,1)!important}
         .theme-transitioning .main-surface{transition-delay:0.2s!important}
         .theme-transitioning .footer{transition-delay:0.4s!important}
@@ -559,6 +573,21 @@
 <body data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
     data-remembered="{{ 'true' if session.get('remembered') else 'false' }}" data-page-type="{{ page_type }}"
     data-logout-url="{{ url_for('Logout') }}">
+
+    <script>
+        // --- SYNCHRONOUS JUMP ENGINE (Zero-Latency Restore) ---
+        (function () {
+            const key = window.location.pathname + '-window-scroll';
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                const pos = parseInt(saved, 10);
+                if (pos > 60) {
+                    window.scrollTo({ top: pos, behavior: 'instant' });
+                }
+            }
+            // The reveal ('uncloak') is now handled in DOMContentLoaded after the final accurate jump
+        })();
+    </script>
     <div class="nav-top-progress"></div>
 
     <!-- Cinematic Fullscreen Fallback Banner -->
@@ -607,6 +636,24 @@
                     style="background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-color) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">CyberShield
                     AI</span>
             </a>
+
+            <script>
+                // --- IMMEDIATE NAVBAR VISIBILITY SYNC (2026 Premium Engine) ---
+                (function () {
+                    const scrollKey = window.location.pathname + '-window-scroll';
+                    const savedPos = localStorage.getItem(scrollKey);
+                    const currentPos = savedPos ? parseInt(savedPos, 10) : window.pageYOffset;
+
+                    if (currentPos > 100) {
+                        const nav = document.querySelector('.navbar');
+                        if (nav) {
+                            nav.classList.add('navbar-hidden');
+                            nav.style.transition = 'none'; // Lock visibility to prevent slide-on-load flicker
+                        }
+                    }
+                })();
+            </script>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -874,10 +921,19 @@
                 const docHeight = this.state.docHeight;
                 const winHeight = this.state.winHeight;
 
-                // 1. Smart Navbar Visibility
+                // 1. Smart Navbar Visibility (Zero-Flicker 2026 Engine)
                 if (this.elements.navbar) {
                     const shouldHide = top > 100 && top > this.state.lastScroll;
                     this.elements.navbar.classList.toggle('navbar-hidden', shouldHide);
+
+                    // Smoothly re-enable transitions after initial render lock
+                    if (this.elements.navbar.style.transition === 'none') {
+                        requestAnimationFrame(() => {
+                            setTimeout(() => {
+                                if (this.elements.navbar) this.elements.navbar.style.transition = '';
+                            }, 50);
+                        });
+                    }
                 }
 
                 // 2. Branding & Footer Sync (Glow-Entry Trigger: 350px Footer Gap Start)
@@ -1056,7 +1112,30 @@
 
         // Restore on load
         document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(restoreScrollPositions, 0);
+            // Restore window/component scrolls with high precision
+            requestAnimationFrame(() => {
+                const key = window.location.pathname + '-window-scroll';
+                const saved = localStorage.getItem(key);
+                
+                // 1. Final Window Jump (Ensures accuracy if the body-start jump was blocked by height)
+                if (saved && parseInt(saved, 10) > 0) {
+                    window.scrollTo({ top: parseInt(saved, 10), behavior: 'instant' });
+                }
+
+                // 2. Component Scrolls
+                const main = document.querySelector('main');
+                const log = document.getElementById('logWindow');
+                const table = document.querySelector('.table-container');
+                if (main) { const pos = localStorage.getItem(getScrollKey('main-scroll')); if (pos) main.scrollTop = pos; }
+                if (log) { const pos = localStorage.getItem(getScrollKey('log-scroll')); if (pos) log.scrollTop = pos; }
+                if (table) { const pos = localStorage.getItem(getScrollKey('table-scroll')); if (pos) table.scrollTop = pos; }
+
+                // 3. Lift the 'Cloak' after the final jump is processed
+                setTimeout(() => {
+                    document.documentElement.style.visibility = '';
+                    window.isRestoringScroll = false;
+                }, 20); // Small buffer for paint cycle
+            });
 
             // Process Flash Messages
             const flashData = document.querySelectorAll('.flash-message-data');
@@ -1081,7 +1160,12 @@
                     async () => {
                         try {
                             // 1. Clear Server-Side Session first
-                            const response = await fetch('/api/clear-session', { method: 'POST' });
+                            const response = await fetch('/api/clear-session', { 
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                                }
+                            });
                             if (!response.ok) throw new Error('Session Clear Failed');
 
                             // 2. Clear Browser-Side Storage

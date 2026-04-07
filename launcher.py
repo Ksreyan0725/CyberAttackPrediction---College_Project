@@ -2,10 +2,12 @@ import subprocess
 import os
 import sys
 import time
+import webbrowser
 
 # Professional Terminal Environment Detection
 IS_VIRTUAL = sys.prefix != sys.base_prefix
 root_dir = os.path.dirname(os.path.abspath(__file__))
+REPO_URL = "https://github.com/Ksreyan0725/CyberAttackPrediction---College_Project"
 
 def run_script(script_name, new_window=False):
     """
@@ -112,6 +114,7 @@ def main():
         print("==========================================")
         print("   CyberShield AI - COMMAND CENTER       ")
         print(f"   {env_color}{env_label}{reset}")
+        print(f"   Source: {REPO_URL}")
         print("==========================================")
         print("1. Launch Dashboard (Integrated - Same Window)")
         print("2. Launch Dashboard (External - New Window)")
@@ -119,9 +122,10 @@ def main():
         print("4. Launch Jupyter   (External - New Window)")
         print("5. Initialize/Harden 2026 Environment (Install Setup)")
         print("6. Exit Launcher")
+        print("7. Open GitHub Repository (Source Code)")
         print("------------------------------------------")
 
-        choice = input("Selection Code (1-6): ").strip()
+        choice = input("Selection Code (1-7): ").strip()
 
         if choice == '1':
             run_script("Start_WebApp_Venv.bat", new_window=False)
@@ -138,6 +142,10 @@ def main():
         elif choice == '6':
             print("[*] Closing Command Center.")
             break
+        elif choice == '7':
+            print(f"[+] Launching Repository: {REPO_URL}")
+            webbrowser.open(REPO_URL)
+            input("\n[!] Browser Spawned. Press ENTER to return to menu...")
         else:
             print("[-] Invalid code.")
             input("Press ENTER to retry...")

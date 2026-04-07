@@ -725,7 +725,13 @@
                     btnDirectLogin.addEventListener('click', function () {
                         btnDirectLogin.disabled = true;
                         btnDirectLogin.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Authenticating...';
-                        fetch('/VerifySavedLogin', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+                        fetch('/VerifySavedLogin', { 
+                            method: 'POST', 
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                            } 
+                        })
                             .then(response => response.json())
                             .then(data => {
                                 if (data.status === 'success') {
@@ -744,11 +750,14 @@
                     });
                 }
 
-                if (btnResetCreds) {
                     btnResetCreds.addEventListener('click', function () {
-                        fetch('/ResetCredentials', { method: 'POST' }).then(() => location.reload());
+                        fetch('/ResetCredentials', { 
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        }).then(() => location.reload());
                     });
-                }
 
                 // Recovery Modal Control Logic
                 const recoveryOverlay = document.getElementById('recoveryOverlay');
@@ -777,7 +786,10 @@
                         try {
                             const res = await fetch('/ResetPasswordAction', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                                },
                                 body: JSON.stringify({ username, new_password: newPass })
                             });
                             const data = await res.json();
@@ -813,7 +825,10 @@
                         try {
                             const res = await fetch('/ResetPasswordAction', {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                                },
                                 body: JSON.stringify({ username, new_password: newPass, auto_login: true })
                             });
                             const data = await res.json();

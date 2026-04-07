@@ -23,28 +23,28 @@
 
         {% set segments = current_doc.split('/') %}
         {% set current_path = namespace(value='') %}
-        
-        {% for segment in segments if segment %}
-            {% if current_path.value %}
-                {% set current_path.value = current_path.value + '/' + segment %}
-            {% else %}
-                {% set current_path.value = segment %}
-            {% endif %}
 
-            <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
-            
-            <li class="breadcrumb-item">
-                {% if not loop.last %}
-                    <a href="{{ url_for('explorer', doc=current_path.value) }}" class="breadcrumb-segment">
-                        {{ segment }}
-                    </a>
-                {% else %}
-                    <span class="breadcrumb-segment active">
-                        <i class="fas fa-file-alt me-1 opacity-50"></i>
-                        {{ segment }}
-                    </span>
-                {% endif %}
-            </li>
+        {% for segment in segments if segment %}
+        {% if current_path.value %}
+        {% set current_path.value = current_path.value + '/' + segment %}
+        {% else %}
+        {% set current_path.value = segment %}
+        {% endif %}
+
+        <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+
+        <li class="breadcrumb-item">
+            {% if not loop.last %}
+            <a href="{{ url_for('explorer', doc=current_path.value) }}" class="breadcrumb-segment">
+                {{ segment }}
+            </a>
+            {% else %}
+            <span class="breadcrumb-segment active">
+                <i class="fas fa-file-alt me-1 opacity-50"></i>
+                {{ segment }}
+            </span>
+            {% endif %}
+        </li>
         {% endfor %}
     </ol>
 </nav>
@@ -53,7 +53,8 @@
 <div class="directory-explorer">
     <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-glass">
         <div>
-            <h2 class="mb-1 fw-bold"><i class="fas fa-folder-open me-2 text-warning"></i>{{ current_doc.split('/')[-1] if current_doc else 'Project Explorer' }}</h2>
+            <h2 class="mb-1 fw-bold"><i class="fas fa-folder-open me-2 text-warning"></i>{{ current_doc.split('/')[-1]
+                if current_doc else 'Project Explorer' }}</h2>
             <p class="small opacity-50 mb-0">Total {{ items|length }} objects synchronized in this node</p>
         </div>
     </div>
@@ -156,12 +157,12 @@
     /* ── The real sidebar (fixed, driven by JS) ── */
     .file-sidebar {
         position: fixed;
-        top: 90px;
+        /* Vertically Centered on Left Side */
+        top: 50%;
         width: 340px;
-        /* overridden by JS to match anchor */
+        /* Matches anchor horizontally */
         left: 0;
-        /* overridden by JS */
-        max-height: calc(100vh - 130px);
+        max-height: 85vh;
         overflow-y: auto;
         overflow-x: hidden;
 
@@ -173,19 +174,41 @@
         padding: 1.5rem;
         z-index: 900;
 
-        /* Stealth initial state */
         opacity: 0;
         pointer-events: none;
-        transform: translateY(16px) scale(0.97);
+        transform: translateY(calc(-50% + 16px)) scale(0.97);
+
+        display: flex;
+        flex-direction: column;
+
+        /* Premium transition for ALL positioning properties */
         transition:
             opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-            transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+            left 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+            width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 🧼 Sidebar Header Separation */
+    .sidebar-header {
+        padding-bottom: 1.25rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--glass-border);
+        flex-shrink: 0;
+    }
+
+    .file-tree-container {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding-right: 4px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--glass-border) transparent;
     }
 
     .file-sidebar.is-visible {
         opacity: 1;
         pointer-events: all;
-        transform: translateY(0) scale(1);
+        transform: translateY(-50%) scale(1);
         border-color: rgba(var(--info-rgb), 0.4);
         box-shadow: var(--card-shadow);
     }
@@ -211,6 +234,7 @@
     .breadcrumb-nav {
         margin-bottom: 2rem;
     }
+
     .breadcrumb-nav .breadcrumb {
         background: transparent;
         padding: 0;
@@ -222,6 +246,7 @@
         align-items: center;
         flex-wrap: wrap;
     }
+
     .breadcrumb-segment {
         background: var(--bg-card-soft);
         border: 1px solid var(--glass-border);
@@ -237,6 +262,7 @@
         transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         backdrop-filter: blur(8px);
     }
+
     .breadcrumb-segment:hover {
         background: var(--primary-light);
         border-color: var(--info-color);
@@ -244,6 +270,7 @@
         transform: translateY(-2px);
         box-shadow: var(--card-shadow);
     }
+
     .breadcrumb-segment.active {
         background: var(--info-light);
         border-color: var(--info-color);
@@ -251,14 +278,17 @@
         cursor: default;
         pointer-events: none;
     }
+
     .breadcrumb-separator {
         color: var(--text-muted);
         opacity: 0.3;
         font-size: 0.75rem;
         margin: 0 -0.2rem;
     }
-    .breadcrumb-item + .breadcrumb-item::before {
-        display: none; /* Hide default Bootstrap separator */
+
+    .breadcrumb-item+.breadcrumb-item::before {
+        display: none;
+        /* Hide default Bootstrap separator */
     }
 
     /* ── File tree ── */
@@ -402,6 +432,124 @@
 
         50% {
             box-shadow: 0 0 0 5px rgba(45, 206, 137, 0);
+        }
+    }
+
+    /* 🧠 Neural Scanner Refresh Animation */
+    .rendered-content {
+        position: relative;
+        transition: opacity 0.4s ease;
+    }
+
+    /* 🎯 Hybrid Cinematic Centering */
+    .rendered-content h1:first-of-type,
+    .rendered-content p:nth-of-type(-n+2):has(img) {
+        text-align: center;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Standard Left-Aligned Documentation Content */
+    .rendered-content p img {
+        display: inline-block;
+        margin: 5px 12px 5px 0; /* Clear left-side badge gutter */
+        vertical-align: middle;
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+    /* 🍱 Panoramic Banner Engine (Hero Config) */
+    .rendered-content p:first-of-type img {
+        display: block;
+        margin: 1rem auto 3.5rem auto; 
+        width: 100%;
+        max-width: 1100px;
+        height: 480px; /* Enhanced height for bottom visibility */
+        object-fit: cover;
+        object-position: center bottom; /* Weighted towards bottom to show operators */
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        border: 1px solid var(--glass-border);
+    }
+
+    .refresh-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(var(--bg-main-rgb, 0, 0, 0), 0.2);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 24px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .refresh-overlay.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    .scanner-beam {
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--info-color), transparent);
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-shadow: 0 0 15px var(--info-color);
+        animation: scan-pulse 1.8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes scan-pulse {
+        0% {
+            top: 0;
+            opacity: 0;
+        }
+
+        15% {
+            opacity: 1;
+        }
+
+        85% {
+            opacity: 1;
+        }
+
+        100% {
+            top: 100%;
+            opacity: 0;
+        }
+    }
+
+    .neural-text {
+        font-family: 'Outfit', sans-serif;
+        color: var(--info-color);
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        margin-top: 1rem;
+        animation: text-pulse 1.5s infinite;
+    }
+
+    @keyframes text-pulse {
+
+        0%,
+        100% {
+            opacity: 0.4;
+        }
+
+        50% {
+            opacity: 1;
+            letter-spacing: 4px;
         }
     }
 
@@ -641,11 +789,11 @@
         border-bottom-color: var(--primary-color);
     }
 
-    /* Horizontal rule */
+    /* Horizontal rule — Softened for Technical Hub */
     .doc-body hr {
         border: none;
-        border-top: 1px solid var(--glass-border);
-        margin: 2rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.08); 
+        margin: 3rem 0;
     }
 
     /* Copy button — positioned top-right inside the code block */
@@ -691,7 +839,7 @@
     }
 
     /* Images — block standalone images only; keep inline badges inline */
-    .doc-body p > img:only-child,
+    .doc-body p>img:only-child,
     .doc-body figure img {
         max-width: min(100%, 640px);
         border-radius: 12px;
@@ -700,11 +848,12 @@
         display: block;
         margin: 1.5rem auto;
     }
+
     /* Shield/badge images stay inline */
-    .doc-body p > img[src*="shields.io"],
-    .doc-body p > img[src*="badge"],
-    .doc-body p > img[alt*="badge"],
-    .doc-body p > img[alt*="Badge"] {
+    .doc-body p>img[src*="shields.io"],
+    .doc-body p>img[src*="badge"],
+    .doc-body p>img[alt*="badge"],
+    .doc-body p>img[alt*="Badge"] {
         display: inline;
         vertical-align: middle;
         border: none;
@@ -748,32 +897,35 @@
 
         <!-- THE REAL SIDEBAR (fixed, positioned by JS) -->
         <aside class="file-sidebar" id="file-sidebar">
-            <!-- Status -->
-            <div class="repo-vitals mb-3">
-                <div class="sync-badge mb-1">
-                    <div class="status-dot"></div>
-                    Live Sync Active
+            <div class="sidebar-header">
+                <!-- Status -->
+                <div class="repo-vitals mb-3">
+                    <div class="sync-badge mb-1">
+                        <div class="status-dot"></div>
+                        Live Sync Active
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span class="small opacity-50">Local Project</span>
+                        <span
+                            class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"
+                            style="font-size:0.7rem;">STABLE</span>
+                    </div>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mt-1">
-                    <span class="small opacity-50">Local Project</span>
-                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"
-                        style="font-size:0.7rem;">STABLE</span>
+
+                <!-- Search -->
+                <div class="mb-0">
+                    <input type="text" id="sidebar-search" class="sidebar-search" placeholder="Search files…">
                 </div>
             </div>
 
-            <!-- Search -->
-            <div class="mb-3">
-                <input type="text" id="sidebar-search" class="sidebar-search" placeholder="Search files…">
-            </div>
-
-            <!-- Tree -->
-            <!-- Dynamic Tree Discovery -->
-            {% for category, files in project_tree.items() %}
+            <div class="file-tree-container">
+                <!-- Tree -->
+                {% for category, files in project_tree.items() %}
                 {% if files %}
                 <div class="folder-label mt-3">{{ category }}</div>
                 {% for file in files %}
                 <a href="{{ url_for('explorer', doc=file.path) }}"
-                   class="file-tree-item {% if current_doc == file.path %}active{% endif %}">
+                    class="file-tree-item {% if current_doc == file.path %}active{% endif %}">
                     {% set ext = file.name.split('.')[-1] | lower %}
                     {% if ext == 'md' %}
                     <i class="fab fa-markdown file-icon text-primary"></i>
@@ -792,12 +944,21 @@
                 </a>
                 {% endfor %}
                 {% endif %}
-            {% endfor %}
+                {% endfor %}
+            </div>
         </aside>
 
         <!-- MAIN CONTENT -->
         <main class="hub-content" id="hub-content">
             <div class="rendered-content">
+                <!-- Neural Scanner Overlay -->
+                <div id="refresh-overlay" class="refresh-overlay">
+                    <div class="scanner-beam"></div>
+                    <div class="neural-spinner">
+                        <i class="fas fa-sync-alt fa-spin-fast text-info" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="neural-text">Neural Refreshing...</div>
+                </div>
                 {{ render_doc_fragment(doc_type, current_doc, md_content, items, error) }}
             </div>
         </main>
@@ -829,7 +990,9 @@
             document.body.appendChild(sidebar);
 
             function syncPosition() {
+                if (!anchor || !sidebar) return;
                 const r = anchor.getBoundingClientRect();
+                // Ensure Sidebar tracks precisely where the anchor column is
                 sidebar.style.left = r.left + 'px';
                 sidebar.style.width = r.width + 'px';
             }
@@ -868,8 +1031,14 @@
         async function loadDoc(url) {
             if (!contentEl) { window.location.href = url; return; }
 
+            const refreshOverlay = document.getElementById('refresh-overlay');
+            const refreshBtnIcon = document.querySelector('button[onclick="refreshDocumentContent()"] i');
+
             barStart();
-            contentEl.style.opacity = '0';
+            if (refreshOverlay) refreshOverlay.classList.add('active');
+            if (refreshBtnIcon) refreshBtnIcon.classList.add('fa-spin');
+
+            contentEl.style.opacity = '0.7';
 
             try {
                 const res = await fetch(url, {
@@ -878,15 +1047,32 @@
                 if (!res.ok) throw new Error('HTTP ' + res.status);
                 const data = await res.json();
 
-                // Swap content after fade-out settles
-                await delay(220);
-                contentEl.innerHTML = data.html || '';
+                // Swap content
+                await delay(250);
+                contentEl.innerHTML = (data.html || '') + `
+                    <div id="refresh-overlay" class="refresh-overlay">
+                        <div class="scanner-beam"></div>
+                        <div class="neural-spinner">
+                            <i class="fas fa-sync-alt fa-spin-fast text-info" style="font-size: 2rem;"></i>
+                        </div>
+                        <div class="neural-text">Neural Refreshing...</div>
+                    </div>
+                `;
+
                 if (data.title) document.title = data.title + ' — CyberShield AI';
 
-                // Fade in
-                contentEl.style.opacity = '1';
-                // Scroll content into view gently
-                contentEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                // Recalibrate sidebar position IMMEDIATELY to prevent shifts
+                if (typeof syncPosition === 'function') syncPosition();
+
+                // Finalize UI
+                setTimeout(() => {
+                    contentEl.style.opacity = '1';
+                    if (refreshOverlay) refreshOverlay.classList.remove('active');
+                    if (refreshBtnIcon) refreshBtnIcon.classList.remove('fa-spin');
+
+                    // Smooth scroll to top of content
+                    contentEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
 
                 initCopyButtons();
                 barDone();
