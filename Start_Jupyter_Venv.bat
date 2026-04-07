@@ -18,8 +18,8 @@ if defined VIRTUAL_ENV (
 :: Secure Workspace Shift
 pushd "%~dp0CyberAttackPrediction"
 
-:: Launch Jupyter
-jupyter notebook
+:: Launch Jupyter in Chrome Incognito for a clean presentation
+jupyter notebook --browser="chrome --incognito %%s"
 
 :: Restoration: Restore directory after closing Jupyter
 popd

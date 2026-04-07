@@ -612,15 +612,23 @@ def get_genai_insight(attack_type):
 browser_timer = None
 
 def open_browser():
-    """Enterprise-grade browser launcher with Pulse Awareness."""
+    """Enterprise-grade browser launcher with Chrome Incognito forcing."""
     global PULSE_DETECTED
     if PULSE_DETECTED:
         print("[Smart Launch] Aborting: Active pulse detected.")
         return
         
-    import webbrowser
-    print("[Smart Launch] No pulse detected. Launching final terminal...")
-    webbrowser.open("http://127.0.0.1:2026/")
+    import subprocess
+    url = "http://127.0.0.1:2026/"
+    print(f"[Smart Launch] Initializing Incognito Presentation on {url}")
+    
+    try:
+        # Force chrome incognito for a clean, examiner-ready session
+        subprocess.Popen(['start', 'chrome', '--incognito', url], shell=True)
+    except Exception as e:
+        print(f"[-] Smart Launch Error: {e}")
+        import webbrowser
+        webbrowser.open(url)
 
 def get_project_tree():
     """Neural Discovery: Builds a dynamic, categorical map of the project file system."""
