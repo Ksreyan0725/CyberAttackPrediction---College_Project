@@ -221,8 +221,10 @@
         <div class="col-lg-6 reveal-depth anim-delay-100">
             <div class="card overflow-hidden shadow-2xl border-0 rounded-4 skeleton-loader-bg" style="background: var(--glass-bg); backdrop-filter: blur(10px); min-height: 300px;">
                 <div class="position-relative">
-                    <img src="{{ url_for('static', filename='images/tra.jpg') }}" 
-                         class="img-fluid w-100 img-fade-init" 
+                    <img src="{{ url_for('static', filename='images/tra_hd_dark.png') }}" 
+                         data-dark="{{ url_for('static', filename='images/tra_hd_dark.png') }}" 
+                         data-light="{{ url_for('static', filename='images/tra_hd_light.png') }}" 
+                         class="theme-asset img-fluid w-100 img-fade-init" 
                          alt="Cyber Security Visualization" 
                          onload="this.classList.add('img-fade-loaded'); this.closest('.skeleton-loader-bg').classList.add('loaded')"
                          style="object-fit: contain; height: 300px; padding: 10px;">

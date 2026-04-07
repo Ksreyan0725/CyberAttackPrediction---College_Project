@@ -97,17 +97,20 @@
         border: 1px solid var(--glass-border);
     }
 
-    /* The sliding blue pill */
+    /* The Ultra-Smooth Liquid sliding pill */
     .toggle-indicator {
         position: absolute;
         top: 4px;
         left: 4px;
-        width: calc(50% - 4px);
+        width: 0; /* Managed by Liquid-JS */
         height: calc(100% - 8px);
         background: var(--primary-color);
         border-radius: 50px;
         box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.4);
-        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        backdrop-filter: blur(8px);
+        /* Ultra-Smooth Liquid Spring Physics */
+        transition: transform 0.55s cubic-bezier(0.5, 1.6, 0.4, 0.7), 
+                    width 0.45s cubic-bezier(0.5, 1.5, 0.5, 1);
         pointer-events: none;
         z-index: 0;
     }
@@ -421,27 +424,35 @@
         const removeFile = document.getElementById('removeFile');
 
         let selectedFile = null;
-
         const modeSlider = document.getElementById('modeSlider');
-
-        const modeDefault     = document.getElementById('modeDefault');
-        const modeCustom      = document.getElementById('modeCustom');
+        const modeDefault = document.getElementById('modeDefault');
+        const modeCustom = document.getElementById('modeCustom');
         const toggleIndicator = document.getElementById('toggleIndicator');
 
+        function syncIndicator(btn) {
+            if (!toggleIndicator || !btn) return;
+            toggleIndicator.style.width = `${btn.offsetWidth}px`;
+            toggleIndicator.style.transform = `translateX(${btn.offsetLeft - 4}px)`; // Offset for container padding
+        }
+
         // Slide the pill indicator + toggle active label + slide content in sync
-        modeDefault.onclick = () => {
+        modeDefault.onclick = function() {
             modeDefault.classList.add('active');
             modeCustom.classList.remove('active');
-            toggleIndicator.classList.remove('slide-right');
+            syncIndicator(this);
             modeSlider.classList.remove('custom-active');
         };
 
-        modeCustom.onclick = () => {
+        modeCustom.onclick = function() {
             modeCustom.classList.add('active');
             modeDefault.classList.remove('active');
-            toggleIndicator.classList.add('slide-right');
+            syncIndicator(this);
             modeSlider.classList.add('custom-active');
         };
+
+        // Initialize for fluid morphing on load/resize
+        window.addEventListener('load', () => syncIndicator(document.querySelector('.dataset-toggle-btn.active')));
+        window.addEventListener('resize', () => syncIndicator(document.querySelector('.dataset-toggle-btn.active')));
 
         // File Selection
         dropZone.onclick = () => trainingFile.click();

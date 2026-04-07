@@ -37,7 +37,7 @@ The project is organized into a modular structure to separate data analysis (Jup
   - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.
 
 - **`/static`**:
-  - `images/`: High-resolution brand assets (`favicon.svg`, `five_pillars.png`, `roadmap.png`).
+  - `images/`: High-resolution brand assets (`favicon.svg`, `five_pillars_HD.png`, `roadmap_HD.png`, `tra_HD.png`).
   - `Dataset/`: Legacy data mirrors and documentation.
 - **`/Dataset`**:
   - `kdd_train.csv`, `kdd_test.csv`: NSL-KDD source data.
