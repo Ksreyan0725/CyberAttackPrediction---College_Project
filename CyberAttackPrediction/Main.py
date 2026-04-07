@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import pickle
+import joblib
 import os
 import webbrowser
 import json
@@ -39,7 +39,12 @@ log.addFilter(HeartbeatFilter())
 load_dotenv()
 
 app = Flask(__name__, static_url_path='')
-app.secret_key = os.getenv('FLASK_SECRET_KEY', 'default_secret')
+# Use a derived secret key for session integrity; fallback to a generated secret if environment is missing
+app.secret_key = os.getenv('FLASK_SECRET_KEY', secrets.token_hex(32) if not os.getenv('FLASK_SECRET_KEY') else os.getenv('FLASK_SECRET_KEY'))
+
+# PROPRIETARY ADMIN SECURITY CONFIG (Hardcoded Bypass with Hashing)
+ADMIN_ID = "admin"
+ADMIN_HASH = "scrypt:32768:8:1$Cw2lrwbxEaJWsMvM$7d647e7e6e63deab9540306b28ceb1ea622ce0632d2d1b4e10807b507efe42355fab976a9acf2b5c0bc8e4a07ed75c2ba5f8e19330c7e3aac45ee82ceab4ceda"
 
 # Global variables to store loaded models/scalers
 rf_model = None
@@ -47,7 +52,9 @@ scaler = None
 labels = None
 label_encoder = None
 feature_columns = None
-system_status = "ready" # Track if training is in progress
+system_status = "ready"  # Track if training is in progress
+PULSE_DETECTED = False # Pulse Detection Flag
+browser_timer = None   # Global Browser Launch Timer
 
 # --- Global Security Middlewares ---
 @app.before_request
@@ -70,17 +77,28 @@ def security_pre_check():
             return jsonify({"status": "error", "message": "Security Violation: CSRF Token Invalid or Missing"}), 403
 
 @app.after_request
-def apply_security_headers(response):
-    """Hardens the response headers to prevent information leakage and caching."""
-    # Prevent caching of sensitive authenticated routes
-    if 'user' in session:
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-        response.headers["Pragma"] = "no-cache"
-        response.headers["Expires"] = "0"
-    
-    # Standard security headers
+def apply_optimization_headers(response):
+    """Hardens the response headers and enables ETag-based caching for optimal reload performance."""
+    # 1. Standard security headers
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "SAMEORIGIN"
+
+    # 2. Performance: Enable ETag generation for all successful GET requests
+    # This allows the browser to perform 'Conditional GETs' (304 Not Modified)
+    if request.method == 'GET' and response.status_code == 200:
+        response.add_etag()
+        response.make_conditional(request)
+
+    # 3. Cache-Control Strategy:
+    # - Sensitive user data routes: Strict no-store
+    # - Public Templates: allow browser to check for changes (must-revalidate)
+    if 'user' in session:
+        # For logged-in users, we still need to prevent stale data leaks
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    else:
+        # Public landing/login/signup pages: allow caching with revalidation (fastest feel)
+        response.headers["Cache-Control"] = "public, no-cache, must-revalidate"
+    
     return response
 
 def load_ml_model():
@@ -92,13 +110,12 @@ def load_ml_model():
         model_path = os.path.join(base_dir, "model", "trained_rf_model.pkl")
         
         if os.path.exists(model_path):
-            with open(model_path, "rb") as f:
-                model_data = pickle.load(f)
-                rf_model = model_data['rf_model']
-                scaler = model_data['scaler']
-                labels = model_data['labels']
-                label_encoder = model_data['label_encoder']
-                feature_columns = model_data['feature_columns']
+            model_data = joblib.load(model_path)
+            rf_model = model_data['rf_model']
+            scaler = model_data['scaler']
+            labels = model_data['labels']
+            label_encoder = model_data['label_encoder']
+            feature_columns = model_data['feature_columns']
             print(f"Successfully loaded pre-trained model from {model_path}.")
             return True
         else:
@@ -182,27 +199,31 @@ def ClearResults():
     
     return jsonify({"status": "success", "message": "Analysis results wiped successfully."})
 
-@app.route('/api/heartbeat')
+@app.route('/api/heartbeat', methods=['GET', 'POST'])
 def heartbeat():
     """Silent Heartbeat for Smart Launch and System Status Sync."""
-    global browser_timer
+    global browser_timer, PULSE_DETECTED
+    
+    # Pulse detected! Mark system as having an active session
+    PULSE_DETECTED = True
     
     # If a heartbeat arrives, an active tab exists - cancel the startup browser launch
     if browser_timer and browser_timer.is_alive():
+        print("[Pulse Detection] Pulse detected from existing tab. Cancelling auto-launch.")
         browser_timer.cancel()
         
-    return jsonify({"status": system_status, "health": "online"})
+    return jsonify({"status": system_status, "health": "online", "pulse": "active"})
 
 # --- Security & User Management ---
 USERS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "users.json")
 
 def load_users():
-    # ULTIMATE ADMIN BYPASS (Hardcoded)
+    """Enterprise-grade user directory loader with auto-initialization for master admin."""
     if not os.path.exists(USERS_FILE):
         users = {
-            "admin": {
-                "username": "admin",
-                "password": generate_password_hash("admin"),
+            ADMIN_ID: {
+                "username": ADMIN_ID,
+                "password": ADMIN_HASH,
                 "role": "admin"
             }
         }
@@ -212,16 +233,17 @@ def load_users():
     try:
         with open(USERS_FILE, 'r') as f:
             users = json.load(f)
-            # Ensure hardcoded admin always exists with original power if deleted
-            if "admin" not in users:
-                users["admin"] = {
-                    "username": "admin",
-                    "password": generate_password_hash("admin"),
+            # Self-healing: Restore master admin if missing from archives
+            if ADMIN_ID not in users:
+                users[ADMIN_ID] = {
+                    "username": ADMIN_ID,
+                    "password": ADMIN_HASH,
                     "role": "admin"
                 }
                 save_users(users)
             return users
-    except:
+    except Exception as e:
+        print(f"[Identity Cache] Error: {e}")
         return {}
 
 def save_users(users):
@@ -247,9 +269,9 @@ def VerifySavedLogin():
             with open(creds_file, 'r') as f:
                 creds = json.load(f)
             
-            # ULTIMATE ADMIN BYPASS
-            if creds.get('user') == "admin" and creds.get('pass') == "admin":
-                session['user'] = "admin"
+            # SECURE ADMIN BYPASS (Using Hashed Comparison)
+            if creds.get('user') == ADMIN_ID and check_password_hash(ADMIN_HASH, creds.get('pass')):
+                session['user'] = ADMIN_ID
                 session['is_ultimate'] = True
                 session['remembered'] = True
                 return jsonify({"status": "success"})
@@ -296,14 +318,14 @@ def UserLoginAction():
     password = request.form.get('t2')
     remember = request.form.get('remember') == 'on'
     
-    # ULTIMATE BYPASS CHECK
-    if username == "admin" and password == "admin":
-        session['user'] = "admin"
+    # SECURE ADMIN BYPASS CHECK (Hashed)
+    if username == ADMIN_ID and check_password_hash(ADMIN_HASH, password):
+        session['user'] = ADMIN_ID
         session['is_ultimate'] = True
         if remember:
             base_dir = os.path.dirname(os.path.abspath(__file__))
             with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
-                json.dump({"user": "admin", "pass": "admin"}, f)
+                json.dump({"user": ADMIN_ID, "pass": password}, f)
             session['remembered'] = True
         return jsonify({"status": "success", "message": "Ultimate Admin access granted!", "redirect": url_for('train_view')})
 
@@ -586,9 +608,66 @@ def get_genai_insight(attack_type):
     }
     return insights.get(attack_type.lower(), "AI suggests this is a known signature. Monitor for unusual lateral movement in the network.")
 
+# Global tracking for pulse-aware auto-launch
+browser_timer = None
+
 def open_browser():
-    """Enterprise-grade browser launcher."""
+    """Enterprise-grade browser launcher with Pulse Awareness."""
+    global PULSE_DETECTED
+    if PULSE_DETECTED:
+        print("[Smart Launch] Aborting: Active pulse detected.")
+        return
+        
+    import webbrowser
+    print("[Smart Launch] No pulse detected. Launching final terminal...")
     webbrowser.open("http://127.0.0.1:2026/")
+
+def get_project_tree():
+    """Neural Discovery: Builds a dynamic, categorical map of the project file system."""
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Root
+    tree = {
+        "Technical Docs": [],
+        "Model Systems": [],
+        "ML Notebooks": [],
+        "Environment": []
+    }
+    
+    # Exclude list for the explorer (as requested)
+    forbidden_dirs = {'.venv', '.git', '.vscode', '__pycache__', 'Software', 'Project materials', '.ipynb_checkpoints'}
+    forbidden_files = {'users.json', '.env', '.gitignore'}
+
+    # Strategy: Scan root and CyberAttackPrediction
+    scan_targets = [base_dir, os.path.join(base_dir, 'CyberAttackPrediction'), os.path.join(base_dir, 'docs')]
+    
+    seen_paths = set()
+
+    for target in scan_targets:
+        if not os.path.exists(target): continue
+        for item in sorted(os.listdir(target)):
+            if item in forbidden_dirs or item in forbidden_files or item.startswith('.'):
+                continue
+            
+            full_item_path = os.path.join(target, item)
+            if os.path.isdir(full_item_path): continue # sidebar handles file navigation; directory browsing is inline
+            
+            # Relative path from Root for URIs
+            rel_path = os.path.relpath(full_item_path, base_dir).replace('\\', '/')
+            if rel_path in seen_paths: continue
+            seen_paths.add(rel_path)
+
+            ext = os.path.splitext(item)[1].lower()
+            
+            # Categorization Logic
+            if ext == '.md' or (ext == '.txt' and 'guide' in item.lower()):
+                tree["Technical Docs"].append({"name": item, "path": rel_path})
+            elif ext == '.py':
+                tree["Model Systems"].append({"name": item, "path": rel_path})
+            elif ext == '.ipynb':
+                tree["ML Notebooks"].append({"name": item, "path": rel_path})
+            elif ext in ['.txt', '.json', '.bat', '.ps1']:
+                tree["Environment"].append({"name": item, "path": rel_path})
+
+    return tree
 
 @app.route('/documentation')
 def documentation():
@@ -604,21 +683,66 @@ def explorer():
     doc_path = request.args.get('doc', 'README.md')
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # Root
     
+    # Neural Discovery Tree
+    project_tree = get_project_tree()
+
     # Simple security check to prevent directory traversal
     if '..' in doc_path or doc_path.startswith('/'):
-        return render_template('documentation.html', error="Invalid path")
+        return render_template('documentation.html', error="Invalid path", project_tree=project_tree)
         
     full_path = os.path.join(base_dir, doc_path)
     if not os.path.exists(full_path):
-        return render_template('documentation.html', error=f"File not found: {doc_path}")
+        return render_template('documentation.html', error=f"Resource not found: {doc_path}", project_tree=project_tree)
         
     try:
+        # FOLDER LISTING INTELLIGENCE
+        if os.path.isdir(full_path):
+            items = []
+            for item in sorted(os.listdir(full_path)):
+                if not item.startswith('.') and item not in {'.venv', 'Software', 'Project materials'}:
+                    item_rel = os.path.join(doc_path, item).replace('\\', '/')
+                    is_dir = os.path.isdir(os.path.join(full_path, item))
+                    items.append({'name': item, 'path': item_rel, 'is_dir': is_dir})
+            
+            render_data = {
+                'items': items,
+                'current_doc': doc_path.replace('\\', '/'),
+                'doc_type': 'folder',
+                'project_tree': project_tree
+            }
+            
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                # SPREAD PURE SYNC: Render only the internal macro from documentation.html
+                html = render_template_string(
+                    "{% from 'documentation.html' import render_doc_fragment %}{{ render_doc_fragment(doc_type, current_doc, items=items) }}",
+                    **render_data
+                )
+                return jsonify({
+                    'html': html,
+                    'doc_type': 'folder',
+                    'path': render_data['current_doc'],
+                    'title': doc_path.split('/')[-1] or 'Repository',
+                    'breadcrumb': render_data['current_doc'].replace('CyberAttackPrediction/', '')
+                })
+
+            return render_template('documentation.html', **render_data)
+
         ext = os.path.splitext(doc_path)[1].lower()
         with open(full_path, 'r', encoding='utf-8') as f:
             content = f.read()
             
+        display_path = doc_path.replace('\\', '/')
         if ext == '.md':
             html_content = markdown2.markdown(content, extras=["tables", "fenced-code-blocks", "toc", "header-ids"])
+            # Fix image src paths: markdown/HTML files use project-relative paths
+            # e.g. "CyberAttackPrediction/static/images/x.png" or "static/images/x.png"
+            # Flask serves static at root (static_url_path=''), so correct URL is "/images/x"
+            import re as _re
+            html_content = _re.sub(
+                r'(src=["\'])(?:(?:\.\./)*)(?:CyberAttackPrediction/)?static/images/',
+                r'\1/images/',
+                html_content
+            )
             doc_type = 'markdown'
         elif ext == '.ipynb':
             nb = nbformat.reads(content, as_version=4)
@@ -626,19 +750,40 @@ def explorer():
             html_exporter.template_name = 'basic' # Simple clean output
             (html_content, resources) = html_exporter.from_notebook_node(nb)
             doc_type = 'notebook'
-        elif ext in ['.py', '.bat', '.ps1', '.json', '.html', '.css', '.js']:
-            lexer = get_lexer_for_filename(full_path)
+        elif ext in ['.py', '.bat', '.ps1', '.json', '.html', '.css', '.js', '.txt']:
+            lexer = get_lexer_for_filename(full_path) if ext != '.txt' else TextLexer()
             formatter = HtmlFormatter(style='monokai', full=False, cssclass="highlight")
             html_content = highlight(content, lexer, formatter)
             doc_type = 'code'
-            # Add simple wrapper for code styling if needed
             html_content = f'<style>{formatter.get_style_defs(".highlight")}</style>{html_content}'
         else:
-            # Plain text
             html_content = f'<pre style="white-space: pre-wrap; word-wrap: break-word;">{content}</pre>'
             doc_type = 'text'
-            
-        return render_template('documentation.html', md_content=html_content, current_doc=doc_path, doc_type=doc_type)
+
+        render_data = {
+            'md_content': html_content,
+            'current_doc': display_path,
+            'doc_type': doc_type,
+            'project_tree': project_tree
+        }
+
+        # AJAX NEURAL SYNC: Return macro-rendered fragment if requested via AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            # SPREAD PURE SYNC: Render only the internal macro from documentation.html
+            html = render_template_string(
+                "{% from 'documentation.html' import render_doc_fragment %}{{ render_doc_fragment(doc_type, current_doc, md_content=md_content) }}",
+                **render_data
+            )
+            return jsonify({
+                'html': html,
+                'doc_type': doc_type,
+                'path': display_path,
+                'title': display_path.split('/')[-1],
+                'breadcrumb': display_path.replace('CyberAttackPrediction/', ''),
+                'project_tree': project_tree
+            })
+
+        return render_template('documentation.html', **render_data)
         
     except Exception as e:
         return render_template('documentation.html', error=f"Rendering error: {str(e)}")

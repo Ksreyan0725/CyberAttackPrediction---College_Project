@@ -1,17 +1,17 @@
-pip install jupyter==1.0.0
-pip install jupyter_client==7.4.9
-pip install jupyter-console==6.4.0
-pip install jupyter_core==4.12.0
-pip install jupyterlab-widgets==3.0.8
-pip install scikit-learn==0.22.2.post1
-pip install seaborn==0.10.1
-pip install ipython==7.34.0
-pip install ipython-genutils==0.2.0
-pip install ipykernel==6.6.12
-pip install nbconvert==7.6.0
-pip install Flask==2.1.0
-pip install pyspark==2.4.5
+@echo off
+title CyberShield 2026 - High-Performance Dependency Setup
+echo.
+echo ============================================================
+echo    CyberShield Intelligence Hub - 2026 PROJECT HARDENING
+echo ============================================================
+echo [!] Initializing high-performance Python 3.13.12 environment...
+echo [!] Installing examiner-ready dependency stack...
+echo.
 
+python -m pip install --upgrade pip
+pip install -r Requirements.txt
 
- 
+echo.
+echo [PROCESSS COMPLETE] Your 2026 Modernized Environment is Ready.
+echo.
 pause

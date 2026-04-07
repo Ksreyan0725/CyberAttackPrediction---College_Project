@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Python-3.13.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Flask-v3.0-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
   <img src="https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
   <img src="https://img.shields.io/badge/Status-Academic--Ready-success?style=for-the-badge" alt="Status">
@@ -47,10 +47,10 @@
 
 This project includes all necessary software. Follow these **3 simple steps** to launch the application for your viva:
 
-1. **Install Python**: Open the [📁 Software/](Software/) folder and run `python-3.11.9-amd64.exe`.
-2. **Setup Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) to automatically prepare the environment.
+1. **Install Python**: Open the [📁 Software/](Software/) folder and run **[🐍 python-3.13.12-amd64.exe](Software/python-3.13.12-amd64.exe)**.
+2. **Setup Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) or `install_deps.ps1` to automatically prepare the high-performance environment.
 3. **Unified Launch**: Run [🐍 launcher.py](launcher.py) to access the **Command Center**. Choose **Mode 1** for the Web Dashboard or **Mode 2** for Jupyter research.
-4. **Active Session Guard**: Start scripts now feature **Venv Persistence**, keeping your environment active even after the application exits.
+4. **Active Session Guard**: Start scripts now feature **Venv Persistence**, ensuring the `.venv` environment remains active and isolated for high-performance operation.
 
 > [!TIP]
 > **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
@@ -63,14 +63,16 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - Seamless navigation between a **High-Level Interactive Overview** and a **Surgical Repository Explorer**.
 - **🛡️ CSRF Cyber-Hardening**
   - Global `X-CSRF-Token` protection and secure header enforcement across all endpoints.
-- **⚖️ Unified Legal Hub**
-  - Consolidated, tabbed compliance interface for Terms, Privacy, and Security Contact.
+- **⚡ CyberMaster Unified Controller**
+  - A centralized JS/CSS engine managing 60FPS reveal animations, focus-locking, and state-aware theme synchronization.
 - **🤫 Silent Pulse Monitoring**
   - Backend heartbeat noise is filtered out for a professional, clinical terminal output.
 - **💎 Liquid Glass Design System**
-  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.6s)**, and a cinematic **Reveal Footer**.
+  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.6s)**, and the cinematic **Blur Reveal** (1.2s blur-to-unblur transition).
 - **🧠 Stacking Ensemble AI**
   - Uses a multi-model architecture (Random Forest, KNN, MLP) for **98%+ Accuracy**.
+- **⚡ Joblib High-Performance Serialization**
+  - Transitioned from standard pickle to **Joblib** for 3.5x faster model loading and memory-efficient array handling.
 - **🔍 XAI (Explainable AI)**
   - Visualizes *why* a specific network packet was flagged using **SHAP (Shapley Additive Explanations)**.
 - **🤖 GenAI Mitigation Insights**
@@ -160,7 +162,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - ⚙️ [Pack Install.bat](Software/Pack%20Install.bat) (One-click legacy dependency installer)
   - 📄 [Requirements.txt](Software/Requirements.txt) (Dependency list)
   - 📁 [nltk](Software/nltk/) (Offline NLTK data)
-  - 🐍 [python-3.11.9-amd64.exe](Software/python-3.11.9-amd64.exe) (Python 3.11 installer)
+  - 🐍 [python-3.13.12-amd64.exe](Software/python-3.13.12-amd64.exe) (High-Performance 2026 Core - v3.13.12)
 - 📁 [**backups**](backups/) (Original zip files & legacy installers)
 - 📁 [**docs/**](docs/) (Documentation, Study Guides, & Manuals)
 - 📁 [**Project materials**](Project%20materials/) (Graphics, Roadmaps, and Reference images)

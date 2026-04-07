@@ -45,13 +45,13 @@
     .blob-1 {
         top: -10%;
         left: -10%;
-        background: #3b82f6;
+        background: var(--primary-color);
     }
 
     .blob-2 {
         bottom: -10%;
         right: -10%;
-        background: #8b5cf6;
+        background: var(--info-color);
         animation-delay: -10s;
     }
 
@@ -108,6 +108,7 @@
         background: transparent;
         display: flex;
         flex-direction: row;
+        align-items: stretch;
         animation: emergeFromDeep 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         will-change: transform, opacity, filter;
         /* Optimization: Limit scope of animation to prevent repainting the entire viewport */
@@ -115,8 +116,12 @@
         transform-origin: center center;
         transform-style: preserve-3d;
         backface-visibility: hidden;
-        /* Forced overflow visible to ensure only global page scroll handles content */
-        overflow: visible !important;
+        /* Forced overflow hidden to ensure child panels are clipped into the perfect 30px curves */
+        overflow: hidden !important;
+        /* Consolidated border and shadow for a unified premium card appearance */
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 30px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         transition: none !important;
         margin: 2rem auto;
     }
@@ -133,21 +138,21 @@
         /* Hard-locked flex basis for zero movement */
         flex: 1.2 0 490.9px;
         /* Lowered white opacity to 0.015 to remove the haze in dark mode */
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%);
+        background: var(--glass-bg);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         padding: 1.75rem 2.25rem;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        /* Custom border softening: Soft left border, zero right border to merge with form side */
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-right: none !important;
-        border-radius: 30px 0 0 30px;
+        /* Boundary simplification: Child panels are now square; clipping is handled by the parent wrapper */
+        border: none !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-radius: 0 !important;
         position: relative;
-        /* Forced overflow visible to prevent shadow clipping */
-        overflow: visible !important;
-        box-shadow: -20px 25px 50px -12px rgba(0, 0, 0, 0.3);
+        z-index: 1;
+        /* Removing independent shadow to prevent shadow-collision at the junction */
+        box-shadow: none !important;
     }
 
     /* Disable all circular blobs and internal shines to clean the interface */
@@ -200,7 +205,7 @@
     .feature-icon {
         width: 32px;
         height: 32px;
-        background: rgba(59, 130, 246, 0.1);
+        background: var(--primary-light);
         border-radius: 8px;
         display: flex;
         align-items: center;
@@ -218,13 +223,13 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        /* Custom border softening: Soft right border, zero left border to merge with info side */
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-left: none !important;
-        border-radius: 0 30px 30px 0 !important;
-        /* Forced overflow visible to prevent shadow clipping */
-        overflow: visible !important;
-        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
+        /* Boundary simplification: Child panels are now square; clipping is handled by the parent wrapper */
+        border: none !important;
+        border-radius: 0 !important;
+        position: relative;
+        z-index: 2;
+        /* Removing independent shadow to prevent shadow-collision at the junction */
+        box-shadow: none !important;
     }
 
     .form-control {
@@ -272,7 +277,7 @@
     }
 
     #togglePassword:hover {
-        background: rgba(59, 130, 246, 0.1);
+        background: var(--primary-light);
         color: var(--primary-color);
     }
 
@@ -298,6 +303,7 @@
             transform: translateY(-20px) translate3d(-50%, 0, -10px);
             filter: blur(8px);
         }
+
         100% {
             opacity: 1;
             transform: translateY(100%) translate3d(-50%, 0, 5px);
@@ -307,12 +313,14 @@
 
     .recovery-container {
         position: absolute;
-        bottom: 25px; /* Aligned to bottom edge of the panel */
+        bottom: 25px;
+        /* Aligned to bottom edge of the panel */
         left: 50%;
         transform: translate3d(-50%, 0, -10px);
         width: 85%;
         padding-top: 15px;
-        z-index: -1; /* Behind the card */
+        z-index: -1;
+        /* Behind the card */
         display: none;
         pointer-events: none;
     }
@@ -367,8 +375,8 @@
     }
 
     .recovery-modal {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: var(--bg-card-soft);
+        border: 1px solid var(--glass-border);
         backdrop-filter: blur(40px);
         -webkit-backdrop-filter: blur(40px);
         padding: 2.5rem;
@@ -381,9 +389,9 @@
     }
 
     .light-mode .recovery-modal {
-        background: rgba(255, 255, 255, 0.8);
-        border: 1px solid rgba(0, 0, 0, 0.05);
-        color: #212529;
+        background: var(--input-bg);
+        border: 1px solid var(--glass-border);
+        color: var(--dark-color);
     }
 
     .recovery-modal-overlay.active .recovery-modal {
@@ -403,13 +411,9 @@
 
         .info-panel {
             padding: 4rem 3rem;
-            /* Breathable padding for left-aligned stack */
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            /* Move content to the top */
-            border-right: none;
-            border-bottom: 1px solid var(--glass-border);
+            /* Mobile seam: Move border from right to bottom in column layout */
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
         }
 
         .form-panel {
@@ -446,10 +450,12 @@
                     </svg>
                 </div>
                 <h1 class="brand-title animate-reveal"
-                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 1.25rem auto;">Sign In to CyberShield AI</h1>
+                    style="animation-delay: 0.75s; text-align: center; margin: 0 auto 1.25rem auto;">Sign In to
+                    CyberShield AI</h1>
                 <div class="typing-container mb-4 animate-reveal"
                     style="height: 160px; width: 100%; max-width: 220px; margin: 0 auto; text-align: center; animation-delay: 0.9s; overflow: hidden; display: flex; align-items: flex-start; justify-content: center;">
-                    <p id="typingText" class="dynamic-muted mb-0" style="display: block; text-align: center; white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 1.15rem; font-weight: 500; opacity: 0.9;"><span id="cursor" class="text-primary fw-bold ms-1" style="display: none; vertical-align: baseline;">|</span></p>
+                    <p id="typingText" class="dynamic-muted mb-0"
+                        style="display: block; text-align: center; white-space: pre-wrap; word-break: break-word; line-height: 1.6; font-size: 1.15rem; font-weight: 500; opacity: 0.9;"><span id="cursor" class="text-primary fw-bold ms-1" style="display: none; vertical-align: baseline;">|</span></p>
                 </div>
 
                 <div class="mt-5 animate-reveal"
@@ -462,7 +468,7 @@
         </div>
 
         <!-- Right: Login Panel -->
-        <div class="form-panel liquid-glass"
+        <div class="form-panel"
             style="padding: 2.5rem 2.25rem; display: flex; flex-direction: column; justify-content: center;">
             {% if has_saved %}
             <!-- Direct Login View -->
@@ -521,14 +527,16 @@
                             Keep me logged in on this machine
                         </label>
                     </div>
-                    <div class="d-grid mt-4 animate-reveal position-relative" style="animation-delay: 1.2s; z-index: 5;">
+                    <div class="d-grid mt-4 animate-reveal position-relative"
+                        style="animation-delay: 1.2s; z-index: 5;">
                         <button type="submit" id="btnAuthenticate" class="btn btn-primary shadow-sm py-2">
                             <i class="fas fa-lock me-2" id="authIcon"></i>Authenticate
                         </button>
-                        
+
                         <!-- Layout-Neutral Security Tab (Detached Flow) -->
                         <div id="recoveryActionContainer" class="recovery-container text-center">
-                            <button type="button" id="btnShowRecovery" class="btn btn-outline-info btn-sm rounded-pill w-100 py-2">
+                            <button type="button" id="btnShowRecovery"
+                                class="btn btn-outline-info btn-sm rounded-pill w-100 py-2">
                                 <i class="fas fa-key me-2"></i>Forgotten Keys? Reset Access
                             </button>
                         </div>
@@ -674,6 +682,7 @@
                 if (typingEl) {
                     const cursor = typingEl.querySelector('#cursor');
                     let charIdx = 0;
+                    // Synchronized: Start after animate-reveal delay (0.9s) + partial fade (0.2s)
                     setTimeout(() => {
                         if (cursor) cursor.style.display = 'inline';
                         function type() {

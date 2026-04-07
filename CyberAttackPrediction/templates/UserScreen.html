@@ -110,13 +110,13 @@
     }
 
     [data-theme="light"] code.dynamic-text {
-        color: #0f172a !important; /* Darkest slate for light mode */
-        background: rgba(0, 0, 0, 0.04) !important;
-        border-color: rgba(0, 0, 0, 0.1) !important;
+        color: var(--dark-color) !important;
+        background: var(--code-bg) !important;
+        border-color: var(--glass-border) !important;
     }
 
     [data-theme="dark"] code.dynamic-text {
-        color: #f8fafc !important; /* Brightest slate for dark mode */
+        color: var(--light-color) !important;
     }
 
     .xx-small { font-size: 0.65rem; }
@@ -151,9 +151,9 @@
 
     /* Extra visibility for dark mode */
     [data-theme="dark"] .btn-fullscreen {
-        background: rgba(255, 255, 255, 0.1);
-        border-color: rgba(255, 255, 255, 0.2) !important;
-        color: #f8fafc !important;
+        background: var(--glass-bg);
+        border-color: var(--glass-border) !important;
+        color: var(--light-color) !important;
     }
     
     .sticky-insights {

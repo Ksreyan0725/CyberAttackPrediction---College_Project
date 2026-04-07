@@ -92,9 +92,9 @@
     .floating-explorer-btn .btn {
         padding: 0.85rem 1rem; /* Restored compact padding for minimalist look */
         border-radius: 51px; /* Precision rounding for a pixel-perfect pill */
-        box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255,255,255,0.1);
+        box-shadow: 0 15px 45px var(--card-shadow), 0 0 0 1px var(--glass-border);
         background: rgba(59, 130, 246, 0.75) !important;
-        border: 1px solid rgba(255, 255, 255, 0.25);
+        border: 1px solid var(--glass-border);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
         display: flex;
@@ -103,7 +103,7 @@
         font-size: 0.8rem;
         letter-spacing: 0.8px;
         text-transform: uppercase;
-        color: white !important;
+        color: var(--light-color) !important;
         isolation: isolate;
         transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
@@ -236,7 +236,7 @@
         <h1 class="display-4 fw-bold mb-3 dynamic-text">Project Documentation</h1>
         <p id="scroll-trigger-text" class="lead opacity-75 dynamic-text mb-4">A comprehensive guide to the Cyber Attack Prediction System</p>
         <div class="d-flex justify-content-center gap-3">
-            <a href="#overview" class="btn btn-shine-glow pulse-btn text-white px-5 py-3 rounded-pill fw-bold">
+            <a href="#overview" id="hero-read-btn" class="btn btn-shine-glow pulse-btn dynamic-text px-5 py-3 rounded-pill fw-bold">
                 <i class="fas fa-book-open me-2"></i>READ OVERVIEW
             </a>
             <a href="{{ url_for('explorer') }}" id="hero-explorer-btn" class="btn btn-outline-info px-5 py-3 rounded-pill fw-bold">
@@ -607,9 +607,17 @@
                                     <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What is the significance of the GenAI layer?</h6>
                                     <p class="small dynamic-muted">A: It provides Explainable AI (XAI) by translating complex ML predictions into human-readable advice and action plans.</p>
                                 </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What is the primary objective of CyberShield AI?</h6>
+                                    <p class="small dynamic-muted">A: To proactively detect and classify network intrusions using a multi-layered AI approach, moving from simple detection to actionable generative mitigation plans.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: How does the "Liquid Glass" UI enhance security operations?</h6>
+                                    <p class="small dynamic-muted">A: It provides a distraction-free, OLED-optimized interface that reduces cognitive load for security analysts while maintaining high aesthetic standards for reporting.</p>
+                                </div>
                                 <div class="mb-0">
-                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What is the academic contribution of this project?</h6>
-                                    <p class="small dynamic-muted">A: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP).</p>
+                                    <h6 class="fw-bold dynamic-text mb-2 text-primary">Q: What are the main challenges faced during data preprocessing?</h6>
+                                    <p class="small dynamic-muted">A: Handling categorical feature encoding (like protocol types) and scaling numerical values (like duration or bytes) to ensure that the AI doesn't get biased by large numbers.</p>
                                 </div>
                             </div>
                         </div>
@@ -625,9 +633,17 @@
                                     <h6 class="fw-bold dynamic-text mb-2 text-success">Q: What is Overfitting vs. Underfitting?</h6>
                                     <p class="small dynamic-muted">A: Overfitting is when a model memorizes the training data too well but fails on new data. Underfitting is when the model is too simple to learn the underlying patterns.</p>
                                 </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: How does Random Forest handle the 41 features of the dataset?</h6>
+                                    <p class="small dynamic-muted">A: It performs feature selection by evaluating "Gini Importance." It prioritizes features like <code>src_bytes</code> and <code>srv_serror_rate</code> that have the highest signal for distinguishing attacks from normal traffic.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: What is the role of the Train-Test Split?</h6>
+                                    <p class="small dynamic-muted">A: We split the data (e.g., 80/20) to ensure the model is evaluated on data it has never seen before, which is the only way to prove it can detect future, unknown attacks.</p>
+                                </div>
                                 <div class="mb-0">
-                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: How do you measure model success?</h6>
-                                    <p class="small dynamic-muted">A: Beyond accuracy, we look at <strong>Precision</strong> (how many flags was correct) and <strong>Recall</strong> (how many total attacks we caught). Recall is critical in security.</p>
+                                    <h6 class="fw-bold dynamic-text mb-2 text-success">Q: Why use a Random Forest instead of a single Decision Tree?</h6>
+                                    <p class="small dynamic-muted">A: A single tree is prone to "Overfitting." By combining 100+ trees (Ensemble), the Random Forest averages out individual errors, leading to much higher stability and accuracy.</p>
                                 </div>
                             </div>
                         </div>
@@ -643,9 +659,17 @@
                                     <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is the role of the Activation Function?</h6>
                                     <p class="small dynamic-muted">A: Functions like <strong>ReLU</strong> or <strong>Sigmoid</strong> introduce non-linearity, allowing the network to solve problems that aren't just simple straight lines.</p>
                                 </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is an Epoch in Deep Learning?</h6>
+                                    <p class="small dynamic-muted">A: One "Epoch" is a full pass of the entire training dataset through the neural network. We use multiple epochs to gradually refine the neuron weights.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: How do you prevent Overfitting in Neural Networks?</h6>
+                                    <p class="small dynamic-muted">A: We use techniques like <strong>Dropout</strong> (randomly turning off neurons during training) to force the network to learn redundant, robust patterns instead of specific data points.</p>
+                                </div>
                                 <div class="mb-0">
-                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is Backpropagation?</h6>
-                                    <p class="small dynamic-muted">A: The "learning engine." It calculates errors at the end and sends them backward to adjust the weights of every neuron to minimize future mistakes.</p>
+                                    <h6 class="fw-bold dynamic-text mb-2 text-danger">Q: What is the "Loss Function"?</h6>
+                                    <p class="small dynamic-muted">A: It calculates the "Distance" between the AI's prediction and the actual truth. Our goal is to use Optimization (like Adam) to drive this loss to its lowest possible point.</p>
                                 </div>
                             </div>
                         </div>
@@ -661,9 +685,17 @@
                                     <h6 class="fw-bold dynamic-text mb-2 text-info">Q: What are AI Hallucinations?</h6>
                                     <p class="small dynamic-muted">A: When a model generates text that sounds confident but is factually incorrect. We mitigate this by using restricted context and specific knowledge bases.</p>
                                 </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: How does GenAI handle Zero-Day (unknown) attacks?</h6>
+                                    <p class="small dynamic-muted">A: While traditional ML detects the anomaly, GenAI analyzes the <em>context</em> of the anomaly to suggest defensive postures even for attacks it has never encountered before.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: What is the "Temperature" setting in GenAI?</h6>
+                                    <p class="small dynamic-muted">A: It controls the "Creativity" of the response. For security, we keep it low (e.g., 0.2) to ensure the advice is factual, consistent, and strictly follows security protocols.</p>
+                                </div>
                                 <div class="mb-0">
-                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: RAG vs. Fine-Tuning?</h6>
-                                    <p class="small dynamic-muted">A: <strong>Fine-tuning</strong> retrains the model on new data. <strong>RAG</strong> gives the model external documents to "read" during the conversation without retraining.</p>
+                                    <h6 class="fw-bold dynamic-text mb-2 text-info">Q: Can GenAI replace a human security analyst?</h6>
+                                    <p class="small dynamic-muted">A: No. It acts as a <strong>Force Multiplier</strong>. It handles the data-heavy analysis and drafting, allowing the human expert to make the final "Execute/Stop" decision faster.</p>
                                 </div>
                             </div>
                         </div>
@@ -679,9 +711,17 @@
                                     <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: What is the "Kernel" in Jupyter?</h6>
                                     <p class="small dynamic-muted">A: The background process that actually executes the code cells. Restarting it clears the environment memory.</p>
                                 </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: Why is Scikit-Learn preferred for this project?</h6>
+                                    <p class="small dynamic-muted">A: It is the gold standard for ML in Python, providing robust, high-performance implementations of Random Forest and standardized tools for feature scaling and evaluation.</p>
+                                </div>
+                                <div class="mb-4">
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: How do you manage large datasets in Python without crashing?</h6>
+                                    <p class="small dynamic-muted">A: We use <strong>Pandas</strong> for efficient memory management and data manipulation, allowing us to process thousands of network logs in seconds.</p>
+                                </div>
                                 <div class="mb-0">
-                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: Why use Virtual Environments?</h6>
-                                    <p class="small dynamic-muted">A: To isolate project libraries and versions, preventing conflicts between different AI projects on the same computer.</p>
+                                    <h6 class="fw-bold dynamic-text mb-2 text-warning">Q: What is Model Serialization (Joblib)?</h6>
+                                    <p class="small dynamic-muted">A: It is the process of saving the trained "Brain" of the AI to a <code>.joblib</code> file. We specifically use <strong>Joblib</strong> over standard <code>pickle</code> because it is 3.5x faster at handling large NumPy arrays, ensuring the application loads instantly.</p>
                                 </div>
                             </div>
                         </div>
@@ -709,7 +749,7 @@
     .x-small { font-size: 0.85rem; }
     .xx-small { font-size: 0.75rem; }
     .doc-section { scroll-margin-top: 180px; } /* Increased for centered landing */
-    .glass-card-runway { padding-bottom: 250px !important; } /* Visual buffer for footer reveal */
+    .glass-card-runway { padding-bottom: 100px !important; } /* Visual buffer for footer reveal */
 </style>
 {% endblock %}
 
@@ -778,6 +818,14 @@
         // 4. Intelligent Nudge: Auto-scroll Handshake
         let scrollHandshakeDone = false;
         const scrollTrigger = document.getElementById('scroll-trigger-text');
+        const heroReadBtn = document.getElementById('hero-read-btn');
+
+        // Kill the nudge early if the user manually clicks the CTA
+        if (heroReadBtn) {
+            heroReadBtn.addEventListener('click', () => {
+                scrollHandshakeDone = true;
+            });
+        }
         
         if (scrollTrigger) {
             const nudgeObserver = new IntersectionObserver((entries) => {

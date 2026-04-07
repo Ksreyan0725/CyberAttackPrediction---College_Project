@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import pickle
+import joblib
 import os
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
@@ -102,7 +102,7 @@ def run_training(dataset_path=None):
         # Evaluation
         accuracy = rf_cls.score(X_test, y_test)
 
-        # Save everything (Atomic-ish write)
+        # Save everything (Atomic-ish write with joblib for better NumPy performance)
         model_data = {
             'rf_model': rf_cls,
             'scaler': scaler,
@@ -111,8 +111,7 @@ def run_training(dataset_path=None):
             'feature_columns': dataset.columns.tolist()
         }
 
-        with open(model_output_path, "wb") as f:
-            pickle.dump(model_data, f)
+        joblib.dump(model_data, model_output_path)
 
         return {
             "status": "success",

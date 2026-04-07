@@ -114,6 +114,7 @@ Imagine a very busy school gate (The Internet). Thousands of students (Data) ent
 11. [GENERATIVE AI INSIGHT ENGINE: HOW IT WORKS](#generative-ai-insight-engine)
 12. [VIVA PREPARATION: TOP 100 QUESTIONS & ANSWERS](#viva-preparation-top-100-questions--answers)
 13. [INSTALLATION & THE TROUBLESHOOTING ENCYCLOPEDIA](#troubleshooting-encyclopedia)
+
 14. [SECURITY, ETHICS & BEST PRACTICES](#security-ethics--best-practices)
 15. [FUTURE ROADMAP & EXTENSIONS](#future-roadmap--extensions)
 16. [GLOSSARY OF TERMS](#glossary-of-terms)
@@ -198,7 +199,7 @@ We take three different AI models (MLP, KNN, Random Forest) and let them all gue
 #### 1. `.venv/` (Directory)
 
 - **What is it?**: A "Bubble" for Python.
-- **Detailed Logic**: Python versions change all the time. If you have Python 3.12 on your PC but this project needs 3.11, they will fight. The `.venv` folder contains its own private copy of Python. It ensures the project works forever, even if you update your PC.
+- **Detailed Logic**: Python versions change all the time. If you have Python 3.14 on your PC but this project needs **3.13.12**, they will fight. The `.venv` folder contains its own private copy of Python. It ensures the project works forever, even if you update your PC.
 
 #### 2. `Start_WebApp_Venv.bat` (Automation)
 

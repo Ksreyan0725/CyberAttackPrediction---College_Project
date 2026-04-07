@@ -16,18 +16,18 @@
 
     /* Premium Alert Button (Fix: Visibility in Dark Theme) */
     .btn-view-result {
-        background: rgba(0, 210, 255, 0.1);
-        border: 1px solid rgba(0, 210, 255, 0.3);
-        color: #00d2ff !important;
+        background: rgba(var(--info-rgb), 0.1);
+        border: 1px solid rgba(var(--info-rgb), 0.3);
+        color: var(--info-color) !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         font-weight: 600;
         letter-spacing: 0.5px;
     }
 
     .btn-view-result:hover {
-        background: rgba(0, 210, 255, 0.25) !important;
-        border-color: #00d2ff !important;
-        color: #fff !important;
+        background: rgba(var(--info-rgb), 0.25) !important;
+        border-color: var(--info-color) !important;
+        color: white !important;
         box-shadow: 0 0 15px rgba(0, 210, 255, 0.3);
         transform: translateY(-1px);
     }
@@ -63,15 +63,15 @@
     }
     
     .upload-box:hover, .upload-box.dragover {
-        background: rgba(13, 110, 253, 0.08);
-        border-color: #0d6efd;
+        background: var(--primary-light);
+        border-color: var(--primary-color);
         transform: translateY(-2px);
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        box-shadow: var(--card-shadow);
     }
 
     .upload-box.file-selected {
-        border-color: #198754; 
-        background: rgba(25, 135, 84, 0.08);
+        border-color: var(--success-color); 
+        background: rgba(var(--success-rgb), 0.08);
     }
 
     .file-info-display {
@@ -93,7 +93,7 @@
 
     .file-icon {
         font-size: 2rem;
-        color: #0dcaf0;
+        color: var(--info-color);
     }
 
     .file-details {
@@ -127,20 +127,20 @@
     }
 
     [data-theme="light"] .file-name-text {
-        color: #1e293b;
+        color: var(--dark-color);
     }
 
     [data-theme="light"] .file-info-display {
-        background: #f8fafc;
-        border-color: rgba(0, 0, 0, 0.05);
+        background: var(--light-color);
+        border-color: var(--glass-border);
     }
 
     [data-theme="light"] .file-meta {
-        color: #64748b;
+        color: var(--text-muted);
     }
 
     [data-theme="light"] .text-white-enhanced {
-        color: #1e293b !important;
+        color: var(--dark-color) !important;
         text-shadow: none;
     }
 
@@ -158,7 +158,7 @@
 
     /* High contrast text improvements */
     .text-white-enhanced {
-        color: #ffffff !important;
+        color: white !important;
         text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 

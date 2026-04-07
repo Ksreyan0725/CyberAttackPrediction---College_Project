@@ -7,13 +7,11 @@ final commit ..
 
 ==================================================================================
 
-
-
 Ensure all functionalities are fully working, properly integrated, and user-friendly. Review and fix any broken or incomplete features.
 
 Test the complete functionality using the following credentials:
 
 Username: sreyan
-Password: sre2026
+Password: srey2026
 
 Verify that all actions perform correctly and the user experience is smooth and consistent.

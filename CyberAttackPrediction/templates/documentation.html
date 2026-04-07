@@ -1,379 +1,987 @@
 {% extends "base.html" %}
-
 {% block title %}Project Explorer - CyberShield AI{% endblock %}
 
-{% block extra_css %}
-<style>
-    .explorer-container {
-        display: flex;
-        gap: 2rem;
-        margin-top: 2rem;
-        position: relative;
-    }
-    .file-sidebar {
-        width: 300px;
-        flex-shrink: 0;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(20px);
-        border-radius: var(--premium-radius, 24px);
-        padding: 1.5rem;
-        height: min-content;
-        position: sticky;
-        top: 2rem;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-        overflow: hidden; /* Edge fix */
-        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0);
-        z-index: 100;
-    }
-
-    .file-sidebar.sidebar-hidden {
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(20px);
-        pointer-events: none;
-    }
-    /* Custom Scrollbar for Sidebar */
-    .file-sidebar::-webkit-scrollbar { width: 4px; }
-    .file-sidebar::-webkit-scrollbar-track { background: transparent; }
-    .file-sidebar::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.3); border-radius: 10px; }
-
-    .content-viewer {
-        flex-grow: 1;
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
-        backdrop-filter: blur(25px);
-        border-radius: var(--premium-radius, 24px);
-        padding: 3rem;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-        position: relative;
-        overflow: hidden; /* Edge fix */
-        min-height: 85vh;
-    }
-
-    /* Premium Markdown Styling (Fixes MD033 while keeping the look) */
-    .rendered-content h1, .rendered-content h2 {
-        color: var(--info-color);
-        font-weight: 700;
-        margin-top: 3rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid var(--glass-border);
-    }
-    .rendered-content h3 {
-        color: var(--primary-color);
-        font-weight: 600;
-        margin-top: 2rem;
-    }
-    .rendered-content blockquote {
-        background: rgba(59, 130, 246, 0.05);
-        border-left: 4px solid var(--primary-color);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin: 2rem 0;
-        font-style: italic;
-    }
-    .rendered-content img {
-        border-radius: 20px;
-        margin: 2rem 0;
-        box-shadow: var(--premium-shadow);
-        border: 1px solid var(--glass-border);
-    }
-    .rendered-content strong { color: var(--primary-color); }
-    
-    .rendered-content ul {
-        list-style-type: none;
-        padding-left: 0.5rem;
-    }
-    .rendered-content li {
-        margin-bottom: 0.8rem;
-        padding-left: 1.5rem;
-        position: relative;
-    }
-    .rendered-content li::before {
-        content: '→';
-        position: absolute;
-        left: 0;
-        color: var(--primary-color);
-        font-weight: bold;
-    }
-
-    /* Original Content Styles Restored */
-    .doc-section { margin-bottom: 4rem; }
-    .feature-card {
-        transition: all 0.3s ease;
-        border: 1px solid var(--glass-border);
-        background: rgba(255, 255, 255, 0.03);
-    }
-    .feature-card:hover {
-        background: var(--glass-bg);
-        transform: translateY(-5px);
-    }
-    .bg-primary-light { background: rgba(13, 110, 253, 0.1); }
-    .bg-success-light { background: rgba(25, 135, 84, 0.1); }
-    .border-glass { border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; }
-    .accordion-button:not(.collapsed) { background: transparent !important; box-shadow: none !important; color: #3b82f6 !important; }
-    .accordion-button::after { filter: invert(1); scale: 0.8; }
-    [data-theme="light"] .accordion-button::after { filter: none; }
-    
-    .code-block {
-        background: rgba(0,0,0,0.3);
-        padding: 1.5rem;
-        border-radius: 12px;
-        font-family: 'Courier New', Courier, monospace;
-        border: 1px solid var(--glass-border);
-    }
-    [data-theme="light"] .code-block {
-        background: #f8fafc;
-        border-color: #e2e8f0;
-    }
-
-    /* Mobile Responsiveness */
-    @media (max-width: 991.98px) {
-        .explorer-container {
-            flex-direction: column;
-        }
-        .file-sidebar {
-            width: 100%;
-            height: auto;
-            position: relative;
-            top: 0;
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-        }
-        .content-viewer {
-            padding: 2rem;
-        }
-        .hero-section h1 { font-size: 2.2rem; }
-    }
-
-    @media (max-width: 575.98px) {
-        .content-viewer {
-            padding: 1.5rem;
-            border-radius: 20px;
-        }
-        .file-tree-item {
-            padding: 0.6rem 1rem;
-            font-size: 0.85rem;
-        }
-    }
-
-    .file-tree-item {
-        display: flex;
-        font-family: 'Outfit', sans-serif;
-        align-items: center;
-        padding: 0.8rem 1.2rem;
-        color: rgba(255, 255, 255, 0.65);
-        text-decoration: none !important;
-        border-radius: 12px;
-        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        font-size: 0.9rem;
-        margin-bottom: 0.5rem;
-        border: 1px solid transparent;
-        background: rgba(255, 255, 255, 0.02);
-    }
-    [data-theme="light"] .file-tree-item {
-        color: rgba(0, 0, 0, 0.7);
-        background: rgba(0, 0, 0, 0.02);
-    }
-    .file-tree-item:hover {
-        background: rgba(59, 130, 246, 0.12);
-        color: #60a5fa;
-        transform: translateX(8px);
-        border-color: rgba(59, 130, 246, 0.2);
-    }
-    .file-tree-item.active {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.1));
-        color: #60a5fa;
-        border-color: rgba(59, 130, 246, 0.4);
-        font-weight: 600;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    }
-    .folder-label {
-        font-weight: 800;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        color: var(--primary-color);
-        margin: 2.2rem 0 1rem 0.5rem;
-        opacity: 0.9;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .folder-label::after {
-        content: '';
-        flex-grow: 1;
-        height: 1px;
-        background: linear-gradient(to right, rgba(59, 130, 246, 0.3), transparent);
-    }
-    .file-icon { width: 18px; margin-right: 12px; opacity: 0.9; font-size: 1.1rem; }
-
-    /* Content Styling Improvements */
-    .rendered-content { line-height: 1.85; font-size: 1.1rem; }
-    .rendered-content h1, .rendered-content h2, .rendered-content h3 {
-        color: var(--primary-color);
-        margin-top: 3rem;
-        margin-bottom: 1.5rem;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-    .rendered-content pre {
-        background: #0d1117 !important;
-        border-radius: 16px;
-        padding: 2rem !important;
-        border: 1px solid rgba(255,255,255,0.1);
-        margin: 2rem 0;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    }
-    [data-theme="light"] .rendered-content pre {
-        background: #f6f8fa !important;
-        border-color: rgba(0,0,0,0.05);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    }
-    .highlight { background: transparent !important; }
-
-
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="hero-section text-center reveal-soft">
-    <div class="container py-4">
-        <h1 class="display-3 fw-bold mb-3 dynamic-text premium-gradient">Project Repository Explorer</h1>
-        <p class="lead opacity-75 dynamic-text mb-4">Deep dive into the source code, notebooks, and structure of CyberShield AI</p>
-        <div class="d-flex justify-content-center">
-            <a href="{{ url_for('documentation') }}" class="btn btn-outline-info px-4 rounded-pill">
-                <i class="fas fa-arrow-left me-2"></i>Back to Overview
+{% macro render_doc_fragment(doc_type, current_doc, md_content=None, items=None, error=None) %}
+{% if error %}
+<div class="alert alert-danger glass-bg border-danger border-opacity-25 p-5 text-center">
+    <i class="fas fa-exclamation-triangle display-1 text-danger mb-4"></i>
+    <h3 class="fw-bold">Synchronization Error</h3>
+    <p class="opacity-75 lead">{{ error }}</p>
+    <a href="{{ url_for('explorer') }}" class="btn btn-outline-danger mt-3 px-4 rounded-pill">Restore Sync</a>
+</div>
+{% else %}
+<!-- 🧭 Breadcrumb Navigation -->
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <ol class="breadcrumb">
+        <!-- Root Segment -->
+        <li class="breadcrumb-item">
+            <a href="{{ url_for('explorer', doc='README.md') }}" class="breadcrumb-segment">
+                <i class="fas fa-home text-primary"></i>
+                <span>Project Root</span>
             </a>
+        </li>
+
+        {% set segments = current_doc.split('/') %}
+        {% set current_path = namespace(value='') %}
+        
+        {% for segment in segments if segment %}
+            {% if current_path.value %}
+                {% set current_path.value = current_path.value + '/' + segment %}
+            {% else %}
+                {% set current_path.value = segment %}
+            {% endif %}
+
+            <li class="breadcrumb-separator"><i class="fas fa-chevron-right"></i></li>
+            
+            <li class="breadcrumb-item">
+                {% if not loop.last %}
+                    <a href="{{ url_for('explorer', doc=current_path.value) }}" class="breadcrumb-segment">
+                        {{ segment }}
+                    </a>
+                {% else %}
+                    <span class="breadcrumb-segment active">
+                        <i class="fas fa-file-alt me-1 opacity-50"></i>
+                        {{ segment }}
+                    </span>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ol>
+</nav>
+
+{% if doc_type == 'folder' %}
+<div class="directory-explorer">
+    <div class="d-flex justify-content-between align-items-center mb-5 pb-3 border-bottom border-glass">
+        <div>
+            <h2 class="mb-1 fw-bold"><i class="fas fa-folder-open me-2 text-warning"></i>{{ current_doc.split('/')[-1] if current_doc else 'Project Explorer' }}</h2>
+            <p class="small opacity-50 mb-0">Total {{ items|length }} objects synchronized in this node</p>
+        </div>
+    </div>
+    <div class="row g-4">
+        {% for item in items %}
+        <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('explorer', doc=item.path) }}"
+                class="folder-item-card p-4 d-flex align-items-center text-decoration-none">
+                <div class="icon-box me-3">
+                    {% if item.is_dir %}
+                    <i class="fas fa-folder text-warning fs-3"></i>
+                    {% else %}
+                    {% set ext = item.name.split('.')[-1] | lower %}
+                    {% if ext == 'py' %}<i class="fab fa-python text-info fs-3"></i>
+                    {% elif ext == 'md' %}<i class="fab fa-markdown text-primary fs-3"></i>
+                    {% elif ext == 'ipynb' %}<i class="fas fa-brain text-danger fs-3"></i>
+                    {% elif ext == 'json' %}<i class="fas fa-database text-warning fs-3"></i>
+                    {% elif ext == 'txt' %}<i class="fas fa-file-contract text-success fs-3"></i>
+                    {% else %}<i class="fas fa-file-alt text-secondary fs-3"></i>{% endif %}
+                    {% endif %}
+                </div>
+                <div class="text-truncate">
+                    <h6 class="mb-0 dynamic-text fw-bold text-truncate">{{ item.name }}</h6>
+                    <span class="x-small opacity-50 text-uppercase letter-spacing-1">{% if item.is_dir %}Directory{%
+                        else %}File{% endif %}</span>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<div class="content-header mb-5 pb-4 border-bottom border-glass">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h2 fw-bold mb-1">
+                {% if doc_type == 'code' %}<i class="fas fa-code me-3 text-primary"></i>
+                {% elif doc_type == 'notebook' %}<i class="fas fa-brain me-3 text-info"></i>
+                {% else %}<i class="fab fa-markdown me-3 text-primary"></i>{% endif %}
+                {{ current_doc.split('/')[-1] }}
+            </h1>
+            <p class="small opacity-50 mb-0 uppercase letter-spacing-1">
+                Format: <span class="text-info">{{ doc_type }}</span> &nbsp;|&nbsp; Last Audited: <span
+                    class="text-success">LIVE</span>
+            </p>
+        </div>
+        <div class="d-none d-md-flex gap-2">
+            <button class="btn btn-outline-info btn-sm rounded-pill px-3" onclick="window.print()">
+                <i class="fas fa-print me-1"></i>Export
+            </button>
+            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="refreshDocumentContent()">
+                <i class="fas fa-sync-alt me-1"></i>Refresh
+            </button>
         </div>
     </div>
 </div>
 
-<div class="container-fluid px-lg-5">
-    <div class="explorer-container">
-        <!-- SMART SIDEBAR: Managed by CyberMaster Scroll Logic -->
-        <aside class="file-sidebar reveal-soft">
-            <div class="d-flex align-items-center mb-4">
-                <div class="p-2 rounded-3 bg-primary bg-opacity-10 me-3">
-                    <i class="fas fa-project-diagram text-primary"></i>
-                </div>
-                <h5 class="fw-bold mb-0 dynamic-text">Structure</h5>
-            </div>
-            
-            <div class="folder-label">Docs / Governance</div>
-            <a href="{{ url_for('explorer', doc='CyberAttackPrediction/PROJECT_BOOK.md') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/PROJECT_BOOK.md' %}active{% endif %}">
-                <i class="fas fa-book-medical file-icon text-info"></i> Technical Book
-            </a>
-            <a href="{{ url_for('explorer', doc='README.md') }}" class="file-tree-item {% if current_doc == 'README.md' %}active{% endif %}">
-                <i class="fab fa-markdown file-icon text-primary"></i> Project Overview
-            </a>
-            <div class="ms-3">
-                <a href="{{ url_for('explorer', doc='docs/PROJECT_GUIDE.md') }}" class="file-tree-item {% if current_doc == 'docs/PROJECT_GUIDE.md' %}active{% endif %}">
-                    <i class="fas fa-scroll file-icon text-info"></i> Project Guide
-                </a>
-                <a href="{{ url_for('explorer', doc='docs/BeReady.md') }}" class="file-tree-item {% if current_doc == 'docs/BeReady.md' %}active{% endif %}">
-                    <i class="fas fa-graduation-cap file-icon text-success"></i> Viva Preparation
-                </a>
-            </div>
+<div class="doc-body">
+    {{ md_content|safe }}
+</div>
+{% endif %}
+{% endif %}
+{% endmacro %}
 
-            <div class="folder-label">Source Code</div>
-            <div class="ms-1">
-                <a href="{{ url_for('explorer', doc='CyberAttackPrediction/Main.py') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/Main.py' %}active{% endif %}">
-                    <i class="fab fa-python file-icon text-primary"></i> Main Server Engine
-                </a>
-                <a href="{{ url_for('explorer', doc='CyberAttackPrediction/train_model.py') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/train_model.py' %}active{% endif %}">
-                    <i class="fas fa-brain file-icon text-danger"></i> Training Logic
-                </a>
-                <a href="{{ url_for('explorer', doc='CyberAttackPrediction/validate_pipeline.py') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/validate_pipeline.py' %}active{% endif %}">
-                    <i class="fas fa-vial file-icon text-success"></i> Validation Suite
-                </a>
-                
-                <div class="folder-label mt-2">ML Notebooks</div>
-                <div class="ms-3">
-                    <a href="{{ url_for('explorer', doc='CyberAttackPrediction/ExtensionCyberAttack.ipynb') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/ExtensionCyberAttack.ipynb' %}active{% endif %}">
-                        <i class="fas fa-book-open file-icon text-info"></i> Extension Analysis
-                    </a>
-                    <a href="{{ url_for('explorer', doc='CyberAttackPrediction/ProposeCyberAttack.ipynb') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/ProposeCyberAttack.ipynb' %}active{% endif %}">
-                        <i class="fas fa-flask file-icon text-warning"></i> Proposed Model
-                    </a>
-                </div>
-            </div>
+{% block extra_css %}
+<style>
+    /* ═══════════════════════════════════════════════════
+       INTELLIGENCE HUB 2.0 — CLEAN ARCHITECTURE
+       Fixed sidebar via JS-driven position sync
+    ═══════════════════════════════════════════════════ */
 
-            <div class="folder-label">System Env</div>
-            <a href="{{ url_for('explorer', doc='CyberAttackPrediction/requirements.txt') }}" class="file-tree-item {% if current_doc == 'CyberAttackPrediction/requirements.txt' %}active{% endif %}">
-                <i class="fas fa-file-contract file-icon text-warning"></i> dependencies.txt
-            </a>
-            <a href="{{ url_for('explorer', doc='install_deps.ps1') }}" class="file-tree-item {% if current_doc == 'install_deps.ps1' %}active{% endif %}">
-                <i class="fas fa-terminal file-icon text-info"></i> Setup Script (PS1)
-            </a>
-            <a href="{{ url_for('explorer', doc='to do list.txt') }}" class="file-tree-item {% if current_doc == 'to do list.txt' %}active{% endif %}">
-                <i class="fas fa-check-double file-icon text-success"></i> Implementation Log
-            </a>
-        </aside>
+    /* Hero */
+    .hub-hero {
+        padding: 100px 0 60px;
+        text-align: center;
+        border-bottom: 1px solid var(--glass-border);
+        position: relative;
+        z-index: 10;
+    }
 
-        <!-- Main Content Area -->
-        <main class="content-viewer reveal-premium">
-            <div class="rendered-content dynamic-text">
-                {% if error %}
-                    <div class="alert alert-danger border-glass glass-bg text-center p-5">
-                        <i class="fas fa-exclamation-circle display-1 mb-4"></i>
-                        <h3>Error Loading Resource</h3>
-                        <p class="opacity-75">{{ error }}</p>
-                        <a href="{{ url_for('documentation') }}" class="btn btn-outline-danger mt-3">Reset Explorer</a>
-                    </div>
-                {% else %}
-                    {% if doc_type == 'code' %}
-                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-glass">
-                            <h4 class="mb-0 fw-bold"><i class="fas fa-code me-2 text-primary"></i>Source Code Viewer</h4>
-                            <span class="badge bg-primary rounded-pill">Syntax Highlighted</span>
-                        </div>
-                    {% elif doc_type == 'notebook' %}
-                        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom border-glass">
-                            <h4 class="mb-0 fw-bold"><i class="fas fa-book-open me-2 text-info"></i>Research Notebook</h4>
-                            <span class="badge bg-info rounded-pill">Interactive Format</span>
-                        </div>
-                    {% endif %}
-                    
-                    <div class="doc-body">
-                        {{ md_content|safe }}
-                    </div>
-                {% endif %}
-            </div>
-        </main>
+    /* Two-column layout: sidebar placeholder + content */
+    .hub-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 2rem;
+        padding: 2rem 1.5rem 4rem 1.5rem;
+        min-height: calc(100vh - 12rem);
+    }
+
+    /* ── Sidebar Anchor (in-flow placeholder) ── */
+    .sidebar-anchor {
+        flex: 0 0 340px;
+        width: 340px;
+        /* Invisible — just holds space */
+        visibility: hidden;
+        pointer-events: none;
+        align-self: stretch;
+    }
+
+    /* ── The real sidebar (fixed, driven by JS) ── */
+    .file-sidebar {
+        position: fixed;
+        top: 90px;
+        width: 340px;
+        /* overridden by JS to match anchor */
+        left: 0;
+        /* overridden by JS */
+        max-height: calc(100vh - 130px);
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        background: var(--bg-card-soft);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border: 1px solid var(--glass-border);
+        border-radius: 20px;
+        padding: 1.5rem;
+        z-index: 900;
+
+        /* Stealth initial state */
+        opacity: 0;
+        pointer-events: none;
+        transform: translateY(16px) scale(0.97);
+        transition:
+            opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .file-sidebar.is-visible {
+        opacity: 1;
+        pointer-events: all;
+        transform: translateY(0) scale(1);
+        border-color: rgba(var(--info-rgb), 0.4);
+        box-shadow: var(--card-shadow);
+    }
+
+    /* Sidebar scrollbar */
+    .file-sidebar::-webkit-scrollbar {
+        width: 3px;
+    }
+
+    .file-sidebar::-webkit-scrollbar-thumb {
+        background: var(--text-muted);
+        border-radius: 10px;
+    }
+
+    /* ── Content column ── */
+    .hub-content {
+        flex: 1;
+        min-width: 0;
+        padding-bottom: 3rem;
+    }
+
+    /* 🧭 Premium Segmented Breadcrumbs (Explorer Style) */
+    .breadcrumb-nav {
+        margin-bottom: 2rem;
+    }
+    .breadcrumb-nav .breadcrumb {
+        background: transparent;
+        padding: 0;
+        border-radius: 0;
+        border: none;
+        backdrop-filter: none;
+        gap: 0.5rem;
+        display: inline-flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+    .breadcrumb-segment {
+        background: var(--bg-card-soft);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        padding: 0.45rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        backdrop-filter: blur(8px);
+    }
+    .breadcrumb-segment:hover {
+        background: var(--primary-light);
+        border-color: var(--info-color);
+        color: var(--text-main);
+        transform: translateY(-2px);
+        box-shadow: var(--card-shadow);
+    }
+    .breadcrumb-segment.active {
+        background: var(--info-light);
+        border-color: var(--info-color);
+        color: var(--info-color);
+        cursor: default;
+        pointer-events: none;
+    }
+    .breadcrumb-separator {
+        color: var(--text-muted);
+        opacity: 0.3;
+        font-size: 0.75rem;
+        margin: 0 -0.2rem;
+    }
+    .breadcrumb-item + .breadcrumb-item::before {
+        display: none; /* Hide default Bootstrap separator */
+    }
+
+    /* ── File tree ── */
+    .folder-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        opacity: 0.4;
+        color: var(--text-main);
+        margin: 1.6rem 0 0.6rem 0.8rem;
+    }
+
+    .file-tree-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0.65rem 1rem;
+        margin-bottom: 0.25rem;
+        border-radius: 10px;
+        color: var(--text-main);
+        text-decoration: none;
+        font-size: 0.88rem;
+        border: 1px solid transparent;
+        transition: all 0.25s ease;
+    }
+
+    .file-tree-item:hover {
+        background: var(--primary-light);
+        transform: translateX(4px);
+        border-color: var(--glass-border);
+        color: var(--text-main);
+    }
+
+    .file-tree-item.active {
+        background: var(--bg-gradient);
+        color: var(--input-text) !important;
+        box-shadow: 0 4px 14px rgba(var(--primary-rgb), 0.3);
+    }
+
+    .file-icon {
+        font-size: 0.9rem;
+        min-width: 1rem;
+        text-align: center;
+    }
+
+    /* ── Search ── */
+    .sidebar-search {
+        background: rgba(var(--primary-rgb), 0.06);
+        border: 1px solid var(--glass-border);
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        width: 100%;
+        color: var(--text-main);
+        font-size: 0.88rem;
+        outline: none;
+        transition: border-color 0.25s;
+    }
+
+    .sidebar-search:focus {
+        border-color: var(--info-color);
+    }
+
+    /* ── Folder grid cards ── */
+    .folder-item-card {
+        background: var(--bg-card-soft);
+        border: 1px solid var(--glass-border);
+        border-radius: 16px;
+        transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+        color: var(--text-main);
+    }
+
+    .folder-item-card:hover {
+        background: var(--primary-light);
+        transform: translateY(-6px);
+        border-color: var(--info-color);
+        box-shadow: var(--card-shadow);
+        color: var(--text-main);
+    }
+
+    /* ── Code blocks ── */
+    .highlight {
+        background: var(--bg-base) !important;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    /* ── Content transition ── */
+    .rendered-content {
+        transition: opacity 0.25s ease;
+    }
+
+    /* ── Loading bar (top of content area) ── */
+    #nav-progress {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background: linear-gradient(90deg, var(--primary-color), var(--info-color));
+        z-index: 9999;
+        transition: width 0.3s ease, opacity 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    #nav-progress.loading {
+        opacity: 1;
+        width: 70%;
+    }
+
+    #nav-progress.done {
+        width: 100%;
+        opacity: 0;
+    }
+
+    .sync-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.78rem;
+        opacity: 0.6;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-dot {
+        width: 7px;
+        height: 7px;
+        background: var(--success-color);
+        border-radius: 50%;
+        animation: pulse-dot 2s infinite;
+    }
+
+    @keyframes pulse-dot {
+
+        0%,
+        100% {
+            box-shadow: 0 0 0 0 rgba(45, 206, 137, 0.5);
+        }
+
+        50% {
+            box-shadow: 0 0 0 5px rgba(45, 206, 137, 0);
+        }
+    }
+
+    /* ════════════════════════════════════════════
+       DOC BODY — PREMIUM CONTENT STYLING
+    ════════════════════════════════════════════ */
+
+    /* Typography — reading-optimized */
+    .doc-body {
+        font-size: 1rem;
+        line-height: 1.85;
+        color: var(--text-main);
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    .doc-body p {
+        margin-bottom: 1.2rem;
+        color: var(--text-main);
+    }
+
+    /* Headings — styled but not flex (breaks inline content) */
+    .doc-body h1,
+    .doc-body h2,
+    .doc-body h3,
+    .doc-body h4 {
+        color: var(--text-main);
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.6rem;
+        line-height: 1.3;
+    }
+
+    .doc-body h1 {
+        font-size: 1.9rem;
+        border-bottom: 2px solid rgba(var(--primary-rgb), 0.35);
+        padding-bottom: 0.75rem;
+    }
+
+    .doc-body h2 {
+        font-size: 1.45rem;
+        border-bottom: 1px solid rgba(var(--info-rgb), 0.25);
+    }
+
+    .doc-body h3 {
+        font-size: 1.15rem;
+        color: var(--text-main);
+        border-bottom: none;
+        margin-top: 1.75rem;
+        padding-bottom: 0;
+    }
+
+    .doc-body h4 {
+        font-size: 1rem;
+        color: var(--text-muted);
+        border-bottom: none;
+        padding-bottom: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Ordered list — step cards */
+    .doc-body ol {
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0;
+        counter-reset: step-counter;
+    }
+
+    .doc-body ol>li {
+        counter-increment: step-counter;
+        position: relative;
+        padding: 1.2rem 1.5rem 1.2rem 4rem;
+        margin-bottom: 1rem;
+        background: var(--bg-card-soft);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .doc-body ol>li:hover {
+        border-color: rgba(var(--primary-rgb), 0.4);
+        box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    }
+
+    .doc-body ol>li::before {
+        content: counter(step-counter);
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 2rem;
+        height: 2rem;
+        background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+        color: white;
+        font-weight: 700;
+        font-size: 0.82rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.35);
+        flex-shrink: 0;
+    }
+
+    /* Unordered list */
+    .doc-body ul {
+        padding-left: 0;
+        margin: 1rem 0;
+        list-style: none;
+    }
+
+    .doc-body ul>li {
+        padding: 0.4rem 0 0.4rem 1.6rem;
+        position: relative;
+        color: var(--text-main);
+    }
+
+    .doc-body ul>li::before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: var(--info-color);
+        font-size: 0.85rem;
+    }
+
+    /* Inline code */
+    .doc-body code:not(pre code) {
+        background: rgba(var(--primary-rgb), 0.12);
+        color: var(--info-color);
+        border: 1px solid rgba(var(--info-rgb), 0.2);
+        padding: 0.15em 0.5em;
+        border-radius: 6px;
+        font-size: 0.87em;
+        font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    }
+
+    /* Code block — terminal style */
+    .doc-body pre {
+        background: var(--code-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 14px;
+        margin: 1.25rem 0;
+        overflow: hidden;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Terminal header bar */
+    .doc-body pre::before {
+        content: '● ● ●';
+        display: block;
+        background: var(--card-header-bg);
+        padding: 0.5rem 1rem;
+        font-size: 0.65rem;
+        letter-spacing: 4px;
+        color: var(--text-muted);
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .doc-body pre code {
+        display: block;
+        padding: 1.25rem 1.5rem;
+        font-size: 0.875rem;
+        line-height: 1.7;
+        color: var(--code-color);
+        font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+        overflow-x: auto;
+        background: transparent !important;
+        border: none !important;
+    }
+
+    /* Blockquote — callout style */
+    .doc-body blockquote {
+        margin: 1.5rem 0;
+        padding: 1rem 1.5rem;
+        background: rgba(var(--info-rgb), 0.07);
+        border-left: 4px solid var(--info-color);
+        border-radius: 0 12px 12px 0;
+        color: var(--text-main);
+        font-style: normal;
+    }
+
+    /* Tables */
+    .doc-body table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin: 1.5rem 0;
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .doc-body thead th {
+        background: rgba(var(--primary-rgb), 0.12);
+        color: var(--text-main);
+        font-weight: 700;
+        padding: 0.9rem 1.2rem;
+        text-align: left;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .doc-body tbody td {
+        padding: 0.8rem 1.2rem;
+        border-bottom: 1px solid var(--glass-border);
+        font-size: 0.92rem;
+    }
+
+    .doc-body tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .doc-body tbody tr:hover {
+        background: var(--bg-card-soft);
+    }
+
+    /* Strong / Bold */
+    .doc-body strong {
+        color: var(--text-main);
+        font-weight: 700;
+    }
+
+    /* Links */
+    .doc-body a {
+        color: var(--info-color);
+        text-decoration: none;
+        border-bottom: 1px dashed rgba(var(--info-rgb), 0.4);
+        transition: border-color 0.2s, color 0.2s;
+    }
+
+    .doc-body a:hover {
+        color: var(--primary-color);
+        border-bottom-color: var(--primary-color);
+    }
+
+    /* Horizontal rule */
+    .doc-body hr {
+        border: none;
+        border-top: 1px solid var(--glass-border);
+        margin: 2rem 0;
+    }
+
+    /* Copy button — positioned top-right inside the code block */
+    .doc-body pre {
+        position: relative;
+        /* ensure button can be absolutely placed */
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 2.6rem;
+        /* below the terminal header bar */
+        right: 0.75rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.3rem 0.75rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, border-color 0.2s;
+        backdrop-filter: blur(4px);
+        z-index: 2;
+        font-family: 'Inter', sans-serif;
+        text-transform: uppercase;
+    }
+
+    .copy-btn:hover {
+        background: rgba(var(--info-rgb), 0.2);
+        border-color: rgba(var(--info-rgb), 0.5);
+        color: var(--info-color);
+    }
+
+    .copy-btn.copied {
+        background: rgba(var(--success-rgb), 0.2);
+        border-color: rgba(var(--success-rgb), 0.5);
+        color: var(--success-color);
+    }
+
+    /* Images — block standalone images only; keep inline badges inline */
+    .doc-body p > img:only-child,
+    .doc-body figure img {
+        max-width: min(100%, 640px);
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+        display: block;
+        margin: 1.5rem auto;
+    }
+    /* Shield/badge images stay inline */
+    .doc-body p > img[src*="shields.io"],
+    .doc-body p > img[src*="badge"],
+    .doc-body p > img[alt*="badge"],
+    .doc-body p > img[alt*="Badge"] {
+        display: inline;
+        vertical-align: middle;
+        border: none;
+        box-shadow: none;
+        border-radius: 4px;
+        margin: 2px 3px;
+        max-width: unset;
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<!-- ═══ HERO ═══ -->
+<div class="hub-hero">
+    <div class="container">
+        <h1 class="display-3 fw-bold mb-3 premium-gradient">CyberShield Intelligence Hub</h1>
+        <p class="lead opacity-75 mb-4">Neural documentation gateway for advanced threat detection and machine learning
+            infrastructure.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{{ url_for('documentation') }}" class="btn btn-outline-info px-5 py-3 rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i>Exit Hub
+            </a>
+            <button class="btn btn-primary px-5 py-3 rounded-pill shadow-lg"
+                onclick="document.querySelector('.hub-content').scrollIntoView({behavior:'smooth'})">
+                <i class="fas fa-rocket me-2"></i>Explore Project
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Progress bar (lives on body level) -->
+<div id="nav-progress"></div>
 
+<!-- ═══ MAIN LAYOUT ═══ -->
+<div class="container-fluid">
+    <div class="hub-layout">
 
+        <!-- Anchor: holds the column space & gives JS the exact coordinates -->
+        <div class="sidebar-anchor" id="sidebar-anchor"></div>
+
+        <!-- THE REAL SIDEBAR (fixed, positioned by JS) -->
+        <aside class="file-sidebar" id="file-sidebar">
+            <!-- Status -->
+            <div class="repo-vitals mb-3">
+                <div class="sync-badge mb-1">
+                    <div class="status-dot"></div>
+                    Live Sync Active
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-1">
+                    <span class="small opacity-50">Local Project</span>
+                    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25"
+                        style="font-size:0.7rem;">STABLE</span>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="mb-3">
+                <input type="text" id="sidebar-search" class="sidebar-search" placeholder="Search files…">
+            </div>
+
+            <!-- Tree -->
+            <!-- Dynamic Tree Discovery -->
+            {% for category, files in project_tree.items() %}
+                {% if files %}
+                <div class="folder-label mt-3">{{ category }}</div>
+                {% for file in files %}
+                <a href="{{ url_for('explorer', doc=file.path) }}"
+                   class="file-tree-item {% if current_doc == file.path %}active{% endif %}">
+                    {% set ext = file.name.split('.')[-1] | lower %}
+                    {% if ext == 'md' %}
+                    <i class="fab fa-markdown file-icon text-primary"></i>
+                    {% elif ext == 'ipynb' %}
+                    <i class="fas fa-brain file-icon text-danger"></i>
+                    {% elif ext == 'py' %}
+                    <i class="fab fa-python file-icon text-info"></i>
+                    {% elif ext == 'json' %}
+                    <i class="fas fa-database file-icon text-warning"></i>
+                    {% elif ext == 'txt' %}
+                    <i class="fas fa-file-contract file-icon text-success"></i>
+                    {% else %}
+                    <i class="fas fa-file-alt file-icon opacity-50"></i>
+                    {% endif %}
+                    {{ file.name }}
+                </a>
+                {% endfor %}
+                {% endif %}
+            {% endfor %}
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="hub-content" id="hub-content">
+            <div class="rendered-content">
+                {{ render_doc_fragment(doc_type, current_doc, md_content, items, error) }}
+            </div>
+        </main>
+
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+    (function () {
+        /* ═══════════════════════════════════════════════════════════
+           INTELLIGENCE HUB — SPA ENGINE
+           Smooth navigation: no full reloads, fade transition,
+           loading bar, browser history (back/forward) support.
+        ═══════════════════════════════════════════════════════════ */
 
+        /* ── Elements ── */
+        const sidebar = document.getElementById('file-sidebar');
+        const anchor = document.getElementById('sidebar-anchor');
+        const footer = document.getElementById('footer-reveal-trigger');
+        const progress = document.getElementById('nav-progress');
+        const contentEl = document.querySelector('.rendered-content');
+        const treeItems = document.querySelectorAll('.file-tree-item');
+        const searchInput = document.getElementById('sidebar-search');
 
-    // Smart Sidebar Hiding Logic
-    const sidebar = document.querySelector('.file-sidebar');
-    const footerTrigger = document.getElementById('footer-reveal-trigger');
+        /* ── Sidebar: escape transformed ancestor ── */
+        if (sidebar && anchor) {
+            document.body.appendChild(sidebar);
 
-    if (sidebar && footerTrigger) {
-        // Enhanced Sidebar Observer: Synchronized with Footer Reveal (350px zone)
-        const sidebarObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    sidebar.classList.add('sidebar-hidden');
+            function syncPosition() {
+                const r = anchor.getBoundingClientRect();
+                sidebar.style.left = r.left + 'px';
+                sidebar.style.width = r.width + 'px';
+            }
+
+            function tick() {
+                const scrollY = window.scrollY;
+                const viewH = window.innerHeight;
+                const footerTop = footer ? footer.getBoundingClientRect().top : 99999;
+                if (scrollY > 440 && footerTop > viewH) {
+                    syncPosition();
+                    sidebar.classList.add('is-visible');
                 } else {
-                    sidebar.classList.remove('sidebar-hidden');
+                    sidebar.classList.remove('is-visible');
                 }
+            }
+
+            window.addEventListener('scroll', tick, { passive: true });
+            window.addEventListener('resize', function () { syncPosition(); tick(); });
+            setTimeout(function () { syncPosition(); tick(); }, 300);
+        }
+
+        /* ── Progress bar helpers ── */
+        function barStart() {
+            if (!progress) return;
+            progress.classList.remove('done');
+            progress.classList.add('loading');
+        }
+        function barDone() {
+            if (!progress) return;
+            progress.classList.remove('loading');
+            progress.classList.add('done');
+            setTimeout(function () { progress.classList.remove('done'); }, 400);
+        }
+
+        /* ── Core: load a doc URL without page reload ── */
+        async function loadDoc(url) {
+            if (!contentEl) { window.location.href = url; return; }
+
+            barStart();
+            contentEl.style.opacity = '0';
+
+            try {
+                const res = await fetch(url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+
+                // Swap content after fade-out settles
+                await delay(220);
+                contentEl.innerHTML = data.html || '';
+                if (data.title) document.title = data.title + ' — CyberShield AI';
+
+                // Fade in
+                contentEl.style.opacity = '1';
+                // Scroll content into view gently
+                contentEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+                initCopyButtons();
+                barDone();
+
+            } catch (err) {
+                console.error('[Hub] Navigation error:', err);
+                contentEl.style.opacity = '1';
+                barDone();
+                window.location.href = url; // safe fallback
+            }
+        }
+
+        /* ── Set active link by current URL ── */
+        function syncActiveLink(url) {
+            const params = new URL(url, location.origin).searchParams;
+            const doc = params.get('doc') || '';
+            treeItems.forEach(function (item) {
+                const itemDoc = new URL(item.href, location.origin).searchParams.get('doc') || '';
+                item.classList.toggle('active', itemDoc === doc || (!doc && !itemDoc));
             });
-        }, {
-            threshold: 0,
-            rootMargin: '0px 0px 350px 0px' // Triggers early to prevent overlap with 350px footer
+        }
+
+        /* ── Sidebar link interception ── */
+        treeItems.forEach(function (link) {
+            link.addEventListener('click', function (e) {
+                const url = link.getAttribute('href');
+                if (!url || !url.includes('doc=')) return;
+                e.preventDefault();
+                if (url === window.location.href) return; // already here
+
+                history.pushState({ url: url }, '', url);
+                syncActiveLink(url);
+                loadDoc(url);
+            });
         });
 
-        sidebarObserver.observe(footerTrigger);
-    }
+        /* ── Browser back / forward ── */
+        window.addEventListener('popstate', function (e) {
+            const url = (e.state && e.state.url) || window.location.href;
+            syncActiveLink(url);
+            loadDoc(url);
+        });
+
+        /* ── Refresh button ── */
+        window.refreshDocumentContent = function () {
+            loadDoc(window.location.href);
+        };
+
+        /* ── Search ── */
+        if (searchInput) {
+            searchInput.addEventListener('input', function () {
+                const term = this.value.toLowerCase();
+                treeItems.forEach(function (item) {
+                    item.style.display = item.textContent.toLowerCase().includes(term) ? 'flex' : 'none';
+                });
+            });
+        }
+
+        /* ── Copy buttons ── */
+        function initCopyButtons() {
+            document.querySelectorAll('.doc-body pre').forEach(function (block) {
+                if (block.querySelector('.copy-btn')) return;
+
+                // Get code text (skip the terminal header pseudo-element text)
+                var codeEl = block.querySelector('code');
+                var btn = document.createElement('button');
+                btn.className = 'copy-btn';
+                btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+
+                btn.addEventListener('click', function () {
+                    var text = codeEl ? codeEl.innerText : block.innerText;
+                    navigator.clipboard.writeText(text).then(function () {
+                        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        btn.classList.add('copied');
+                        setTimeout(function () {
+                            btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                            btn.classList.remove('copied');
+                        }, 2000);
+                    }).catch(function () {
+                        btn.innerHTML = '<i class="fas fa-times"></i> Failed';
+                        setTimeout(function () { btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 2000);
+                    });
+                });
+
+                block.appendChild(btn);
+            });
+        }
+
+        /* ── Utility ── */
+        function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+        /* ── Boot ── */
+        syncActiveLink(window.location.href);
+        initCopyButtons();
+
+    })();
 </script>
 {% endblock %}

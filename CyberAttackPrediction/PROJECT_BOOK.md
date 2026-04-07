@@ -1,4 +1,6 @@
-# Comprehensive Guide: Cyber Attack Prediction Analysis
+# Comprehensive Guide: Cyber Attack Prediction Analysis 🛡️
+
+**Status**: 🟢 **Migrated to Python 3.13.12 Core** (2026 High-Performance Hardening)
 
 This document serves as the "Project Book," consolidating the technical logic, results, and interpretation for both **Extension** and **Propose** analysis notebooks.
 
@@ -18,7 +20,7 @@ The project is organized into a modular structure to separate data analysis (Jup
 
 - **`/` (Root)**:
   - `Main.py`: The heart of the application. Handles Flask routing, session logic, and real-time inference.
-  - `train_model.py`: Utility script to re-train the Random Forest model and generate the `.pkl` artifact.
+  - `train_model.py`: Utility script to re-train the Random Forest model and generate the high-performance `.joblib` artifact.
   - `validate_pipeline.py`: Sanity check script for data processing and model compatibility.
   - `PROJECT_BOOK.md`: Technical documentation and project guide (The file you are reading).
   - `users.json`: Persistent user database (Salted/Hashed).
@@ -26,10 +28,10 @@ The project is organized into a modular structure to separate data analysis (Jup
   - `requirements.txt`: Python dependency manifest.
   - `.env`: Environment configuration (API keys, Secret keys).
 - **`/model`**:
-  - `trained_rf_model.pkl`: Serialized model artifact (includes Scaler and Encoders).
+  - `trained_rf_model.joblib`: High-performance serialized model artifact (includes Scaler and Encoders, optimized for memory).
   - `*.hdf5`: Binary weight files for deep learning components.
 - **`/templates`**:
-  - `base.html`: Global layout with **Integrated CSS/JS engine** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Includes a **'Reveal Footer' architecture** for a cinematic scroll experience and a **'Dropdown Guard' diagnostic script** for navigation stability.
+  - `base.html`: Global layout with **CyberMaster Unified Controller** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Managed by a high-performance JS/CSS engine for 60FPS visuals.
   - `AccountSettings.html`: The **CyberShield Command Center**. A high-security administrator dashboard with live system monitoring and user registry management.
   - `Legal.html`: The **Unified Legal Hub**. Consolidates Terms, Privacy, and Security Contact into a tabbed, high-performance interface.
   - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.

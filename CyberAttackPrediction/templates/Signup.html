@@ -44,13 +44,13 @@
     .blob-1 {
         top: -10%;
         left: -10%;
-        background: #3b82f6;
+        background: var(--primary-color);
     }
 
     .blob-2 {
         bottom: -10%;
         right: -10%;
-        background: #8b5cf6;
+        background: var(--info-color);
         animation-delay: -10s;
     }
 
@@ -105,6 +105,7 @@
         background: transparent;
         display: flex;
         flex-direction: row;
+        align-items: stretch;
         animation: emergeFromDeep 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
         will-change: transform, opacity, filter;
         /* Optimization: Limit scope of animation to prevent repainting the entire viewport */
@@ -112,8 +113,12 @@
         transform-origin: center center;
         transform-style: preserve-3d;
         backface-visibility: hidden;
-        /* Forced overflow visible to ensure only global page scroll handles content */
-        overflow: visible !important;
+        /* Forced overflow hidden to ensure child panels are clipped into the perfect 30px curves */
+        overflow: hidden !important;
+        /* Consolidated border and shadow for a unified premium card appearance */
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 30px !important;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         transition: none !important;
         margin: 2rem auto;
     }
@@ -125,35 +130,26 @@
         transition: none !important;
     }
 
-    .form-panel {
-        animation-delay: 0.15s;
-        /* Hard-locked flex basis for zero movement to match login */
-        flex: 0 0 410px;
-        padding: 3rem 2.5rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        border-radius: 0 30px 30px 0 !important;
-        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
+
 
     .info-panel {
         /* Hard-locked flex basis for zero movement to match login */
         flex: 0 0 490px;
         /* Lowered white opacity to 0.015 to remove the haze in dark mode */
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.015) 0%, rgba(255, 255, 255, 0.01) 100%);
+        background: var(--glass-bg);
         backdrop-filter: blur(20px);
         padding: 2.5rem 3rem;
         display: flex;
         flex-direction: column;
         justify-content: flex-start;
-        /* Custom border softening: Soft left border, zero right border to merge with form side */
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-right: none !important;
-        border-radius: 30px 0 0 30px;
-        /* Forced overflow visible to prevent shadow clipping */
-        overflow: visible !important;
-        box-shadow: -20px 25px 50px -12px rgba(0, 0, 0, 0.3);
+        /* Boundary simplification: Child panels are now square; clipping is handled by the parent wrapper */
+        border: none !important;
+        border-right: 1px solid rgba(255, 255, 255, 0.04) !important;
+        border-radius: 0 !important;
+        position: relative;
+        z-index: 1;
+        /* Removing independent shadow to prevent shadow-collision at the junction */
+        box-shadow: none !important;
     }
 
     /* Disable all circular blobs and internal shines to clean the interface */
@@ -180,13 +176,13 @@
         display: flex;
         flex-direction: column;
         justify-content: center;
-        /* Custom border softening: Soft right border, zero left border to merge with info side */
-        border: 1px solid rgba(255, 255, 255, 0.04);
-        border-left: none !important;
-        border-radius: 0 30px 30px 0 !important;
-        /* Forced overflow visible to prevent shadow clipping */
-        overflow: visible !important;
-        box-shadow: 20px 25px 50px -12px rgba(0, 0, 0, 0.5);
+        /* Boundary simplification: Child panels are now square; clipping is handled by the parent wrapper */
+        border: none !important;
+        border-radius: 0 !important;
+        position: relative;
+        z-index: 2;
+        /* Removing independent shadow to prevent shadow-collision at the junction */
+        box-shadow: none !important;
     }
 
     .form-control {
@@ -217,12 +213,9 @@
 
         .info-panel {
             padding: 2.5rem 3.5rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            border-right: none;
-            border-bottom: 1px solid var(--glass-border);
-            border-radius: 30px 30px 0 0;
+            /* Mobile seam: Move border from right to bottom in column layout */
+            border-right: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
         }
 
         .form-panel {
@@ -232,16 +225,16 @@
 
     /* Modal Styling - Premium Cyber Card */
     .modal-content {
-        background: rgba(15, 23, 42, 0.8) !important;
+        background: var(--dropdown-bg) !important;
         backdrop-filter: blur(25px) saturate(180%) !important;
-        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border: 1px solid var(--glass-border) !important;
         border-radius: 24px !important;
-        color: white;
+        color: var(--text-main);
     }
 
     .credential-card {
-        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: var(--bg-card-soft);
+        border: 1px solid var(--glass-border);
         border-radius: 20px;
         padding: 2rem;
         position: relative;
@@ -256,7 +249,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent);
+        background: radial-gradient(circle at top right, var(--primary-light), transparent);
     }
 
     .card-label {
@@ -278,9 +271,9 @@
 
     .shield-success-icon {
         font-size: 4rem;
-        color: #10b981;
+        color: var(--success-color);
         margin-bottom: 1rem;
-        filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.4));
+        filter: drop-shadow(0 0 20px rgba(var(--success-rgb), 0.4));
         animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
@@ -336,7 +329,7 @@
             </div>
         </div>
 
-        <div class="form-panel liquid-glass"
+        <div class="form-panel"
             style="padding: 3rem 2.5rem; display: flex; flex-direction: column; justify-content: center;">
             <div class="text-center mb-4 animate-reveal" style="animation-delay: 0.7s;">
                 <h4 class="dynamic-text fw-bold">Create Account</h4>
@@ -392,7 +385,7 @@
                     <div class="card-value" id="displayUsername">---</div>
                     
                     <div class="card-label">Encryption Key</div>
-                    <div class="card-value" id="displayPassword" style="font-family: 'Space Mono', monospace; color: #3b82f6;">••••••••</div>
+                    <div class="card-value" id="displayPassword" style="font-family: 'Space Mono', monospace; color: var(--primary-color);">••••••••</div>
                 </div>
 
                 <div class="d-grid gap-3">
