@@ -89,12 +89,12 @@ This project includes all necessary software. Follow these **3 simple steps** to
 ## 📊 Project Foundations
 
 <p align="center">
-  <img src="CyberAttackPrediction/static/images/roadmap.png" alt="Project Roadmap" width="85%">
+  <img src="CyberAttackPrediction/static/images/roadmap_HD.png" alt="Project Roadmap" width="85%">
   <br><i>The systematic development lifecycle from data ingestion to Generative AI integration.</i>
 </p>
 
 <p align="center">
-  <img src="CyberAttackPrediction/static/images/five_pillars.png" alt="Five Pillars" width="85%">
+  <img src="CyberAttackPrediction/static/images/five_pillars_HD.png" alt="Five Pillars" width="85%">
   <br><i>Aligning with cybersecurity frameworks for comprehensive monitoring and defense.</i>
 </p>
 

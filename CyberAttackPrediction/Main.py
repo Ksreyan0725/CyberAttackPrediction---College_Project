@@ -25,6 +25,8 @@ from pygments.formatters import HtmlFormatter
 import nbformat
 from nbconvert import HTMLExporter
 import logging
+from docx import Document
+from docx.shared import Pt
 
 # Silence repetitive Heartbeat logs for a cleaner terminal experience
 class HeartbeatFilter(logging.Filter):
@@ -672,6 +674,8 @@ def get_project_tree():
             # Categorization Logic
             if ext == '.md' or (ext == '.txt' and 'guide' in item.lower()):
                 tree["Technical Docs"].append({"name": item, "path": rel_path})
+            elif ext == '.docx':
+                tree["Technical Docs"].append({"name": item, "path": rel_path})
             elif ext == '.py':
                 tree["Model Systems"].append({"name": item, "path": rel_path})
             elif ext == '.ipynb':
@@ -740,8 +744,11 @@ def explorer():
             return render_template('documentation.html', **render_data)
 
         ext = os.path.splitext(doc_path)[1].lower()
-        with open(full_path, 'r', encoding='utf-8') as f:
-            content = f.read()
+        if ext == '.docx':
+            content = "[Binary Word Data]" # Placeholder for reading branch
+        else:
+            with open(full_path, 'r', encoding='utf-8') as f:
+                content = f.read()
             
         display_path = doc_path.replace('\\', '/')
         if ext == '.md':
@@ -756,12 +763,40 @@ def explorer():
                 html_content
             )
             doc_type = 'markdown'
-        elif ext == '.ipynb':
-            nb = nbformat.reads(content, as_version=4)
-            html_exporter = HTMLExporter()
-            html_exporter.template_name = 'basic' # Simple clean output
-            (html_content, resources) = html_exporter.from_notebook_node(nb)
-            doc_type = 'notebook'
+        elif ext == '.docx':
+            try:
+                doc = Document(full_path)
+                html = []
+                for para in doc.paragraphs:
+                    if para.text.strip():
+                        # Simple Mapping
+                        style = para.style.name.lower()
+                        if 'heading 1' in style: html.append(f'<h1>{para.text}</h1>')
+                        elif 'heading 2' in style: html.append(f'<h2>{para.text}</h2>')
+                        else:
+                            # Basic formatting scan
+                            p_html = ""
+                            for run in para.runs:
+                                r_text = run.text
+                                if run.bold: r_text = f'<strong>{r_text}</strong>'
+                                if run.italic: r_text = f'<em>{r_text}</em>'
+                                p_html += r_text
+                            html.append(f'<p>{p_html}</p>')
+                
+                for table in doc.tables:
+                    html.append('<div class="table-responsive"><table class="table table-bordered border-glass-soft">')
+                    for row in table.rows:
+                        html.append('<tr>')
+                        for cell in row.cells:
+                            html.append(f'<td class="p-2">{cell.text}</td>')
+                        html.append('</tr>')
+                    html.append('</table></div>')
+                
+                html_content = "\n".join(html)
+                doc_type = 'word'
+            except Exception as e:
+                html_content = f'<div class="alert alert-warning">Error processing Word document: {str(e)}</div>'
+                doc_type = 'word'
         elif ext in ['.py', '.bat', '.ps1', '.json', '.html', '.css', '.js', '.txt']:
             lexer = get_lexer_for_filename(full_path) if ext != '.txt' else TextLexer()
             formatter = HtmlFormatter(style='monokai', full=False, cssclass="highlight")
@@ -774,6 +809,7 @@ def explorer():
 
         render_data = {
             'md_content': html_content,
+            'raw_content': content if ext != '.docx' else "", # DOCX editing will use HTML-to-Text conversion or be read-only for now
             'current_doc': display_path,
             'doc_type': doc_type,
             'project_tree': project_tree
@@ -798,7 +834,41 @@ def explorer():
         return render_template('documentation.html', **render_data)
         
     except Exception as e:
-        return render_template('documentation.html', error=f"Rendering error: {str(e)}")
+        return render_template('documentation.html', error=str(e), project_tree=project_tree)
+
+@app.route('/api/explorer/save', methods=['POST'])
+def explorer_save():
+    if 'user' not in session:
+        return jsonify({"status": "error", "message": "Auth Required"}), 401
+    
+    data = request.json
+    rel_path = data.get('path')
+    new_content = data.get('content')
+    
+    if not rel_path or '..' in rel_path or rel_path.startswith('/'):
+        return jsonify({"status": "error", "message": "Invalid Path"}), 400
+        
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    full_path = os.path.join(base_dir, rel_path)
+    
+    try:
+        ext = os.path.splitext(rel_path)[1].lower()
+        if ext == '.docx':
+            # Save HTML-to-Docx (Simple Text replacement)
+            doc = Document()
+            # Basic conversion: Split by newlines or use a simple parser
+            # For now, we save as plain paragraphs to ensure structure
+            for line in new_content.split('\n'):
+                if line.strip():
+                    doc.add_paragraph(line)
+            doc.save(full_path)
+        else:
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(new_content)
+        
+        return jsonify({"status": "success", "message": "Neural Synchronized: System Hardened"})
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route('/Train')
 def train_view():

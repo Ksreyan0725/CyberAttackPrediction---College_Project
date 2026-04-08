@@ -70,6 +70,7 @@
                     {% set ext = item.name.split('.')[-1] | lower %}
                     {% if ext == 'py' %}<i class="fab fa-python text-info fs-3"></i>
                     {% elif ext == 'md' %}<i class="fab fa-markdown text-primary fs-3"></i>
+                    {% elif ext == 'docx' %}<i class="fas fa-file-word text-info fs-3"></i>
                     {% elif ext == 'ipynb' %}<i class="fas fa-brain text-danger fs-3"></i>
                     {% elif ext == 'json' %}<i class="fas fa-database text-warning fs-3"></i>
                     {% elif ext == 'txt' %}<i class="fas fa-file-contract text-success fs-3"></i>
@@ -93,6 +94,7 @@
             <h1 class="h2 fw-bold mb-1">
                 {% if doc_type == 'code' %}<i class="fas fa-code me-3 text-primary"></i>
                 {% elif doc_type == 'notebook' %}<i class="fas fa-brain me-3 text-info"></i>
+                {% elif doc_type == 'word' %}<i class="fas fa-file-word me-3 text-info"></i>
                 {% else %}<i class="fab fa-markdown me-3 text-primary"></i>{% endif %}
                 {{ current_doc.split('/')[-1] }}
             </h1>
@@ -101,19 +103,43 @@
                     class="text-success">LIVE</span>
             </p>
         </div>
-        <div class="d-none d-md-flex gap-2">
-            <button class="btn btn-outline-info btn-sm rounded-pill px-3" onclick="window.print()">
-                <i class="fas fa-print me-1"></i>Export
-            </button>
-            <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="refreshDocumentContent()">
-                <i class="fas fa-sync-alt me-1"></i>Refresh
-            </button>
+        <div class="d-none d-md-flex gap-2" id="doc-actions">
+            <!-- Normal Mode -->
+            <div class="btn-group-normal d-flex gap-2">
+                <button class="btn btn-outline-info btn-sm rounded-pill px-3" onclick="window.print()">
+                    <i class="fas fa-print me-1"></i>Export
+                </button>
+                <button class="btn btn-outline-warning btn-sm rounded-pill px-3" id="edit-btn" onclick="toggleEditMode(true)">
+                    <i class="fas fa-pen-nib me-1"></i>Edit
+                </button>
+                <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="refreshDocumentContent()">
+                    <i class="fas fa-sync-alt me-1"></i>Refresh
+                </button>
+            </div>
+            <!-- Edit Mode -->
+            <div class="btn-group-edit d-none d-flex gap-2">
+                <button class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="saveFileContent()">
+                    <i class="fas fa-save me-1"></i>Save
+                </button>
+                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" onclick="toggleEditMode(false)">
+                    <i class="fas fa-times me-1"></i>Cancel
+                </button>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="doc-body">
+<div class="doc-body" id="doc-view-area">
     {{ md_content|safe }}
+</div>
+
+<!-- 🖋️ Neural Editor Area -->
+<div class="editor-area d-none" id="doc-edit-area">
+    <div class="editor-toolbar mb-2 d-flex justify-content-between align-items-center opacity-75">
+        <span class="x-small text-uppercase letter-spacing-1"><i class="fas fa-terminal me-2"></i>Native Neural Editor</span>
+        <span class="x-small text-info letter-spacing-1">AUTOSAVE: OFF</span>
+    </div>
+    <textarea id="native-editor" class="form-control glass-editor" spellcheck="false">{{ raw_content }}</textarea>
 </div>
 {% endif %}
 {% endif %}
@@ -852,6 +878,7 @@
     /* Shield/badge images stay inline */
     .doc-body p>img[src*="shields.io"],
     .doc-body p>img[src*="badge"],
+    .doc-body p>img[src*="badge"],
     .doc-body p>img[alt*="badge"],
     .doc-body p>img[alt*="Badge"] {
         display: inline;
@@ -861,6 +888,35 @@
         border-radius: 4px;
         margin: 2px 3px;
         max-width: unset;
+    }
+
+    /* 🖋️ Neural Editor Styling */
+    .glass-editor {
+        background: rgba(255, 255, 255, 0.03) !important;
+        border: 1px solid var(--glass-border) !important;
+        border-radius: 16px !important;
+        color: var(--text-main) !important;
+        font-family: 'JetBrains Mono', 'Fira Code', monospace !important;
+        font-size: 0.95rem !important;
+        line-height: 1.7 !important;
+        padding: 2rem !important;
+        min-height: 60vh;
+        width: 100%;
+        resize: vertical;
+        box-shadow: inset 0 4px 12px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(12px);
+        transition: border-color 0.3s ease;
+    }
+
+    .glass-editor:focus {
+        border-color: var(--info-color) !important;
+        outline: none;
+        background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    .editor-toolbar {
+        color: var(--text-muted);
+        font-weight: 600;
     }
 </style>
 {% endblock %}
@@ -1161,12 +1217,78 @@
             });
         }
 
-        /* ── Utility ── */
-        function delay(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
-
         /* ── Boot ── */
         syncActiveLink(window.location.href);
         initCopyButtons();
+
+        /* ── Neural Editor Logic ── */
+        window.toggleEditMode = function(enable) {
+            const normalGroup = document.querySelector('.btn-group-normal');
+            const editGroup = document.querySelector('.btn-group-edit');
+            const viewArea = document.getElementById('doc-view-area');
+            const editArea = document.getElementById('doc-edit-area');
+            const editor = document.getElementById('native-editor');
+
+            if (enable) {
+                normalGroup.classList.add('d-none');
+                editGroup.classList.remove('d-none');
+                viewArea.classList.add('d-none');
+                editArea.classList.remove('d-none');
+                // Focus and set cursor to end
+                editor.focus();
+                editor.setSelectionRange(editor.value.length, editor.value.length);
+            } else {
+                normalGroup.classList.remove('d-none');
+                editGroup.classList.add('d-none');
+                viewArea.classList.remove('d-none');
+                editArea.classList.add('d-none');
+            }
+        };
+
+        window.saveFileContent = async function() {
+            const editor = document.getElementById('native-editor');
+            const path = new URL(window.location.href).searchParams.get('doc');
+            const content = editor.value;
+
+            if (!path) {
+                alert("Security Error: Target path lost in neural stream.");
+                return;
+            }
+
+            barStart();
+            try {
+                const res = await fetch('/api/explorer/save', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '' 
+                    },
+                    body: JSON.stringify({ path, content })
+                });
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    // Show success state
+                    const saveBtn = document.querySelector('.btn-group-edit .btn-outline-success');
+                    const originalHTML = saveBtn.innerHTML;
+                    saveBtn.innerHTML = '<i class="fas fa-check me-1"></i>Synchronized';
+                    saveBtn.classList.replace('btn-outline-success', 'btn-success');
+                    
+                    setTimeout(() => {
+                        saveBtn.innerHTML = originalHTML;
+                        saveBtn.classList.replace('btn-success', 'btn-outline-success');
+                        toggleEditMode(false);
+                        refreshDocumentContent(); // Reload to see rendered changes
+                    }, 1000);
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (err) {
+                alert("Synchronization Failed: " + err.message);
+            } finally {
+                barDone();
+            }
+        };
 
     })();
 </script>
