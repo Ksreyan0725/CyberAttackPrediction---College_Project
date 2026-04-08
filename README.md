@@ -18,9 +18,6 @@
   <img src="https://img.shields.io/badge/Status-Hardened--2026-success?style=for-the-badge" alt="Status">
 </p>
 
----
----
-
 ## 🏛️ Academic Institutional Details
 
 - **Institution**: Roland Institute of Computer & Management Studies, Berhampur
