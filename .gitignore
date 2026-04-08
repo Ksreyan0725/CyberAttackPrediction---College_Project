@@ -72,3 +72,4 @@ CyberAttackPrediction/users.json
 # add new documenattion
 documentation_docs/
 
+*.log
