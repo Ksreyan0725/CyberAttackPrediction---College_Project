@@ -115,6 +115,10 @@
                 <button class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="refreshDocumentContent()">
                     <i class="fas fa-sync-alt me-1"></i>Refresh
                 </button>
+                <!-- Neural Execution Trigger -->
+                <button class="btn btn-outline-success btn-sm rounded-pill px-3 d-none" id="run-script-btn" onclick="runPythonScript()">
+                    <i class="fas fa-play me-1"></i>Run Script
+                </button>
             </div>
             <!-- Edit Mode -->
             <div class="btn-group-edit d-none d-flex gap-2">
@@ -143,6 +147,38 @@
 </div>
 {% endif %}
 {% endif %}
+
+<!-- 🌌 Neural Execution Console (Terminal Modal) -->
+<div class="modal fade" id="executionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content glass-card p-0 overflow-hidden border-glass shadow-2026">
+            <div class="modal-header border-glass py-3 bg-card-soft">
+                <div class="d-flex align-items-center">
+                    <div class="status-dot dot-ready me-3"></div>
+                    <h5 class="modal-title h6 fw-bold text-uppercase letter-spacing-1 mb-0">
+                        <i class="fas fa-terminal me-2 text-info"></i>Neural Console: <span id="execFileName" class="text-primary"></span>
+                    </h5>
+                </div>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="execConsole" class="terminal-body bg-base p-4 overflow-auto" style="height: 450px; font-family: 'JetBrains Mono', monospace;">
+                    <div class="text-success mb-2 opacity-75">/usr/cybershield/system > initialization sequence started...</div>
+                    <div id="execOutput" class="dynamic-text x-small"></div>
+                </div>
+            </div>
+            <div class="modal-footer border-glass bg-card-soft d-flex justify-content-between">
+                <div id="execStatus" class="x-small fw-bold letter-spacing-1">READY</div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-info btn-sm rounded-pill px-3" onclick="clearConsole()">
+                        <i class="fas fa-eraser me-1"></i>Clear
+                    </button>
+                    <button type="button" class="btn btn-primary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endmacro %}
 
 {% block extra_css %}
@@ -488,15 +524,15 @@
     /* 🍱 Panoramic Banner Engine (Hero Config) */
     .rendered-content p:first-of-type img {
         display: block;
-        margin: 1rem auto 3.5rem auto; 
+        margin: 1.5rem auto;
         width: 100%;
-        max-width: 1100px;
-        height: 480px; /* Enhanced height for bottom visibility */
+        max-width: min(100%, 640px);
+        height: 480px;
         object-fit: cover;
-        object-position: center bottom; /* Weighted towards bottom to show operators */
-        border-radius: 20px;
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        object-position: center;
+        border-radius: 12px;
         border: 1px solid var(--glass-border);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
     }
 
     .refresh-overlay {
@@ -796,7 +832,36 @@
         background: var(--bg-card-soft);
     }
 
-    /* Strong / Bold */
+    /* 🔳 Neural Console Styling */
+    .terminal-body {
+        background: #0d1117 !important;
+        color: #e6edf3 !important;
+        scroll-behavior: smooth;
+    }
+    
+    .terminal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .terminal-body::-webkit-scrollbar-thumb {
+        background: #30363d;
+        border-radius: 10px;
+    }
+
+    .exec-line {
+        margin-bottom: 0.25rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+    }
+
+    .exec-stdout { color: #8b949e; }
+    .exec-stderr { color: #ff7b72; font-weight: 600; }
+    .exec-prompt { color: var(--info-color); font-weight: 700; margin-right: 8px; }
+
+    .shadow-2026 {
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--info-rgb), 0.1) !important;
+    }
+
     .doc-body strong {
         color: var(--text-main);
         font-weight: 700;
@@ -1289,6 +1354,94 @@
                 barDone();
             }
         };
+
+        /* 🚀 Neural Execution Engine Interface */
+        window.runPythonScript = async function() {
+            const path = new URL(window.location.href).searchParams.get('doc');
+            if (!path || !path.endsWith('.py')) return;
+
+            const modal = new bootstrap.Modal(document.getElementById('executionModal'));
+            const outputEl = document.getElementById('execOutput');
+            const statusEl = document.getElementById('execStatus');
+            const nameEl = document.getElementById('execFileName');
+            
+            nameEl.textContent = path.split('/').pop();
+            outputEl.innerHTML = '<div class="exec-line"><span class="exec-prompt">></span> Dispatching neural process...</div>';
+            statusEl.textContent = 'EXECUTING...';
+            statusEl.className = 'x-small fw-bold letter-spacing-1 text-warning';
+            
+            modal.show();
+
+            try {
+                const res = await fetch('/api/explorer/run', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || '' 
+                    },
+                    body: JSON.stringify({ path })
+                });
+
+                const data = await res.json();
+                
+                if (data.status === 'success') {
+                    let finalHTML = '';
+                    if (data.stdout) {
+                        finalHTML += `<div class="exec-line exec-stdout">${data.stdout}</div>`;
+                    }
+                    if (data.stderr) {
+                        finalHTML += `<div class="exec-line exec-stderr">${data.stderr}</div>`;
+                    }
+                    
+                    outputEl.innerHTML += finalHTML;
+                    outputEl.innerHTML += `<div class="exec-line text-success fw-bold">Process terminated with exit code: ${data.returncode}</div>`;
+                    
+                    statusEl.textContent = data.returncode === 0 ? 'SUCCESS' : 'FAILED';
+                    statusEl.className = 'x-small fw-bold letter-spacing-1 ' + (data.returncode === 0 ? 'text-success' : 'text-danger');
+                } else {
+                    outputEl.innerHTML += `<div class="exec-line exec-stderr">System Failure: ${data.message}</div>`;
+                    statusEl.textContent = 'ERROR';
+                    statusEl.className = 'x-small fw-bold letter-spacing-1 text-danger';
+                }
+            } catch (err) {
+                outputEl.innerHTML += `<div class="exec-line exec-stderr">Network/Neural Interruption: ${err.message}</div>`;
+                statusEl.textContent = 'OFFLINE';
+                statusEl.className = 'x-small fw-bold letter-spacing-1 text-danger';
+            }
+            
+            // Auto-scroll to bottom
+            const consoleEl = document.getElementById('execConsole');
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        };
+
+        window.clearConsole = function() {
+            document.getElementById('execOutput').innerHTML = '<div class="exec-line text-muted">Console cleared. Ready for next dispatch.</div>';
+            document.getElementById('execStatus').textContent = 'READY';
+            document.getElementById('execStatus').className = 'x-small fw-bold letter-spacing-1';
+        };
+
+        // Utility to check if run button should be visible
+        function syncRunButton() {
+            const path = new URL(window.location.href).searchParams.get('doc');
+            const runBtn = document.getElementById('run-script-btn');
+            if (runBtn) {
+                if (path && path.endsWith('.py')) {
+                    runBtn.classList.remove('d-none');
+                } else {
+                    runBtn.classList.add('d-none');
+                }
+            }
+        }
+
+        // Hook into navigation to update run button
+        const originalLoadDoc = window.loadDoc;
+        window.loadDoc = async function(url) {
+            await originalLoadDoc(url);
+            syncRunButton();
+        };
+
+        // Initial check
+        syncRunButton();
 
     })();
 </script>

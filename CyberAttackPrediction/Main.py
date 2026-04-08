@@ -15,6 +15,9 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 import secrets
+import subprocess
+import sys
+
 #=================flask code starts here
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -872,6 +875,53 @@ def explorer_save():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
+@app.route('/api/explorer/run', methods=['POST'])
+def explorer_run():
+    if 'user' not in session:
+        return jsonify({"status": "error", "message": "Auth Required"}), 401
+    
+    # Restrict to admin/ultimate users for security
+    if not session.get('is_ultimate') and session.get('user') != ADMIN_ID:
+         return jsonify({"status": "error", "message": "Neural Access Denied: Administrator Level Restricted"}), 403
+
+    data = request.json
+    rel_path = data.get('path')
+    
+    if not rel_path or not rel_path.endswith('.py') or '..' in rel_path:
+        return jsonify({"status": "error", "message": "Invalid Script Path: Only .py files allowed"}), 400
+        
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    full_path = os.path.join(base_dir, rel_path)
+    
+    if not os.path.exists(full_path):
+        return jsonify({"status": "error", "message": "Script not found on disk"}), 404
+
+    try:
+        # Determine the best python interpreter (current venv preferred)
+        python_exe = sys.executable
+        
+        # Security: Execute with a timeout to prevent hanging the web server
+        process = subprocess.run(
+            [python_exe, full_path],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            cwd=base_dir # Run from project root
+        )
+        
+        return jsonify({
+            "status": "success",
+            "stdout": process.stdout,
+            "stderr": process.stderr,
+            "returncode": process.returncode,
+            "message": "Execution Complete" if process.returncode == 0 else "Execution Failed"
+        })
+        
+    except subprocess.TimeoutExpired:
+        return jsonify({"status": "error", "message": "Execution Timed Out (30s Limit)"}), 408
+    except Exception as e:
+        return jsonify({"status": "error", "message": f"Execution Error: {str(e)}"}), 500
+
 @app.route('/Train')
 def train_view():
     if 'user' not in session:
@@ -948,6 +998,11 @@ def terms():
 @app.route('/PrivacyPolicy')
 def privacy():
     return render_template('Legal.html', section='privacy')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static', 'images'),
+                             'favicon.svg', mimetype='image/svg+xml')
 
 if __name__ == '__main__':
     import sys
