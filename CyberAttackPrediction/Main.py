@@ -1,3 +1,5 @@
+# CyberShield AI: Advanced Cyber Attack Prediction System (2026 Stable)
+# Tech Stack: Flask 3.1.3, Pandas 3.0.2, Scikit-Learn 1.8.0, Python 3.13
 import pandas as pd
 import numpy as np
 import joblib
