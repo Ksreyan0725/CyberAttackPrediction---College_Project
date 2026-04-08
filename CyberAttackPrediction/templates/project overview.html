@@ -721,7 +721,7 @@
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-columns me-3"></i>Five Pillars of Security</h3>
                     <div class="premium-img-container overflow-hidden mb-4 border-primary border-opacity-25 shadow-sm">
                         <img src="{{ url_for('static', filename='images/five_pillars_HD.png') }}" 
-                             class="w-100" 
+                             class="w-100 auto-light-invert" 
                              alt="Five Pillars Visualization" 
                              style="max-height: 450px; object-fit: contain; object-position: center; padding: 20px;">
                         <div class="p-4 bg-primary-light">
@@ -756,7 +756,7 @@
                     <h3 class="h2 fw-bold mb-4 text-info"><i class="fas fa-map-signs me-3"></i>Strategic Roadmap</h3>
                     <div class="premium-img-container overflow-hidden mb-4 border-info border-opacity-25 shadow-sm">
                         <img src="{{ url_for('static', filename='images/roadmap_HD.png') }}" 
-                             class="w-100" 
+                             class="w-100 auto-light-invert" 
                              alt="Strategic Roadmap Visualization" 
                              style="max-height: 450px; object-fit: contain; object-position: center; padding: 20px;">
                         
@@ -983,6 +983,11 @@
     .xx-small { font-size: 0.75rem; }
     .doc-section { scroll-margin-top: 180px; } /* Increased for centered landing */
     .glass-card-runway { padding-bottom: 100px !important; } /* Visual buffer for footer reveal */
+    
+    /* Auto Invert for images in light mode to force pure white bg without bluish tint */
+    .light-mode .auto-light-invert {
+        filter: invert(1) grayscale(100%) brightness(1.5) contrast(1.2);
+    }
 </style>
 {% endblock %}
 
