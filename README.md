@@ -2,7 +2,7 @@
 
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
-  <img src="CyberAttackPrediction/static/images/favicon.svg" alt="CyberShield AI Logo" width="160" height="160">
+  <img src="CyberAttackPrediction/static/images/logo_with_bg.svg" alt="CyberShield AI Logo" width="160" height="160">
 </p>
 
 <h1 align="center">CyberShield AI</h1>
