@@ -937,7 +937,7 @@ def render_premium_menu(health_data=None, current_input=""):
     
     # High-Visibility Cursor Block
     if int(time.time() * 2) % 2 == 0: 
-        input_line.append("█", style="bold cyan")
+        input_line.append("_", style="bold cyan")
     
     prompt_panel = Panel(input_line, border_style="cyan", padding=(0, 2))
 
