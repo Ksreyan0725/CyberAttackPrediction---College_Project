@@ -960,6 +960,10 @@ def boot_loader():
     if not HAS_RICH:
         return
 
+    # 💡 IMPROVEMENT: Turbo Mode (Skip animation if recently booted)
+    settings = load_settings()
+    turbo_mode = settings.get("turbo_mode", False)
+    
     os.system('cls' if os.name == 'nt' else 'clear')
     
     # Force enable ANSI escape sequences for Windows
@@ -984,26 +988,31 @@ def boot_loader():
     [dim cyan]      SYSTEM INITIALIZATION | COMMAND CENTER {CONFIG['VERSION']} | 2026 PRODUCTION [/]
     """
     console.print(Align.center(logo))
-    time.sleep(0.5)
+    
+    if turbo_mode:
+        console.print(Align.center("[dim italic]Turbo Mode Active: Skipping Animation...[/]"))
+        time.sleep(0.3)
+    else:
+        time.sleep(0.5)
 
-    # 2. THE BOOT DIAGNOSTICS
-    with Progress(
-        SpinnerColumn(),
-        TextColumn("[progress.description]{task.description}"),
-        BarColumn(bar_width=40, pulse_style="bright_cyan"),
-        transient=True,
-    ) as progress:
-        
-        task1 = progress.add_task("[cyan]Initializing Core Registry...", total=100)
-        task2 = progress.add_task("[magenta]Loading Neural Weights...", total=100)
-        task3 = progress.add_task("[yellow]Synchronizing Uplink...", total=100)
+        # 2. THE BOOT DIAGNOSTICS
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(bar_width=40, pulse_style="bright_cyan"),
+            transient=True,
+        ) as progress:
+            
+            task1 = progress.add_task("[cyan]Initializing Core Registry...", total=100)
+            task2 = progress.add_task("[magenta]Loading Neural Weights...", total=100)
+            task3 = progress.add_task("[yellow]Synchronizing Uplink...", total=100)
 
-        # Step-by-step fake 'loading' for aesthetic feel
-        while not progress.finished:
-            progress.update(task1, advance=2)
-            if progress.tasks[0].percentage > 40: progress.update(task2, advance=3)
-            if progress.tasks[1].percentage > 30: progress.update(task3, advance=5)
-            time.sleep(0.03)
+            # Step-by-step fake 'loading' for aesthetic feel
+            while not progress.finished:
+                progress.update(task1, advance=2)
+                if progress.tasks[0].percentage > 40: progress.update(task2, advance=3)
+                if progress.tasks[1].percentage > 30: progress.update(task3, advance=5)
+                time.sleep(0.03)
 
     # 3. FINAL HEALTH CHECK (Real Data)
     h = get_project_health()
@@ -1013,7 +1022,7 @@ def boot_loader():
             title="[bold red]PRE-FLIGHT DIAGNOSTIC[/]", border_style="red"
         ))
         console.print("\n[bold cyan][?] AUTO-REPAIR RECOMMENDED[/bold cyan]")
-        fix = input("Would you like to attempt an Auto-Repair (Harden) now? (y/n): ").lower()
+        fix = input("Would you like me to attempt an Auto-Repair (Harden) now? (y/n): ").lower()
         if fix == 'y':
             harden_environment()
         else:
@@ -1348,8 +1357,9 @@ def main():
             elif choice in ['16', 'reset', 'clear_settings']:
                 settings = load_settings()
                 settings["browser_mode"] = None
+                settings["turbo_mode"] = False
                 save_settings(settings)
-                print(f"\n{GREEN}[+] Browser preferences cleared.{RESET}")
+                print(f"\n{GREEN}[+] All launcher preferences cleared.{RESET}")
                 input("Press ENTER to return to menu...")
 
             elif choice in ['17', 'alias', 'bro', 'cyber']:
