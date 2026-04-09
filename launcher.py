@@ -74,6 +74,16 @@ IS_ADMIN = False # Calculated and cached at startup
 
 # --- BLOCK 1.2: PATH CACHE (PRE-COMPUTED TO SAVE CPU) ---
 root_dir = os.path.dirname(os.path.abspath(__file__))
+
+# 💡 TEST MODE: Support running against sandbox without copying the script
+if "--sandbox" in sys.argv:
+    sandbox_path = os.path.join(root_dir, "tactical_sandbox")
+    if os.path.exists(sandbox_path):
+        root_dir = sandbox_path
+        print(f"\033[93m[!] TACTICAL SANDBOX REDIRECT: {root_dir}\033[0m")
+    else:
+        print(f"\033[91m[-] Sandbox redirect failed: Folder not found.\033[0m")
+
 PATHS = {
     "root": root_dir,
     "project": os.path.join(root_dir, CONFIG["PROJECT_NAME"]),
