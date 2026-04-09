@@ -73,3 +73,12 @@ CyberAttackPrediction/users.json
 documentation_docs/
 
 *.log
+launcher_debug.log
+*.pyc
+Project materials/
+
+# add new folder to git ignore for tactical_sandbox 
+tactical_sandbox/
+
+# add new bat file 
+start_launcher.bat

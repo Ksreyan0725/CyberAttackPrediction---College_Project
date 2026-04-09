@@ -44,7 +44,97 @@
     </script>
 
     <!-- Smart Theme & Storage Management -->
-    <script>(function () { const saved = localStorage.getItem('theme'), system = window.matchMedia('(prefers-color-scheme:dark)').matches, theme = saved || (system ? 'dark' : 'light'); document.documentElement.setAttribute('data-theme', theme); if (sessionStorage.getItem('visited_' + window.location.pathname)) document.documentElement.classList.add('page-visited') })();</script>
+    <script>
+        (function () { 
+            const saved = localStorage.getItem('theme'), 
+                  system = window.matchMedia('(prefers-color-scheme:dark)').matches, 
+                  theme = saved || (system ? 'dark' : 'light'); 
+            document.documentElement.setAttribute('data-theme', theme); 
+            
+            // Environmental Theme Persistent Sync
+            const envTheme = localStorage.getItem('cybershield_env_theme') || 'default';
+            document.documentElement.setAttribute('data-env-theme', envTheme);
+
+            if (sessionStorage.getItem('visited_' + window.location.pathname)) 
+                document.documentElement.classList.add('page-visited') 
+        })();
+    </script>
+
+    <!-- Immersive Engine: Fullscreen Persistence & Aesthetic Restoration -->
+    <script>
+        window.ImmersiveEngine = {
+            state: {
+                isFullscreen: !!document.fullscreenElement,
+                persistenceEnabled: localStorage.getItem('cybershield_fs_mode') === 'true'
+            },
+            
+            init() {
+                document.addEventListener('fullscreenchange', () => {
+                    this.state.isFullscreen = !!document.fullscreenElement;
+                    this.updateUI();
+                });
+
+                // Auto-restore check
+                if (this.state.persistenceEnabled && !this.state.isFullscreen) {
+                    this.showRestoreShield();
+                }
+            },
+
+            async toggle() {
+                try {
+                    if (!document.fullscreenElement) {
+                        await document.documentElement.requestFullscreen();
+                        localStorage.setItem('cybershield_fs_mode', 'true');
+                        this.state.persistenceEnabled = true;
+                    } else {
+                        await document.exitFullscreen();
+                        localStorage.setItem('cybershield_fs_mode', 'false');
+                        this.state.persistenceEnabled = false;
+                    }
+                } catch (err) {
+                    console.error("Immersive Engine Error:", err);
+                    showToast("System blocked fullscreen. Click anywhere to retry.", "warning");
+                }
+            },
+
+            showRestoreShield() {
+                if (document.getElementById('fs-restore-shield')) return;
+                
+                const shield = document.createElement('div');
+                shield.id = 'fs-restore-shield';
+                shield.innerHTML = `
+                    <div class="shield-content animate__animated animate__fadeIn">
+                        <div class="shield-icon"><i class="fas fa-expand-arrows-alt"></i></div>
+                        <div class="shield-text">Click anywhere to restore Immersive Mode</div>
+                        <div class="shield-subtext">Session persistence active</div>
+                    </div>
+                `;
+                
+                shield.onclick = async () => {
+                    try {
+                        await document.documentElement.requestFullscreen();
+                        shield.classList.add('animate__animated', 'animate__fadeOut');
+                        setTimeout(() => shield.remove(), 500);
+                    } catch (e) {
+                        shield.remove();
+                    }
+                };
+                
+                document.body.appendChild(shield);
+            },
+
+            updateUI() {
+                const floatingToggle = document.getElementById('floatingFsToggle');
+                if (floatingToggle) {
+                    floatingToggle.innerHTML = this.state.isFullscreen ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
+                }
+                // Dispatch event for local buttons (like in UserScreen)
+                window.dispatchEvent(new CustomEvent('immersive-state-change', { detail: { isFullscreen: this.state.isFullscreen } }));
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => window.ImmersiveEngine.init());
+    </script>
     <script>(function () { let wasOffline = false, checkInProgress = false; async function checkPulse() { if (checkInProgress) return; checkInProgress = true; const statusPill = document.getElementById('globalSystemStatus'), statusText = statusPill?.querySelector('.status-text'), trainingPill = document.getElementById('trainingStatus'), trainingText = trainingPill?.querySelector('.status-text') || document.getElementById('statusText'), trainingDot = trainingPill?.querySelector('.status-dot'); try { const response = await fetch('/api/heartbeat', { method: 'GET', cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }); if (response.ok) { const data = await response.json(), isBusy = data.status === 'busy'; if (statusPill) { statusPill.className = 'system-status-pill status-' + (isBusy ? 'busy' : 'ready') + ' me-2'; if (statusText) statusText.textContent = isBusy ? 'System Busy' : 'System Ready' } if (trainingPill) { const startBtn = document.getElementById('startTrainingBtn'); if (!startBtn || !startBtn.disabled) { if (isBusy) { trainingPill.className = 'status-badge status-running d-flex align-items-center'; if (trainingText) trainingText.textContent = 'System Processing...'; if (trainingDot) trainingDot.className = 'status-dot dot-busy' } else if (!trainingPill.classList.contains('status-success')) { trainingPill.className = 'status-badge status-idle d-flex align-items-center'; if (trainingText) trainingText.textContent = 'System Ready'; if (trainingDot) trainingDot.className = 'status-dot dot-ready' } } } if (wasOffline) setTimeout(() => { if (typeof reloadWithScroll === 'function') reloadWithScroll(); else window.location.reload() }, 500); wasOffline = false } } catch (err) { wasOffline = true; if (statusPill) { statusPill.className = 'system-status-pill status-offline me-2'; if (statusText) statusText.textContent = 'Server Offline' } if (trainingPill) { trainingPill.className = 'status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center'; if (trainingText) trainingText.textContent = 'Server Offline' } } finally { checkInProgress = false } } setInterval(checkPulse, 3000); document.addEventListener('DOMContentLoaded', checkPulse) })();</script>
 
     <script>let lastToastInfo = { message: '', time: 0 }; function showToast(message, type = 'info', details = null) { const container = document.getElementById('toastContainer'); if (!container) return; const currentTime = Date.now(); if (message === lastToastInfo.message && (currentTime - lastToastInfo.time < 3000)) return; lastToastInfo = { message, time: currentTime }; const toast = document.createElement('div'); toast.className = `premium-toast toast-${type}`; if (details) toast.classList.add('cursor-pointer'); let icon = 'info-circle'; if (type === 'success') icon = 'check-circle'; if (type === 'error' || type === 'danger') icon = 'exclamation-circle'; if (type === 'warning') icon = 'exclamation-triangle'; const subtext = details ? '<div class="xx-small opacity-75 mt-1 mt-n1"><i class="fas fa-search-plus me-1"></i>Click to view details</div>' : ''; toast.innerHTML = `<div class="toast-icon text-white"><i class="fas fa-${icon}"></i></div><div class="toast-body"><div class="small fw-bold dynamic-text">${message}</div>${subtext}</div><button type="button" class="btn-close ms-2 small" style="font-size:0.6rem;filter:var(--close-filter,none);" onclick="event.stopPropagation();this.parentElement.remove()"></button>`; if (details) toast.onclick = () => showDetailModal(type.toUpperCase() + ' DETAILS', `<div class="p-3 rounded-3 border-glass font-monospace text-break" style="background:var(--bg-card-soft);">${details}</div>`); container.appendChild(toast); toast.offsetHeight; toast.classList.add('show'); setTimeout(() => { if (toast.parentElement) { toast.classList.add('hide'); setTimeout(() => toast.remove(), 500) } }, 5000) } document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.flash-message-data').forEach(el => { showToast(el.dataset.message, el.dataset.category); el.remove() }) }); (function () { const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'), setupAjax = () => { if (window.jQuery && csrfToken) $.ajaxSetup({ headers: { 'X-CSRF-Token': csrfToken } }); else setTimeout(setupAjax, 100) }; setupAjax(); window.addEventListener('storage', e => { if (e.key === 'cybershield_logout') window.location.href = '/UserLogin?reason=sync_logout' }); document.addEventListener('click', e => { if (e.target.closest('a[href*="/Logout"]')) localStorage.setItem('cybershield_logout', Date.now()) }) })();</script>
@@ -126,7 +216,136 @@
             --brand-text-gradient: linear-gradient(to right, #004085, #007bff, #004085);
             --close-filter: none;
             --bg-base: #ffffff;
-            --card-bg: #f8f9fa
+            --card-bg: #f8f9fa;
+            --profile-shield-bg: linear-gradient(45deg, #f1f5f9, #e2e8f0);
+            --btn-glass-glow: linear-gradient(135deg, rgba(var(--primary-rgb), 0.1), rgba(var(--primary-rgb), 0.05));
+        }
+
+        :root {
+            --profile-shield-bg: linear-gradient(45deg, #1e293b, #334155);
+            --btn-glass-glow: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(var(--primary-rgb), 0.1));
+        }
+
+        /* Environmental Themes Expansion */
+        [data-env-theme="midnight"] {
+            --bg-gradient: radial-gradient(circle at top right, #0f172a, #020617);
+            --primary-color: #38bdf8;
+            --primary-rgb: 56, 189, 248;
+            --accent-primary: #7dd3fc;
+        }
+
+        [data-env-theme="crimson"] {
+            --bg-gradient: radial-gradient(circle at top right, #450a0a, #000000);
+            --primary-color: #ef4444;
+            --primary-rgb: 239, 68, 68;
+            --accent-primary: #f87171;
+            --brand-text-gradient: linear-gradient(to right, #991b1b, #ef4444, #991b1b);
+        }
+
+        [data-env-theme="cyberpunk"] {
+            --bg-gradient: radial-gradient(circle at top right, #2e1065, #000000);
+            --primary-color: #d946ef;
+            --primary-rgb: 217, 70, 239;
+            --accent-primary: #22d3ee;
+            --brand-text-gradient: linear-gradient(to right, #701a75, #d946ef, #701a75);
+        }
+
+        /* Premium Glass Glow Buttons */
+        .btn-glass-glow {
+            background: var(--btn-glass-glow) !important;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-main) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-glass-glow:hover {
+            transform: translateY(-2px);
+            border-color: rgba(var(--primary-rgb), 0.4) !important;
+            box-shadow: 0 8px 25px rgba(var(--primary-rgb), 0.2);
+            color: var(--primary-color) !important;
+        }
+
+        .btn-glass-glow::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+
+        .btn-glass-glow:hover::after {
+            opacity: 1;
+        }
+
+        /* FS Restore Shield Overlay */
+        #fs-restore-shield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .shield-content {
+            text-align: center;
+            color: white;
+        }
+
+        .shield-icon {
+            font-size: 4rem;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 30px rgba(var(--primary-rgb), 0.5);
+            animation: pulseRestore 2s infinite;
+        }
+
+        @keyframes pulseRestore {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .shield-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .shield-subtext {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Logo & Profile Background Fixes for Light Mode */
+        .navbar-brand img, 
+        .profile-shield-container {
+            background: transparent !important;
+            mix-blend-mode: normal;
+        }
+        
+        [data-theme="light"] .navbar-brand img {
+            filter: brightness(0.8) contrast(1.2);
         }
 
         /* Remove global smooth-scroll conflict (relying on JS for precision jumps) */
@@ -1513,6 +1732,63 @@
             animation: pulse-fs 2s infinite
         }
 
+        /* --- Immersive Mode Restoration UI --- */
+        .fs-restore-prompt {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            z-index: 10001;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(var(--primary-rgb), 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(var(--primary-rgb), 0.2);
+            padding: 12px 28px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #fff;
+            font-family: Outfit, sans-serif;
+            font-size: 0.95rem;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            white-space: nowrap;
+        }
+
+        .fs-restore-prompt.active {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .fs-restore-prompt i {
+            color: var(--accent-primary);
+            animation: float-y 2s ease-in-out infinite;
+        }
+
+        .fs-restore-click-shield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: rgba(0, 0, 0, 0.01);
+            cursor: pointer;
+            display: none;
+        }
+
+        .fs-restore-click-shield.active {
+            display: block;
+        }
+
+        @keyframes float-y {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
         @keyframes pulse-fs {
 
             0%,
@@ -1609,6 +1885,13 @@
     <div id="fs-fallback-banner" class="fs-fallback-banner">
         <i class="fa-solid fa-desktop"></i>
         <span>Immersive Mode restricted by browser. Press <strong>[F11]</strong> for total immersion.</span>
+    </div>
+
+    <!-- Immersive Mode Restoration Prompts -->
+    <div id="fs-restore-shield" class="fs-restore-click-shield"></div>
+    <div id="fs-restore-prompt" class="fs-restore-prompt">
+        <i class="fas fa-expand-arrows-alt"></i>
+        <span>Click anywhere to restore <strong>Immersive Mode</strong></span>
     </div>
 
     <!-- Floating Fullscreen Toggle -->
@@ -2074,6 +2357,10 @@
         }
 
         function saveScrollPositions() {
+            // Check Auto-Save preference
+            const autoSaveEnabled = localStorage.getItem('cybershield_autosave_enabled') !== 'false';
+            if (!autoSaveEnabled) return;
+
             const main = document.querySelector('main');
             const log = document.getElementById('logWindow');
             const table = document.querySelector('.table-container');
@@ -2210,10 +2497,12 @@
             });
         }
 
-        // Initialize all Bootstrap tooltips globally
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
+        // Initialize all Bootstrap tooltips globally (Wait for Library)
+        document.addEventListener('DOMContentLoaded', () => {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
         });
 
     </script>
@@ -2271,14 +2560,248 @@
             document.getElementById('modalActionContainer').innerHTML = ''; // No extra buttons for info
             modal.show();
         }
+    </script>    <script>
+        /**
+         * WebApp Immersive Engine (v2.1)
+         * Manages Fullscreen state across navigations and optimizes UI for expanded viewports.
+         */
+        window.ImmersiveEngine = {
+            config: {
+                storageKey: 'cybershield_fs_mode',
+                restoreDelay: 800
+            },
+
+            elements: {
+                btn: document.getElementById('fullscreen-floating-toggle'),
+                banner: document.getElementById('fs-fallback-banner'),
+                prompt: document.getElementById('fs-restore-prompt'),
+                shield: document.getElementById('fs-restore-shield')
+            },
+
+            init() {
+                if (!this.elements.btn) return;
+                this.bindEvents();
+                this.checkRestore();
+                console.log('ImmersiveEngine: Ready');
+            },
+
+            bindEvents() {
+                this.elements.btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggle();
+                });
+
+                ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
+                    document.addEventListener(evt, () => this.syncUI());
+                });
+
+                // Global First-Click Restore Catch
+                this.elements.shield?.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.restore();
+                });
+            },
+
+            getFullscreenElement() {
+                return document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement;
+            },
+
+            syncUI() {
+                const isFs = !!this.getFullscreenElement();
+                const icon = this.elements.btn.querySelector('i');
+                
+                // Track preference for persistence
+                localStorage.setItem(this.config.storageKey, isFs ? 'active' : 'inactive');
+
+                if (icon) {
+                    this.elements.btn.classList.add('spin-transition');
+                    icon.className = isFs ? 'fas fa-compress' : 'fas fa-expand';
+                    setTimeout(() => this.elements.btn.classList.remove('spin-transition'), 400);
+                }
+
+                if (isFs && this.elements.banner) this.elements.banner.classList.remove('reveal');
+                
+                // Synchronize CyberMaster with new viewport geometry
+                if (window.CyberMaster) {
+                    window.CyberMaster.updateDimensions();
+                    window.CyberMaster.requestTick();
+                }
+
+                // Hide restoration UI if it was active
+                this.hideRestoreUI();
+            },
+
+            toggle(targetElement = document.documentElement) {
+                const el = targetElement;
+                const isNowFs = !!this.getFullscreenElement();
+
+                if (!isNowFs) {
+                    const p = (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen)?.call(el);
+                    if (p && p.catch) {
+                        p.catch(err => {
+                            console.warn('FS Blocked:', err);
+                            showToast("Fullscreen restricted by browser policy.", "warning");
+                            this.elements.banner?.classList.add('reveal');
+                        });
+                    }
+                } else {
+                    const exit = (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen);
+                    if (exit) exit.call(document);
+                }
+            },
+
+            checkRestore() {
+                const savedState = localStorage.getItem(this.config.storageKey);
+                const isAlreadyFs = !!this.getFullscreenElement();
+
+                if (savedState === 'active' && !isAlreadyFs) {
+                    setTimeout(() => this.showRestoreUI(), this.config.restoreDelay);
+                }
+            },
+
+            showRestoreUI() {
+                if (this.elements.prompt) this.elements.prompt.classList.add('active');
+                if (this.elements.shield) this.elements.shield.classList.add('active');
+            },
+
+            hideRestoreUI() {
+                if (this.elements.prompt) this.elements.prompt.classList.remove('active');
+                if (this.elements.shield) this.elements.shield.classList.remove('active');
+            },
+
+            restore() {
+                this.toggle();
+                // Ensure UI cleans up even if browser blocks toggle
+                setTimeout(() => this.hideRestoreUI(), 400);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => ImmersiveEngine.init());
+
+        // --- UI Navigation State Feedback ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const timers = new Map();
+            const normalize = v => {
+                try {
+                    const u = new URL(v, window.location.origin);
+                    return (u.hostname + u.pathname).replace(/\/+$/, '').toLowerCase();
+                } catch (e) {
+                    return String(v).toLowerCase().replace(/\/+$/, '');
+                }
+            };
+            
+            document.addEventListener('click', e => {
+                const a = e.target.closest('.nav-link,.navbar-brand');
+                if (!a || a.getAttribute('href') === '#' || a.classList.contains('dropdown-toggle')) return;
+                
+                const hr = a.getAttribute('href');
+                if (!hr || hr.startsWith('javascript:')) return;
+                
+                if (normalize(a.href) === normalize(window.location.href)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const p = a.closest('.nav-item') || a;
+                    const l = p.previousElementSibling;
+                    const r = p.nextElementSibling;
+                    const els = [p, l, r].filter(Boolean);
+                    
+                    els.forEach(el => {
+                        el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right');
+                        if (timers.has(el)) { clearTimeout(timers.get(el)); timers.delete(el); }
+                    });
+                    
+                    void p.offsetWidth;
+                    requestAnimationFrame(() => {
+                        p.classList.add('state-feedback-active');
+                        if (l) l.classList.add('state-feedback-adjacent-left');
+                        if (r) r.classList.add('state-feedback-adjacent-right');
+                        els.forEach(el => {
+                            const t = setTimeout(() => {
+                                el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right');
+                                timers.delete(el);
+                            }, 450);
+                            timers.set(el, t);
+                        });
+                    });
+                }
+            }, true);
+        });
+
+        // Dropdown Interaction Log
+        document.addEventListener('DOMContentLoaded', () => {
+            const d = document.getElementById('userDropdown');
+            if (d) d.addEventListener('click', function () {
+                setTimeout(() => {
+                    if (this.nextElementSibling?.classList.contains('show')) console.log('%c[CyberShield] %cNavigation Active.', 'color: #10b981; font-weight: bold;', 'color: inherit;');
+                }, 100);
+            });
+        });
+
+        // Unified Theme Controller
+        (function () {
+            const tg = document.getElementById('theme-toggle'),
+                ic = tg?.querySelector('i'),
+                htm = document.documentElement,
+                nb = tg?.closest('.navbar'),
+                gt = () => localStorage.getItem('theme') || 'auto',
+                ut = (th, uc = false) => {
+                    if (uc) document.body.classList.add('theme-transitioning');
+                    const sd = window.matchMedia('(prefers-color-scheme:dark)').matches,
+                        ed = th === 'dark' || (th === 'auto' && sd);
+
+                    if (ed) {
+                        htm.classList.remove('light-mode');
+                        htm.dataset.theme = 'dark';
+                        if (nb) { nb.classList.add('navbar-dark'); nb.classList.remove('navbar-light'); }
+                    } else {
+                        htm.classList.add('light-mode');
+                        htm.dataset.theme = 'light';
+                        if (nb) { nb.classList.add('navbar-light'); nb.classList.remove('navbar-dark'); }
+                    }
+
+                    const assets = document.querySelectorAll('.theme-asset');
+                    assets.forEach(img => {
+                        const src = ed ? img.dataset.dark : img.dataset.light;
+                        if (src && img.getAttribute('src') !== src) img.src = src;
+                    });
+
+                    if (uc) setTimeout(() => document.body.classList.remove('theme-transitioning'), 1400);
+                    if (!ic || !tg) return;
+                    ic.className = th === 'dark' ? 'fas fa-moon' : (th === 'light' ? 'fas fa-sun' : 'fas fa-desktop');
+                    tg.title = `Theme: ${th.charAt(0).toUpperCase() + th.slice(1)} Mode`;
+                };
+
+            ut(gt());
+            window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => { if (gt() === 'auto') ut('auto'); });
+            tg?.addEventListener('click', () => {
+                if (typeof bootstrap !== 'undefined') {
+                    const t = bootstrap.Tooltip.getInstance(tg);
+                    if (t) t.hide();
+                }
+                const c = gt();
+                let n = c === 'auto' ? 'light' : (c === 'light' ? 'dark' : 'auto');
+                localStorage.setItem('theme', n);
+                ut(n, true);
+            });
+        })();
+
+        // Global Heartbeat
+        (function () {
+            const interval = 2000, token = document.querySelector('meta[name="csrf-token"]')?.content;
+            async function sendPulse() {
+                try {
+                    await fetch('/api/heartbeat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
+                        body: JSON.stringify({ pulse: Date.now() })
+                    });
+                } catch (e) { }
+            }
+            sendPulse();
+            setInterval(sendPulse, interval);
+        })();
     </script>
-    <script>(function () { document.addEventListener('DOMContentLoaded', () => { const fsBtn = document.getElementById('fullscreen-toggle'), banner = document.getElementById('phantomFullscreenWarning'), getFullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement, syncUI = () => { if (!fsBtn) return; fsBtn.classList.add('spin-transition'); const isFs = !!getFullscreenElement(); const icon = fsBtn.querySelector('i'); if (icon) icon.className = isFs ? 'fas fa-compress-arrows-alt' : 'fas fa-expand-arrows-alt'; if (!isFs && banner) banner.classList.remove('reveal'); setTimeout(() => fsBtn.classList.remove('spin-transition'), 400) }; const toggleFullscreen = () => { const el = document.documentElement, isNowFs = !!getFullscreenElement(); if (!isNowFs) { let p; if (el.webkitRequestFullscreen) p = el.webkitRequestFullscreen(); else if (el.requestFullscreen) p = el.requestFullscreen(); else if (el.mozRequestFullScreen) p = el.mozRequestFullScreen(); else if (el.msRequestFullscreen) p = el.msRequestFullscreen(); setTimeout(() => { const h = window.innerHeight, sh = window.screen.height; if (getFullscreenElement() && h < (sh - 100) && banner) banner.classList.add('reveal') }, 600); if (p && p.catch) p.catch(err => { if (banner) banner.classList.add('reveal') }) } else { if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.exitFullscreen) document.exitFullscreen(); else if (document.mozCancelFullScreen) document.mozCancelFullScreen(); else if (document.msExitFullscreen) document.msExitFullscreen() } }; if (fsBtn) fsBtn.addEventListener('click', toggleFullscreen);['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => document.addEventListener(evt, syncUI)) }) })();</script>
-    <script>document.addEventListener('DOMContentLoaded', () => { const timers = new Map(), normalize = v => { try { const u = new URL(v, window.location.origin); return (u.hostname + u.pathname).replace(/\/+$/, '').toLowerCase() } catch (e) { return String(v).toLowerCase().replace(/\/+$/, '') } }; document.addEventListener('click', e => { const a = e.target.closest('.nav-link,.navbar-brand'); if (!a || a.getAttribute('href') === '#' || a.classList.contains('dropdown-toggle')) return; const hr = a.getAttribute('href'); if (!hr || hr.startsWith('javascript:')) return; if (normalize(a.href) === normalize(window.location.href)) { e.preventDefault(); e.stopPropagation(); const p = a.closest('.nav-item') || a, l = p.previousElementSibling, r = p.nextElementSibling, els = [p, l, r].filter(Boolean); els.forEach(el => { el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right'); if (timers.has(el)) { clearTimeout(timers.get(el)); timers.delete(el) } }); void p.offsetWidth; requestAnimationFrame(() => { p.classList.add('state-feedback-active'); if (l) l.classList.add('state-feedback-adjacent-left'); if (r) r.classList.add('state-feedback-adjacent-right'); els.forEach(el => { const t = setTimeout(() => { el.classList.remove('state-feedback-active', 'state-feedback-adjacent-left', 'state-feedback-adjacent-right'); timers.delete(el) }, 450); timers.set(el, t) }) }) } }, true) });</script>
-    <script>document.addEventListener('DOMContentLoaded', () => { const d = document.getElementById('userDropdown'); if (d) d.addEventListener('click', function () { setTimeout(() => { if (this.nextElementSibling?.classList.contains('show')) console.log('%c[CyberShield] %cNavigation Active.', 'color: #10b981; font-weight: bold;', 'color: inherit;') }, 100) }) });</script>
-    <script>(function () { const tg = document.getElementById('theme-toggle'), ic = tg?.querySelector('i'), htm = document.documentElement, nb = tg?.closest('.navbar'), gt = () => localStorage.getItem('theme') || 'auto', ut = (th, uc = false) => { if (uc) document.body.classList.add('theme-transitioning'); const sd = window.matchMedia('(prefers-color-scheme:dark)').matches, ed = th === 'dark' || (th === 'auto' && sd); if (ed) { htm.classList.remove('light-mode'); htm.dataset.theme = 'dark'; if (nb) { nb.classList.add('navbar-dark'); nb.classList.remove('navbar-light') } } else { htm.classList.add('light-mode'); htm.dataset.theme = 'light'; if (nb) { nb.classList.add('navbar-light'); nb.classList.remove('navbar-dark') } } const assets = document.querySelectorAll('.theme-asset'); assets.forEach(img => { const src = ed ? img.dataset.dark : img.dataset.light; if (src && img.getAttribute('src') !== src) img.src = src }); if (uc) setTimeout(() => document.body.classList.remove('theme-transitioning'), 1400); if (!ic || !tg) return; if (th === 'dark') { ic.className = 'fas fa-moon'; tg.title = 'Theme: Dark Mode' } else if (th === 'light') { ic.className = 'fas fa-sun'; tg.title = 'Theme: Light Mode' } else { ic.className = 'fas fa-desktop'; tg.title = 'Theme: System Sync' } }; ut(gt()); window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change', () => { if (gt() === 'auto') ut('auto') }); tg?.addEventListener('click', () => { if (typeof bootstrap !== 'undefined') { const t = bootstrap.Tooltip.getInstance(tg); if (t) t.hide() } const c = gt(); let n = c === 'auto' ? 'light' : (c === 'light' ? 'dark' : 'auto'); localStorage.setItem('theme', n); ut(n, true) }) })();</script>
-    <script>(function () { const interval = 2000, token = document.querySelector('meta[name="csrf-token"]')?.content; async function sendPulse() { try { await fetch('/api/heartbeat', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token }, body: JSON.stringify({ pulse: Date.now() }) }) } catch (e) { } } sendPulse(); setInterval(sendPulse, interval) })();</script>
     {% block fab_zone %}{% endblock %}
     {% block extra_js %}{% endblock %}
-</body>
-
 </html>

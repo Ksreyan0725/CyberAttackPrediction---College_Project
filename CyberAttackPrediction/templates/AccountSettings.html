@@ -221,8 +221,8 @@
             <div class="sidebar-panel">
                 <div class="user-profile-mini">
                     <div class="position-relative d-inline-block mb-3">
-                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center shadow-lg" 
-                             style="width: 80px; height: 80px; background: linear-gradient(45deg, #1e293b, #334155); border: 2px solid rgba(255,255,255,0.1);">
+                        <div class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center shadow-lg profile-shield-container" 
+                             style="width: 80px; height: 80px; background: var(--profile-shield-bg); border: 2px solid rgba(255,255,255,0.1);">
                             <i class="fas fa-user-shield text-primary h2 mb-0"></i>
                         </div>
                         <div class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 14px; height: 14px; border: 2px solid #000;"></div>
@@ -290,11 +290,11 @@
 
                         <div class="mt-5 pt-4 border-top border-glass d-flex align-items-center justify-content-between">
                             <div class="d-flex gap-2">
-                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
-                                    <i class="fas fa-shield-alt me-2"></i>Apply Override
+                                <button type="submit" class="btn btn-glass-glow rounded-pill px-4 fw-bold">
+                                    <i class="fas fa-shield-alt me-2 text-primary"></i>Apply Override
                                 </button>
-                                <a href="/Predict" class="btn btn-outline-secondary rounded-pill px-4 fw-bold opacity-75">
-                                    <i class="fas fa-chevron-left me-2"></i>Return to Analysis
+                                <a href="/Predict" class="btn btn-glass-glow rounded-pill px-4 fw-bold opacity-75">
+                                    <i class="fas fa-chevron-left me-2 text-muted"></i>Return to Analysis
                                 </a>
                             </div>
                             <span class="xx-small dynamic-muted italic">Last Updated: <span id="last-login-time">Today</span></span>
@@ -365,9 +365,27 @@
                     <h5 class="dynamic-text fw-bold mb-3">Environmental Themes</h5>
                     <div class="row g-3">
                         <div class="col-md-3">
-                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('oled')">
-                                <div class="mb-2"><i class="fas fa-moon text-primary"></i></div>
-                                <span class="xx-small fw-bold tracking-wider">OLED BLACK</span>
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('default')">
+                                <div class="mb-2"><i class="fas fa-adjust text-muted"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">DEFAULT</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('midnight')">
+                                <div class="mb-2"><i class="fas fa-moon text-info"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">MIDNIGHT BLUE</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('crimson')">
+                                <div class="mb-2"><i class="fas fa-radiation text-danger"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">CRIMSON ALERT</span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stat-card text-center cursor-pointer" onclick="updateEnvTheme('cyberpunk')">
+                                <div class="mb-2"><i class="fas fa-bolt text-warning"></i></div>
+                                <span class="xx-small fw-bold tracking-wider">CYBER PUNK</span>
                             </div>
                         </div>
                         <div class="col-md-3">
@@ -586,13 +604,8 @@
     }
 
     function updateEnvTheme(theme) {
-        if (theme === 'oled') {
-            document.documentElement.style.setProperty('--bg-main', '#000000');
-            document.documentElement.style.setProperty('--primary-color', '#3b82f6');
-        } else {
-            document.documentElement.style.setProperty('--bg-main', '#022c22');
-            document.documentElement.style.setProperty('--primary-color', '#10b981');
-        }
+        document.documentElement.setAttribute('data-env-theme', theme);
+        localStorage.setItem('cybershield_env_theme', theme);
         showToast(`Environmental Theme synchronized: ${theme.toUpperCase()}`, "info");
     }
 

@@ -1,14 +1,13 @@
-"""
+"""  
 ================================================================================
 PROJECT: CyberShield AI - Bulletproof Command Center (2026)
-VERSION: 2.7.0 (Production Hardened - Multi-Alias Engine)
+VERSION: 2.7.1 (Production Hardened - Multi-Alias Engine)
 AUTHOR: Ksreyan0725 / Managed by Antigravity AI
 PURPOSE: A resilient, zero-failure launcher for the Cyber Attack Prediction project.
 FEATURES: Dual-Speed Refresh, Admin Integrity Check, and NLU Command Routing.
 LICENSE: College Project - Academic / Open Source
 ================================================================================
 """
-
 # --- BLOCK 0: LIBRARIES (THE TOOLS) ---
 import subprocess  # This library allows Python to run other programs or terminal commands (like 'git' or '.bat' files).
 import os          # This library lets Python interact with your files, folders, and operating system (Windows).
@@ -27,12 +26,12 @@ from datetime import datetime # Adds timestamps to logs.
 
 # --- BLOCK 0.5: PREMIUM UI DETECTION ---
 try:
-    from rich.console import Console
+    from rich.console import Console, Group
     from rich.panel import Panel
     from rich.table import Table
-    from rich.columns import Columns
-    from rich.align import Align
     from rich.text import Text
+    from rich.align import Align
+    from rich.live import Live
     from rich.layout import Layout
     console = Console()
     HAS_RICH = True
@@ -47,9 +46,23 @@ except ImportError:
     HAS_PSUTIL = False
 
 # --- BLOCK 0.7: UNIFIED CONFIGURATION (CORE SETTINGS) ---
+def get_version():
+    """Extracts version from the script header docstring dynamically."""
+    try:
+        with open(__file__, "r", encoding="utf-8") as f:
+            for line in f:
+                if "VERSION:" in line:
+                    # Extracts '2.7.0' from 'VERSION: 2.7.0 (Production Hardened...)'
+                    parts = line.split("VERSION:")[1].split("(")
+                    return "v" + parts[0].strip()
+    except Exception:
+        pass
+    return "v2.7.0" # Fallback
+
 CONFIG = {
     "PROJECT_NAME": "CyberAttackPrediction",
     "REPO_URL": "https://github.com/Ksreyan0725/CyberAttackPrediction---College_Project",
+    "VERSION": get_version(),
     "REFRESH_RATE_FAST": 2.0,  # Stats/Clock
     "REFRESH_RATE_SLOW": 10.0, # Disk/Health scans
     "COMMAND_NAME": "cs",
@@ -509,11 +522,21 @@ def get_project_health():
     elif found_count > 0: score += 20
     if check_internet(): score += 10
     
+    # 4. FINAL ADAPTIVE SCORING (User vs Admin)
+    # In User mode, we cap the 'Operational' score at 100% if everything else is perfect.
+    # We still track Admin Integrity separately for the 'Ready' badge.
+    if IS_ADMIN:
+        score_label = f"READY: {score}% [dim](System Integrity Locked)[/]" if score < 100 else "READY: 100% [bold green](SHIELD ACTIVE)[/]"
+    else:
+        # Penalize slightly for lack of admin if it affects core functionality (it doesn't usually, but it's good to note)
+        score_label = f"READY: {score}% [dim](User Mode)[/]"
+    
     return {
         "status": status,
         "msg": msg,
         "color": color,
-        "score": score
+        "score": score,
+        "label": score_label
     }
 
 def find_browser_exe():
@@ -737,7 +760,7 @@ def run_speed_test():
             
             msg = f"Network Pulse: {avg_speed:.2f} MB/s ({status_text})"
             if HAS_RICH:
-                console.print(Panel(Align.center(f"[bold {color}]{msg}[/bold {color}]"), border_style=color, title="[Diagnostic Result]"))
+                console.print(Panel(Align.center(f"[bold {color}]{msg}[/]"), border_style=color, title="[Diagnostic Result]"))
             else:
                 print(f"\n[+] Speed: {avg_speed:.2f} MB/s - {status_text}")
                 
@@ -766,28 +789,41 @@ def get_input_timeout(prompt, timeout=2.0):
     
     while (time.time() - start_time) < timeout:
         if msvcrt.kbhit():
-            char = msvcrt.getche().decode('utf-8')
-            if char in ['\r', '\n']: # Enter key
-                print() # Move to next line
-                return user_input.strip()
-            elif char == '\b': # Backspace
-                user_input = user_input[:-1]
-                # Visual backspace trick
-                print(" \b", end="", flush=True)
-            else:
-                user_input += char
-        time.sleep(0.01) # Low CPU usage while waiting
+            try:
+                raw = msvcrt.getch() # Use getch (no echo) for better control
+                # Handle Windows special keys (Arrow keys, F-keys)
+                if raw in [b'\xe0', b'\x00']:
+                    if msvcrt.kbhit(): msvcrt.getch() # Swallow the second byte
+                    continue
+                
+                char = raw.decode('utf-8', errors='ignore')
+                if not char: continue
+
+                if char in ['\r', '\n']: # Enter key
+                    print() # Move to next line
+                    return user_input.strip()
+                elif char == '\x08': # Backspace (standard byte for \b)
+                    if len(user_input) > 0:
+                        user_input = user_input[:-1]
+                        print("\b \b", end="", flush=True)
+                elif char.isprintable():
+                    user_input += char
+                    print(char, end="", flush=True)
+            except Exception:
+                pass 
+        time.sleep(0.01)
     
     return None # Indicates a timeout (refresh the screen)
 
 # --- BLOCK 3: THE MAIN BRAIN (THE INTERFACE) ---
 
-def render_premium_menu(health_data=None):
+def render_premium_menu(health_data=None, current_input=""):
     """
     PURPOSE: This is the 'Wow Factor' UI. It builds a beautiful two-column dashboard.
+    RETURNS: A Rich Renderable (Group) for Live display.
     """
     if not HAS_RICH:
-        return # Fallback to classic print handled in main()
+        return "" 
 
     # 0. FETCH DATA
     stats = get_system_stats()
@@ -796,112 +832,198 @@ def render_premium_menu(health_data=None):
     h = health_data if health_data else get_project_health()
     
     # 0. HEADER WITH LIVE CLOCK & ADMIN STATUS
-    now = datetime.now().strftime("%H:%M:%S")
-    admin_tag = "[bold green]ADMIN[/bold green]" if IS_ADMIN else "[bold yellow]USER[/bold yellow]"
-    header_text = f"🛡️ CYBERSHIELD COMMAND CENTER | {admin_tag} | [bold cyan]{now}[/bold cyan]"
-    console.print(Panel(Align.center(header_text), style="bold cyan", border_style="cyan"))
-
-    # 1. TOP BAR: SYSTEM STATUS (Real-time Telemetry)
+    now = datetime.now().strftime("%I:%M:%S %p")
+    admin_tag = "[bold green]ADMIN[/]" if IS_ADMIN else "[bold yellow]USER[/]"
+    
+    # 💡 REFINED HEADING: Unified Info Box as requested
     header_grid = Table.grid(expand=True)
-    header_grid.add_column()
+    header_grid.add_column(justify="left")
+    header_grid.add_column(justify="center")
     header_grid.add_column(justify="right")
     
-    health_score = h["score"]
-    health_bar = f"[bold {'green' if health_score > 80 else 'yellow' if health_score > 50 else 'red'}]READY: {health_score}%[/bold]"
+    env_badge = f"[bold white]Env:[/] [bold {('green' if IS_VIRTUAL else 'yellow')}]{VENV_NAME}[/]"
+    center_title = f"🛡️  [bold cyan]CYBERSHIELD COMMAND CENTER[/]  [dim]{CONFIG['VERSION']}[/]"
+    status_badge = f"{admin_tag} | [bold cyan]{now}[/]"
     
-    info_text = Text.assemble(
-        (f"Env: {VENV_NAME} | Status: Online | ", "dim white"),
-        (health_bar, "")
+    header_grid.add_row(env_badge, center_title, status_badge)
+    header_panel = Panel(header_grid, border_style="cyan", padding=(0, 1))
+
+    # 1. TOP BAR: SYSTEM STATUS (Real-time Telemetry)
+    # 💡 Optimization: We merge integrity and Python runtime into this bar
+    stats_text = Text.assemble(
+        (f"💻 CPU: {stats['cpu']}% ", "bold green" if stats['cpu'] < 70 else "bold red"),
+        (f" | 💾 RAM: {stats['ram']}% ", "bold blue" if stats['ram'] < 80 else "bold red"),
+        (f" | 📂 DISK: {stats['disk']}% ", "bold white"),
+        (" | ", "white"),
+        Text.from_markup(f"[bold {h['color']}]Integrity: {h['status']}[/]"),
+        (" | ", "white"),
+        Text.from_markup(f"[bold cyan]Py: {sys.executable.split('\\')[-1]}[/]")
     )
     
-    # Simple CPU/RAM ASCII bars if HAS_PSUTIL
-    if HAS_PSUTIL:
-        telemetry_text = Text.assemble(
-            (f"💻 CPU: {stats['cpu']}% ", "bold green" if stats['cpu'] < 70 else "bold red"),
-            (f"| 💾 RAM: {stats['ram']}% ", "bold blue" if stats['ram'] < 80 else "bold red"),
-            (f"| 📂 DISK: {stats['disk']}% ", "bold white")
-        )
-    else:
-        telemetry_text = Text("\n[TELEMETRY ENABLED AFTER HARDENING]", style="dim yellow")
-
-    header_grid.add_row(info_text, telemetry_text)
-
-    header_panel = Panel(
-        header_grid,
-        border_style="bright_blue",
-        padding=(0, 2)
-    )
-    console.print(header_panel)
-
-    # 1.5 HEALTH STATUS BAR
-    health_banner = Panel(
-        Align.center(f"[bold {h['color']}]PROJECT INTEGRITY: {h['status']} - {h['msg']}[/bold {h['color']}]"),
-        border_style=h['color'],
-        padding=(0, 1)
-    )
-    console.print(health_banner)
+    telemetry_panel = Panel(Align.center(stats_text), border_style="bright_blue", padding=(0, 2))
+    
+    # 💡 The 1.5 Health/Py badges are now integrated into the telemetry bar above.
+    health_banner = None
 
     # 2. THE DASHBOARD GRID
-    # We use a Table with no borders to create a clean 'column' look.
-    grid = Table.grid(expand=True)
-    grid.add_column(justify="left", ratio=1)
-    grid.add_column(justify="left", ratio=1)
+    if IS_ADMIN:
+        # POWER-USER GRID (Rainbow Boxes)
+        grid = Table.grid(expand=True)
+        grid.add_column(justify="left", ratio=1)
+        grid.add_column(justify="left", ratio=1)
 
-    # Group 1: ENGINE LAUNCH
-    launch_panel = Panel(
-        "[bold green]1.[/bold green] Dashboard (Integrated)\n"
-        "[bold green]2.[/bold green] Dashboard (External)\n"
-        "[bold green]3.[/bold green] Jupyter (Integrated)\n"
-        "[bold green]4.[/bold green] Jupyter (External)",
-        title="[bold cyan]🚀 ENGINE LAUNCH[/bold cyan]",
-        border_style="green",
-        padding=(1, 2)
-    )
+        launch_panel = Panel(
+            "[bold green]1.[/] WebApp (Integrated)\n[bold green]2.[/] WebApp (External)\n[bold green]3.[/] Jupyter Notebook\n[bold green]4.[/] Jupyter (External)",
+            title="[bold green]🚀 ENGINE LAUNCH[/]", border_style="green", padding=(0, 2), expand=True
+        )
+        system_panel = Panel(
+            "[bold magenta]5.[/] Harden Environment\n[bold magenta]6.[/] GitHub Repo\n[bold magenta]7.[/] Switch to Venv\n[bold magenta]8.[/] Auto-Upgrade",
+            title="[bold magenta]🛠️ SYSTEM OPS[/]", border_style="magenta", padding=(0, 2), expand=True
+        )
+        git_panel = Panel(
+            "[bold yellow]9.[/] Git: Pull Code\n[bold yellow]10.[/] Git: Sync/Push\n[bold yellow]11.[/] Git: Edit Ignore",
+            title="[bold yellow]📦 VERSION CONTROL[/]", border_style="yellow", padding=(0, 2), expand=True
+        )
+        
+        # 💡 MAINTENANCE: Multi-column to save vertical space in Admin Mode
+        maint_grid = Table.grid(expand=True)
+        maint_grid.add_column(ratio=1)
+        maint_grid.add_column(ratio=1)
+        
+        maint_grid.add_row("12. System Audit", "13. Force Restart")
+        maint_grid.add_row("[bold red]14. Exit Launcher[/]", "[bold yellow]15. Enable 'cs'[/]")
+        maint_grid.add_row("16. Reset Browser", "[bold cyan]17. Reg Aliases[/]")
+        maint_grid.add_row("[bold green]18. Speed Test[/]", "19. Help Guide")
+        maint_grid.add_row("20. Audit Logs", "")
+        
+        maint_panel = Panel(maint_grid, title="[bold blue]🛡️ MAINTENANCE[/]", border_style="blue", padding=(0, 2), expand=True)
+        
+        grid.add_row(launch_panel, system_panel)
+        grid.add_row(git_panel, maint_panel)
+        main_display = grid
+    else:
+        # 💡 MINIMALIST RED PANEL (User Mode Only)
+        hub_grid = Table.grid(expand=True, padding=(0, 2))
+        hub_grid.add_column(ratio=1)
+        hub_grid.add_column(ratio=1)
+        hub_grid.add_column(ratio=1)
+        
+        col1 = (
+            "[bold green]1.[/] WebApp (Int)\n"
+            "[bold green]2.[/] WebApp (Ext)\n"
+            "[bold green]3.[/] Jupyter NB\n"
+            "[bold green]4.[/] Jupyter (Ext)"
+        )
+        col2 = (
+            "[bold magenta]5.[/] Harden Env\n"
+            "[bold magenta]6.[/] GitHub Repo\n"
+            "[bold magenta]7.[/] Switch Venv\n"
+            "[bold magenta]8.[/] Auto-Upgrade"
+        )
+        col3 = (
+            "[bold yellow]9. [/] Git Pull\n"
+            "[bold yellow]10.[/] Git Sync\n"
+            "[bold yellow]11.[/] Edit Ignore\n"
+            "[bold cyan]13.[/] RESTART\n"
+            "[bold red]14. EXIT HUB[/]"
+        )
+        
+        hub_grid.add_row(col1, col2, col3)
+        main_display = Panel(hub_grid, title="[bold red]⚡ CYBER SENTINEL HUB[/]", border_style="red", padding=(0, 2))
 
-    # Group 2: SYSTEM OPS
-    system_panel = Panel(
-        "[bold magenta]5.[/bold magenta] Harden Environment\n"
-        "[bold magenta]6.[/bold magenta] Open GitHub Repo\n"
-        "[bold magenta]7.[/bold magenta] Switch to Venv\n"
-        "[bold magenta]8.[/bold magenta] Auto-Upgrade",
-        title="[bold magenta]🛠️ SYSTEM OPS[/bold magenta]",
-        border_style="magenta",
-        padding=(1, 2)
-    )
+    # 3. PROMPT DISPLAY (Embedded Input)
+    prompt_tag = "cmd_admin" if IS_ADMIN else "cmd_cyber"
+    input_line = Text.from_markup(f"[bold cyan]{prompt_tag}[/] > [white]{current_input}[/]", style="white")
+    
+    # High-Visibility Cursor Block
+    if int(time.time() * 2) % 2 == 0: 
+        input_line.append("█", style="bold cyan")
+    
+    prompt_panel = Panel(input_line, border_style="cyan", padding=(0, 2))
 
-    # Group 3: VERSION CONTROL
-    git_panel = Panel(
-        "[bold yellow]9.[/bold yellow] Git: Pull Code\n"
-        "[bold yellow]10.[/bold yellow] Git: Sync/Push\n"
-        "[bold yellow]11.[/bold yellow] Git: Edit Ignore",
-        title="[bold yellow]📦 VERSION CONTROL[/bold yellow]",
-        border_style="yellow",
-        padding=(1, 2)
-    )
+    # 4. ASSEMBLE ALL COMPONENTS
+    components = [header_panel]
+    
+    # Pillar 2: Dual-UI Strategy. Only show telemetry (Stats) in Admin Mode.
+    if IS_ADMIN:
+        components.append(telemetry_panel)
+    # health_banner is now integrated into telemetry_panel for all modes
+    
+    components.append(main_display)
+    components.append(prompt_panel) # Always show the prompt embedded
+    components.append(Text(f"Tip: Type 'help' for details | Session Log: {LOG_FILE}", style="white"))
+    
+    return Group(*components)
 
-    # Group 4: MAINTENANCE
-    maint_panel = Panel(
-        Text.assemble(
-            ("12. System Audit / Paths\n", "white"),
-            ("13. Force Restart Menu\n", "white"),
-            ("14. [bold red]Exit Launcher[/bold red]\n", "red"),
-            ("15. [bold yellow]🚀 Enable Global 'cs' Command[/bold yellow]\n", "yellow"),
-            ("16. Reset Browser Preferences\n", "dim white"),
-            ("17. [bold cyan]🔥 Register ALL Aliases (bro, cyber)[/bold cyan]\n", "cyan"),
-            ("18. [bold green]🏎️ Network Speed Test (MB/s)[/bold green]", "green")
-        ),
-        title="[bold blue]🛡️ MAINTENANCE[/bold blue]",
-        border_style="blue",
-        padding=(1, 2)
-    )
+def boot_loader():
+    """PURPOSE: A high-tech 'Boot Sequence' for a professional first impression."""
+    if not HAS_RICH:
+        return
 
-    grid.add_row(launch_panel, system_panel)
-    grid.add_row(git_panel, maint_panel)
-    console.print(grid)
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+    # Force enable ANSI escape sequences for Windows
+    if os.name == 'nt':
+        kernel32 = ctypes.windll.kernel32
+        kernel32.SetConsoleMode(kernel32.GetStdHandle(-11), 7)
 
-    # 3. QUICK FEEDBACK
-    console.print(f"[dim white]Tip: Type 'help' for details | Session Log: {LOG_FILE}[/dim white]")
-    print("-" * 50)
+    from rich.columns import Columns
+    from rich.live import Live
+    from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+    
+    # 1. THE LOGO REVEAL
+    logo = f"""
+    [bold red]
+     ██████╗██╗   ██╗██████╗ ███████╗██████╗ ███████╗██╗  ██╗██╗███████╗██╗     ██████╗ 
+    ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║  ██║██║██╔════╝██║     ██╔══██╗
+    ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝███████╗███████║██║█████╗  ██║     ██║  ██║
+    ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗╚════██║██╔══██║██║██╔══╝  ██║     ██║  ██║
+    ╚██████╗   ██║   ██████╔╝███████╗██║  ██║███████║██║  ██║██║███████╗███████╗██████╔╝
+     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝ 
+    [/]
+    [dim cyan]      SYSTEM INITIALIZATION | COMMAND CENTER {CONFIG['VERSION']} | 2026 PRODUCTION [/]
+    """
+    console.print(Align.center(logo))
+    time.sleep(0.5)
+
+    # 2. THE BOOT DIAGNOSTICS
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(bar_width=40, pulse_style="bright_cyan"),
+        transient=True,
+    ) as progress:
+        
+        task1 = progress.add_task("[cyan]Initializing Core Registry...", total=100)
+        task2 = progress.add_task("[magenta]Loading Neural Weights...", total=100)
+        task3 = progress.add_task("[yellow]Synchronizing Uplink...", total=100)
+
+        # Step-by-step fake 'loading' for aesthetic feel
+        while not progress.finished:
+            progress.update(task1, advance=2)
+            if progress.tasks[0].percentage > 40: progress.update(task2, advance=3)
+            if progress.tasks[1].percentage > 30: progress.update(task3, advance=5)
+            time.sleep(0.03)
+
+    # 3. FINAL HEALTH CHECK (Real Data)
+    h = get_project_health()
+    if h["score"] < 70:
+        console.print(Panel(
+            f"[bold red]⚠️  SYSTEM INTEGRITY ALERT: {h['score']}%[/]\n[yellow]Reason: {h['msg']}[/]",
+            title="[bold red]PRE-FLIGHT DIAGNOSTIC[/]", border_style="red"
+        ))
+        console.print("\n[bold cyan][?] AUTO-REPAIR RECOMMENDED[/bold cyan]")
+        fix = input("Would you like to attempt an Auto-Repair (Harden) now? (y/n): ").lower()
+        if fix == 'y':
+            harden_environment()
+        else:
+            log_system_event(f"Startup Health Alert: {h['status']} (User ignored fix)", level="WARNING")
+    else:
+        console.print(Align.center(f"[bold green]✅ SYSTEM NOMINAL: {h['score']}% INTEGRITY VERIFIED[/]"))
+        time.sleep(0.8)
+    
+    # Final buffer purge to ensure input is fresh for the main menu
+    while msvcrt.kbhit(): msvcrt.getch()
 
 def main():
     """
@@ -919,324 +1041,338 @@ def main():
     t = threading.Thread(target=connectivity_guard, daemon=True)
     t.start()
 
-    # Step 1: Integrated Pre-flight Check
-    if HAS_RICH:
-        os.system('cls' if os.name == 'nt' else 'clear')
-        with console.status("[bold cyan]🛡️ INITIALIZING AI COCKPIT PRE-FLIGHT CHECK...[/bold cyan]", spinner="bouncingBar"):
-            time.sleep(1.5) 
-            h = get_project_health()
-            
-        if not IS_ADMIN:
-            console.print("\n[bold yellow][!] ADMIN WARNING: Launcher is running in User Mode.[/bold yellow]")
-            console.print("[dim]Note: 'Enable Global cs' may fail without Administrator privileges.[/dim]\n")
-            time.sleep(1)
+    # Step 1: Integrated Pre-flight Check (BOOT LOADER)
+    boot_loader()
 
-        if h["score"] < 70:
-            console.print(f"\n[bold red][!] PRE-FLIGHT ALERT: System Health is {h['score']}%[/bold red]")
-            console.print(f"[yellow][!] Problem: {h['msg']}[/yellow]")
-            fix = input("\n[?] Would you like me to attempt an Auto-Repair (Harden) now? (y/n): ").lower()
-            if fix == 'y':
-                harden_environment()
-            else:
-                log_system_event(f"Startup Health Alert: {h['status']} (User ignored fix)", level="WARNING")
-        elif h["status"] != "HEALTHY":
-            log_system_event(f"Startup Health Alert: {h['status']}", level="WARNING")
+    # Clean up any leftover input
+    while msvcrt.kbhit(): msvcrt.getch()
 
     # Pillar 5: Global Crash Guard
     # Variables for Dual-Speed refresh
     cached_health = None
     last_health_check = 0
     
+    # Start the Cockpit Engine
+    current_input = ""
+    
     while True:
         try:
-            while True: 
-                # Re-fetch stats every loop
-                os.system('cls' if os.name == 'nt' else 'clear')
-                
-                # Logic for Dual-Speed Refresh (Heavy tasks run every REFRESH_RATE_SLOW seconds)
-                if time.time() - last_health_check > CONFIG["REFRESH_RATE_SLOW"]:
+            # 💡 INTERACTIVE SENTINEL ENGINE (v3.7 - Immersive Fix)
+            # Clear keyboard buffer to start fresh
+            while msvcrt.kbhit(): msvcrt.getch() 
+            
+            # Use screen=True for the "Cockpit" feel and to prevent ghosting artifacts
+            with Live(render_premium_menu(cached_health, current_input), console=console, refresh_per_second=10, screen=True, auto_refresh=True) as live:
+                # Ensure we have fresh health data for the first render
+                if not cached_health:
                     cached_health = get_project_health()
-                    last_health_check = time.time()
+                    live.update(render_premium_menu(cached_health, current_input))
+                
+                while True: 
+                    # 1. SLOW REFRESH (Health/Stats)
+                    if time.time() - last_health_check > CONFIG["REFRESH_RATE_SLOW"]:
+                        cached_health = get_project_health()
+                        last_health_check = time.time()
+                        live.update(render_premium_menu(cached_health, current_input))
 
-                if HAS_RICH:
-                    render_premium_menu(cached_health)
-                else:
-                    # [Classic Menu logic omitted for brevity in snippet, it remains unchanged]
-                    print(f"{CYAN}="*42 + f"{RESET}")
-                    print(f"{CYAN}   CyberShield AI - COMMAND CENTER       {RESET}")
-                    print(f"   {env_color}{env_label}{RESET}")
-                    print(f"   {WHITE}{status_info}{RESET}") 
-                    print(f"   {BLUE}Source: {REPO_URL}{RESET}")
-                    print(f"{CYAN}="*42 + f"{RESET}")
-                    print("1. Launch Dashboard (Integrated - Same Window)")
-                    print("2. Launch Dashboard (External - New Window)")
-                    print("3. Launch Jupyter   (Integrated - Same Window)")
-                    print("4. Launch Jupyter   (External - New Window)")
-                    print("5. Initialize/Harden 2026 Environment (Install Setup)")
-                    print("6. Open GitHub Repository (Source Code)")
-                    print("7. Switch to Virtual Environment (.venv)")
-                    print("8. Auto Upgrade from Global to Venv & Restart")
-                    print("9. Git: Pull Latest Code")
-                    print("10. Git: Commit & Push Changes")
-                    print("11. Git: Edit .gitignore")
-                    print("12. Check Python System Paths & Versions")
-                    print("13. Restart Launcher")
-                    print("14. Exit Launcher")
-                    print("15. Enable Global 'cs' Command")
-                    print("16. Reset Browser Preferences")
-                    print("17. Register ALL Global Aliases (cs, bro, cyber)")
-                    print("18. Network Speed Test (MB/s)")
-                    print("------------------------------------------")
-                    print(" [TIP] Type 'help' or 'h' for command details")
-                    print("------------------------------------------")
+                    # 2. FAST INPUT CAPTURE
+                    has_input_change = False
+                    while msvcrt.kbhit():
+                        try:
+                            raw = msvcrt.getch()
+                            
+                            # Filter system artifacts (Escape sequences, function keys)
+                            if raw == b'\x1b' or raw == b'\x00' or raw == b'\xe0':
+                                time.sleep(0.01) # Small delay to see if more bytes arrive
+                                while msvcrt.kbhit(): msvcrt.getch() 
+                                continue
+                            
+                            key = raw.decode('utf-8', errors='ignore')
+                            
+                            if key in ['\r', '\n']: # Enter
+                                break # Exit the input-burst while loop
+                            elif key == '\x08': # Backspace
+                                if len(current_input) > 0:
+                                    current_input = current_input[:-1]
+                                    has_input_change = True
+                            elif key.isprintable() and ord(key) < 128:
+                                # Standard ASCII Only
+                                if len(current_input) < 40:
+                                    current_input += key
+                                    has_input_change = True
+                        except Exception:
+                            pass
+                    
+                    # Update UI if input changed
+                    if has_input_change:
+                        live.update(render_premium_menu(cached_health, current_input))
 
-                # get_input_timeout: This is our new dynamic input.
-                prompt_style = f"{CYAN}Selection {RESET}> " if HAS_RICH else "Selection Code (1-15): "
-                choice = get_input_timeout(prompt_style, timeout=CONFIG["REFRESH_RATE_FAST"])
-                
-                if choice is None:
-                    continue # Refresh the dashboard stats
-                
-                choice = choice.strip().lower()
+                    # Exit inner loop if Enter was pressed
+                    if 'key' in locals() and key in ['\r', '\n']:
+                        break
+                    
+                    # Small sleep to prevent 100% CPU usage while waiting for input
+                    time.sleep(0.02) 
 
-                # --- BLOCK 4: THE SWITCHBOARD (CHOOSING THE ACTION) ---
-                
-                # NLU COMMAND PARSER: Understanding basic human-like commands
-                words = choice.split()
-                help_patterns = ['help', '?', 'info', 'commands', 'h', 'guide']
-                
-                # Check for "help [topic]" or "[topic] help"
-                is_help_request = any(w in help_patterns for w in words)
-                
-                if is_help_request:
-                    # Extract the topic (any word that is NOT a help pattern)
-                    topics = [w for w in words if w not in help_patterns]
-                    topic = topics[0] if topics else None
-                    show_help(topic)
+            # Action Phase: Process captured choice
+            choice = current_input.strip().lower()
+            current_input = "" 
+            
+            if not choice:
+                continue 
+
+            # --- SUSPEND FOR COMMAND EXECUTION ---
+            # Screen=True automatically restores the buffer on exit from 'with' block
+            console.clear()
+
+            # --- BLOCK 4: THE SWITCHBOARD (CHOOSING THE ACTION) ---
+            
+            # NLU COMMAND PARSER: Understanding basic human-like commands
+            words = choice.split()
+            help_patterns = ['help', '?', 'info', 'commands', 'h', 'guide']
+            
+            # Check for "help [topic]" or "[topic] help"
+            is_help_request = any(w in help_patterns for w in words)
+            
+            if is_help_request:
+                # Extract the topic (any word that is NOT a help pattern)
+                topics = [w for w in words if w not in help_patterns]
+                topic = topics[0] if topics else None
+                show_help(topic)
+                continue
+
+            # ALIASING: mapping words to numbers
+            cmd_map = {
+                'run': '1', 'start': '1', 'launch': '1', 'dashboard': '1', 'webapp': '1',
+                'ext': '2', 'external': '2',
+                'jupyter': '3', 'notebook': '3',
+                'harden': '5', 'setup': '5', 'install': '5', 'fix': '5',
+                'github': '6', 'repo': '6',
+                'venv': '7', 'switch': '7',
+                'upgrade': '8', 'migrate': '8',
+                'pull': '9', 'update': '9',
+                'push': '10', 'commit': '10', 'sync': '10',
+                'ignore': '11', 'gitignore': '11',
+                'audit': '12', 'path': '12',
+                'restart': '13', 'reload': '13',
+                'stop': '14', 'exit': '14', 'bye': '14', 'quit': '14',
+                'global': '15', 'cs': '15', 'register': '15',
+                'reset': '16', 'clear_settings': '16',
+                'alias': '17', 'bro': '17', 'cyber': '17', 'register_all': '17',
+                'speed': '18', 'network': '18', 'test': '18', 'internet': '18',
+                'help': '19', 'guide': '19', 'h': '19', 
+                'log': '20', 'logs': '20', 'audit_logs': '20'
+            }
+            
+            # SENSE: Natural Language Intent Routing
+            matched_choice = None
+            for word in words:
+                if word in cmd_map:
+                    if cmd_map[word] == '18':
+                        matched_choice = '18'
+                        break
+                    if not matched_choice:
+                        matched_choice = cmd_map[word]
+            
+            if matched_choice:
+                choice = matched_choice
+
+            # Check for Health Warning before launching (Option 1/2)
+            h_score = cached_health["score"] if cached_health else get_project_health()["score"]
+            if choice in ['1', '2'] and h_score < 50:
+                print(f"\n{RED}[!] CAUTION: Health Score is low ({h_score}%).{RESET}")
+                print(f"{YELLOW}[!] Launch may fail due to missing files or dependencies.{RESET}")
+                confirm = input("[?] Proceed regardless? (y/n): ").lower()
+                if confirm != 'y': continue
+
+            if choice == '1':
+                run_script("Start_WebApp_Venv.bat", new_window=False)
+
+            elif choice == '2':
+                run_script("Start_WebApp_Venv.bat", new_window=True)
+                input("\n[!] External Process Started. Press ENTER to return to menu...")
+
+            elif choice in ['3', 'jupyter', 'notebook']:
+                run_script("Start_Jupyter_Venv.bat", new_window=False)
+
+            elif choice == '4':
+                run_script("Start_Jupyter_Venv.bat", new_window=True)
+                input("\n[!] External Process Started. Press ENTER to return to menu...")
+
+            elif choice in ['5', 'harden', 'setup', 'install']:
+                harden_environment()
+
+            elif choice in ['6', 'github', 'repo', 'source']:
+                open_repo_smart()
+                input("\n[!] Browser Spawned. Press ENTER to return to menu...")
+
+            elif choice in ['7', 'venv', 'virtualenv', 'isolate']:
+                # Pillar 4: Handoff Safety
+                if IS_VIRTUAL:
+                    print("[!] Already running in Virtual Environment.")
+                    time.sleep(1)
                     continue
-
-                # ALIASING: mapping words to numbers
-                cmd_map = {
-                    'run': '1', 'start': '1', 'launch': '1', 'dashboard': '1',
-                    'ext': '2', 'external': '2',
-                    'jupyter': '3', 'notebook': '3',
-                    'harden': '5', 'setup': '5', 'install': '5', 'fix': '5',
-                    'github': '6', 'repo': '6',
-                    'venv': '7', 'switch': '7',
-                    'upgrade': '8', 'migrate': '8',
-                    'pull': '9', 'update': '9',
-                    'push': '10', 'commit': '10', 'sync': '10',
-                    'ignore': '11', 'gitignore': '11',
-                    'audit': '12', 'path': '12',
-                    'restart': '13', 'reload': '13',
-                    'stop': '14', 'exit': '14', 'bye': '14', 'quit': '14',
-                    'global': '15', 'cs': '15', 'register': '15',
-                    'reset': '16', 'clear_settings': '16',
-                    'alias': '17', 'bro': '17', 'cyber': '17', 'register_all': '17',
-                    'speed': '18', 'network': '18', 'test': '18', 'internet': '18'
-                }
                 
-                # SENSE: Natural Language Intent Routing
-                # This allow words like "start speed test" to work by sensing the strongest keyword.
-                matched_choice = None
-                for word in words:
-                    if word in cmd_map:
-                        # Prioritize Option 18 (Speed Test) if present in the string
-                        if cmd_map[word] == '18':
-                            matched_choice = '18'
-                            break
-                        # Otherwise, take the first valid match found
-                        if not matched_choice:
-                            matched_choice = cmd_map[word]
+                venv_exe = os.path.join(root_dir, '.venv', 'Scripts', 'python.exe')
+                if not os.path.exists(venv_exe):
+                    print(f"[-] Error: Virtual Environment not found at {venv_exe}")
+                    print("[!] Please use Option 5 (Harden) to rebuild the environment first.")
+                    input("\nPress ENTER to continue...")
+                    continue
                 
-                if matched_choice:
-                    choice = matched_choice
+                print(f"[*] Handoff to Venv: {venv_exe}")
+                time.sleep(1)
+                os.execl(venv_exe, venv_exe, *sys.argv)
 
-                # Check for Health Warning before launching (Option 1/2)
-                h_score = cached_health["score"] if cached_health else get_project_health()["score"]
-                if choice in ['1', '2'] and h_score < 50:
-                    print(f"\n{RED}[!] CAUTION: Health Score is low ({h_score}%).{RESET}")
-                    print(f"{YELLOW}[!] Launch may fail due to missing files or dependencies.{RESET}")
-                    confirm = input("[?] Proceed regardless? (y/n): ").lower()
-                    if confirm != 'y': continue
-
-                if choice == '1':
-                    run_script("Start_WebApp_Venv.bat", new_window=False)
-
-                elif choice == '2':
-                    run_script("Start_WebApp_Venv.bat", new_window=True)
-                    input("\n[!] External Process Started. Press ENTER to return to menu...")
-
-                elif choice in ['3', 'jupyter', 'notebook']:
-                    run_script("Start_Jupyter_Venv.bat", new_window=False)
-
-                elif choice == '4':
-                    run_script("Start_Jupyter_Venv.bat", new_window=True)
-                    input("\n[!] External Process Started. Press ENTER to return to menu...")
-
-                elif choice in ['5', 'harden', 'setup', 'install']:
-                    harden_environment()
-
-                elif choice in ['6', 'github', 'repo', 'source']:
-                    open_repo_smart()
-                    input("\n[!] Browser Spawned. Press ENTER to return to menu...")
-
-                elif choice in ['7', 'venv', 'virtualenv', 'isolate']:
-                    # Pillar 4: Handoff Safety
-                    if IS_VIRTUAL:
-                        print("[!] Already running in Virtual Environment.")
-                        time.sleep(1)
-                        continue
-                    
-                    venv_exe = os.path.join(root_dir, '.venv', 'Scripts', 'python.exe')
-                    if not os.path.exists(venv_exe):
-                        print(f"[-] Error: Virtual Environment not found at {venv_exe}")
-                        print("[!] Please use Option 5 (Harden) to rebuild the environment first.")
-                        input("\nPress ENTER to continue...")
-                        continue
-                    
-                    print(f"[*] Handoff to Venv: {venv_exe}")
+            elif choice in ['8', 'upgrade']:
+                if IS_VIRTUAL:
+                    print("[!] Already running in Virtual Environment.")
+                    time.sleep(1)
+                    continue
+                venv_exe = os.path.join(root_dir, '.venv', 'Scripts', 'python.exe')
+                if os.path.exists(venv_exe):
+                    print("[*] Environment Sync: Migrating to Virtual Environment...")
                     time.sleep(1)
                     os.execl(venv_exe, venv_exe, *sys.argv)
-
-                elif choice in ['8', 'upgrade']:
-                    if IS_VIRTUAL:
-                        print("[!] Already running in Virtual Environment.")
-                        time.sleep(1)
-                        continue
-                    # os.path.join: Builds the path to the 'python.exe' inside your project's bubble (.venv).
-                    venv_exe = os.path.join(root_dir, '.venv', 'Scripts', 'python.exe')
+                else:
+                    print("[-] No Virtual Environment found. Running Hardening Engine first...")
+                    harden_environment()
                     if os.path.exists(venv_exe):
-                        print("[*] Environment Sync: Migrating to Virtual Environment...")
-                        time.sleep(1) # Small pause for user to read status
-                        # RE-LAUNCH: Replaces the current launcher process with the one inside the bubble.
                         os.execl(venv_exe, venv_exe, *sys.argv)
-                    else:
-                        print("[-] No Virtual Environment found. Running Hardening Engine first...")
-                        harden_environment() # Auto-run option 5 if venv is missing
-                        # After hardening, try to switch again
-                        if os.path.exists(venv_exe):
-                            os.execl(venv_exe, venv_exe, *sys.argv)
 
-                elif choice in ['9', 'pull', 'update']:
-                    # Pillar 2: Git Protection
-                    # 'git pull' is like asking the internet: "Is there a newer version of my code on GitHub?"
-                    print("\n[*] Pulling latest changes from repository...")
+            elif choice in ['9', 'pull', 'update']:
+                print("\n[*] Pulling latest changes from repository...")
+                try:
+                    subprocess.run(["git", "pull"], cwd=root_dir, check=True)
+                    print("\n[+] Git Pull Complete.")
+                except Exception as e:
+                    print(f"\n[-] Git Error: {e}")
+                    print("[!] Ensure Git is installed and you have an internet connection.")
+                input("\nPress ENTER to return to menu...")
+
+            elif choice in ['10', 'push', 'commit', 'sync', 'upload']:
+                commit_msg = input("\n[?] Enter commit message (or press ENTER to cancel): ").strip()
+                if commit_msg:
                     try:
-                        # subprocess.run: Executes the 'git pull' command. 
-                        # cwd=root_dir: Makes sure we are looking in the right folder.
-                        # check=True: This makes Python notice if the internet cuts out or Git fails.
-                        subprocess.run(["git", "pull"], cwd=root_dir, check=True)
-                        print("\n[+] Git Pull Complete.")
+                        print("[*] Staging all files (git add .)...")
+                        subprocess.run(["git", "add", "."], cwd=root_dir, check=True)
+                        print(f"[*] Committing as: '{commit_msg}'...")
+                        subprocess.run(["git", "commit", "-m", commit_msg], cwd=root_dir, check=True)
+                        print("[*] Pushing to repository (git push)...")
+                        subprocess.run(["git", "push"], cwd=root_dir, check=True)
+                        print("\n[+] Git Operations Successful!")
                     except Exception as e:
-                        # This 'except' block is our safety net. 
-                        # It prevents the script from crashing if Git isn't installed or if you're offline.
-                        print(f"\n[-] Git Error: {e}")
-                        print("[!] Ensure Git is installed and you have an internet connection.")
-                    input("\nPress ENTER to return to menu...")
+                        print(f"\n[-] Git Sync failed: {e}")
+                        log_system_event(f"Git Sync Error: {e}", level="ERROR")
+                else:
+                    print("[-] Operation Canceled.")
+                input("\nPress ENTER to return to menu...")
 
-                elif choice in ['10', 'push', 'commit', 'sync', 'upload']:
-                    commit_msg = input("\n[?] Enter commit message (or press ENTER to cancel): ").strip()
-                    if commit_msg:
-                        try:
-                            # 'git add .': This stages every single file change you made.
-                            print("[*] Staging all files (git add .)...")
-                            subprocess.run(["git", "add", "."], cwd=root_dir, check=True)
-                            
-                            # 'git commit': This wraps your changes into a numbered 'version' with your message.
-                            print(f"[*] Committing as: '{commit_msg}'...")
-                            subprocess.run(["git", "commit", "-m", commit_msg], cwd=root_dir, check=True)
-                            
-                            # 'git push': This uploads your local 'versions' to the cloud (GitHub).
-                            print("[*] Pushing to repository (git push)...")
-                            subprocess.run(["git", "push"], cwd=root_dir, check=True)
-                            print("\n[+] Git Operations Successful!")
-                        except Exception as e:
-                            print(f"\n[-] Git Sync failed: {e}")
-                            log_system_event(f"Git Sync Error: {e}", level="ERROR")
-                    else:
-                        print("[-] Operation Canceled.")
-                    input("\nPress ENTER to return to menu...")
-
-                elif choice in ['11', 'ignore', 'gitignore']:
-                    # Pillar 3: Automated Smart Git Protection
-                    gitignore_path = os.path.join(root_dir, ".gitignore")
-                    
-                    # Essential patterns to exclude
-                    patterns = [
-                        "*.log",
-                        "launcher_debug.log", 
-                        ".venv/", 
-                        "__pycache__/", 
-                        "*.pyc", 
-                        ".vscode/",
-                        "Project materials/"
-                    ]
-                    
+            elif choice in ['11', 'ignore', 'gitignore']:
+                gitignore_path = os.path.join(root_dir, ".gitignore")
+                print(f"\n{BOLD_CYAN}--- GIT IGNORE MANAGER ---{RESET}")
+                print("1. [Manual] Add specific file/folder name")
+                print("2. [Automatic] Add current folder to ignore")
+                print("3. [Harden] Add all common development patterns")
+                print("C. Cancel")
+                
+                sub_choice = input(f"\n{YELLOW}[?] Select mode: {RESET}").lower()
+                
+                to_add = []
+                if sub_choice == '1':
+                    manual_path = input(f"{YELLOW}[?] Enter file/folder to ignore: {RESET}").strip()
+                    if manual_path: to_add.append(manual_path)
+                elif sub_choice == '2':
+                    folder_name = os.path.basename(root_dir)
+                    to_add.append(f"{folder_name}/")
+                elif sub_choice == '3':
+                    to_add = ["*.log", "launcher_debug.log", ".venv/", "__pycache__/", "*.pyc", ".vscode/", "Project materials/"]
+                
+                if to_add:
                     try:
                         existing = []
                         if os.path.exists(gitignore_path):
                             with open(gitignore_path, "r") as f:
                                 existing = [line.strip() for line in f.readlines()]
                         
-                        added = False
+                        added_count = 0
                         with open(gitignore_path, "a") as f:
-                            for p in patterns:
+                            for p in to_add:
                                 if p not in existing:
                                     f.write(f"{p}\n")
-                                    added = True
+                                    added_count += 1
+                                    print(f"{GREEN}[+] Added to ignore: {p}{RESET}")
                         
-                        msg = "Git Protection: .gitignore is now HARDENED (Logs/Venv/Cache ignored)."
-                        if added:
-                            if HAS_RICH:
-                                console.print(Panel(msg, border_style="green"))
-                            else:
-                                print(f"\n[+] {msg}")
+                        if added_count == 0:
+                            print(f"{YELLOW}[!] All entries were already in .gitignore.{RESET}")
                         else:
-                            if HAS_RICH:
-                                console.print("[dim green][+] .gitignore already bulletproof. No changes needed.[/dim green]")
-                            else:
-                                print("[+] .gitignore already hardened.")
-                                
-                        log_system_event("Smart Git Protection triggered - .gitignore verified.", level="INFO")
-                    except Exception as e:
-                        print(f"[-] Error hardening .gitignore: {e}")
-                        log_system_event(f"Gitignore hardening failed: {e}", level="ERROR")
+                            log_system_event(f"Git Protection: Added {added_count} items.", level="INFO")
                         
-                    input("\nPress ENTER to return to menu...")
+                    except Exception as e:
+                        print(f"{RED}[-] Error: {e}{RESET}")
+                else:
+                    print("[-] No changes made.")
+                input("\nPress ENTER to return to menu...")
 
-                elif choice in ['12', 'version', 'path', 'diagnostic', 'audit', 'where']:
-                    check_system_paths()
+            elif choice in ['12', 'audit', ' diagnostic']:
+                check_system_paths()
 
-                elif choice in ['13', 'restart', 'refresh', 'reload']:
-                    print("[*] Restarting Command Center...")
-                    time.sleep(1)
-                    os.execl(sys.executable, sys.executable, *sys.argv)
-
-                elif choice in ['14', 'exit', 'bye', 'by', 'stop', 'quit', 'close']:
-                    # Pillar 1: Safe Exit
-                    print(f"\n{GREEN}[*] Goodbye! Secure logout complete.{RESET}")
-                    return # Exit the main function safely
+            elif choice in ['13', 'restart', 'reload']:
+                print("[*] Synchronizing Environment for Restart...")
+                # Pillar 1: Professional Safe Exit before Handoff
+                if 'live' in locals() and live.is_started:
+                    live.stop()
                 
-                elif choice in ['15', 'global', 'cs', 'register']:
-                    setup_global_access("cs")
-                    
-                elif choice in ['16', 'reset', 'clear_settings']:
-                    settings = load_settings()
-                    settings["browser_mode"] = None
-                    save_settings(settings)
-                    print(f"\n{GREEN}[+] Browser preferences cleared. You will be asked again next time.{RESET}")
+                # Pillar 5: Zero-Failure Process Handoff
+                # On Windows, os.execl is replaced by spawnl + exit.
+                # We need to ensure the console is flushed and ready.
+                sys.stdout.flush()
+                sys.stderr.flush()
+                time.sleep(1.0) # Wait for terminal to settle
+                
+                try:
+                    # Use absolute path to python for reliability
+                    python_exe = sys.executable
+                    os.execl(python_exe, python_exe, os.path.abspath(__file__), *sys.argv[1:])
+                except Exception as restart_err:
+                    print(f"[-] Restart failed: {restart_err}")
                     input("Press ENTER to return to menu...")
 
-                elif choice in ['17', 'alias', 'bro', 'cyber']:
-                    setup_all_aliases()
+            elif choice in ['14', 'exit', 'bye', 'stop']:
+                print(f"\n{GREEN}[*] Goodbye! Secure logout complete.{RESET}")
+                return
 
-                elif choice in ['18', 'speed', 'network', 'test', 'internet']:
-                    run_speed_test()
+            elif choice in ['15', 'global', 'cs', 'register']:
+                setup_global_access("cs")
+                
+            elif choice in ['16', 'reset', 'clear_settings']:
+                settings = load_settings()
+                settings["browser_mode"] = None
+                save_settings(settings)
+                print(f"\n{GREEN}[+] Browser preferences cleared.{RESET}")
+                input("Press ENTER to return to menu...")
 
-                else:
-                    print(f"{RED}[-] Invalid code.{RESET}")
-                    input("Press ENTER to retry...")
+            elif choice in ['17', 'alias', 'bro', 'cyber']:
+                setup_all_aliases()
+
+            elif choice in ['18', 'speed', 'network', 'test']:
+                run_speed_test()
+
+            elif choice in ['19', 'help', 'guide']:
+                show_help()
+
+            elif choice in ['20', 'log', 'logs']:
+                print("[*] Launching Live Audit Logs (External)...")
+                subprocess.Popen(['notepad.exe', LOG_FILE])
+
+            # --- RESUME PHASE ---
+            # After command exits, we clear the console.
+            # The next iteration of the main loop will restart the Live engine automatically.
+            console.clear()
+            # Give the terminal half a second to settle focus and buffer switches
+            time.sleep(0.5)
+            # Drain any leftover characters from command inputs (like Git commit msgs)
+            while msvcrt.kbhit(): msvcrt.getch()
 
         except KeyboardInterrupt:
             # Pillar 1: Professional Safe Exit on Ctrl+C

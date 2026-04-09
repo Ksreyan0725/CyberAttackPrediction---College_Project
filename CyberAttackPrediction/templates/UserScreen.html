@@ -174,15 +174,15 @@
                 </div>
                 <div class="d-flex gap-2">
                     {% if msg %}
-                    <button id="clearResults" class="btn btn-outline-danger btn-sm rounded-pill px-3 x-small">
-                        <i class="fas fa-trash-alt me-1"></i> Clear Results
+                    <button id="clearResults" class="btn btn-glass-glow btn-sm rounded-pill px-3 x-small">
+                        <i class="fas fa-trash-alt me-1 text-danger"></i> Clear Results
                     </button>
                     {% endif %}
-                    <button id="toggleFullscreen" class="btn btn-glass btn-sm rounded-pill px-3 x-small btn-fullscreen d-none d-md-flex align-items-center">
-                        <i class="fas fa-expand me-1"></i> Full Screen
+                    <button id="toggleFullscreen" class="btn btn-glass-glow btn-sm rounded-pill px-3 x-small d-none d-md-flex align-items-center">
+                        <i class="fas fa-expand me-1 text-primary"></i> Full Screen
                     </button>
-                    <a href="{{ url_for('predictView') }}" class="btn btn-outline-primary btn-sm rounded-pill px-3 x-small">
-                        <i class="fas fa-plus me-1"></i> New Analysis
+                    <a href="{{ url_for('predictView') }}" class="btn btn-glass-glow btn-sm rounded-pill px-3 x-small">
+                        <i class="fas fa-plus me-1 text-primary"></i> New Analysis
                     </a>
                 </div>
             </div>
@@ -299,32 +299,24 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (fullscreenBtn && resultsTable) {
         fullscreenBtn.addEventListener('click', function() {
-            if (!document.fullscreenElement) {
-                if (resultsTable.requestFullscreen) {
-                    resultsTable.requestFullscreen();
-                } else if (resultsTable.webkitRequestFullscreen) { /* Safari */
-                    resultsTable.webkitRequestFullscreen();
-                } else if (resultsTable.msRequestFullscreen) { /* IE11 */
-                    resultsTable.msRequestFullscreen();
-                }
-                fullscreenBtn.innerHTML = '<i class="fas fa-compress me-1"></i> Exit Full';
+            if (window.ImmersiveEngine) {
+                window.ImmersiveEngine.toggle();
             } else {
-                if (document.exitFullscreen) {
+                // Fallback if engine not loaded
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                } else {
                     document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
                 }
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand me-1"></i> Full Screen';
             }
         });
 
-        // Update button text on escape key or other exit methods
-        document.addEventListener('fullscreenchange', function() {
-            if (!document.fullscreenElement) {
-                fullscreenBtn.innerHTML = '<i class="fas fa-expand me-1"></i> Full Screen';
-            }
+        // Listen for global engine state changes
+        window.addEventListener('immersive-state-change', function(e) {
+            const isFs = e.detail.isFullscreen;
+            fullscreenBtn.innerHTML = isFs ? 
+                '<i class="fas fa-compress me-1 text-primary"></i> Exit Full' : 
+                '<i class="fas fa-expand me-1 text-primary"></i> Full Screen';
         });
     }
 
