@@ -301,13 +301,6 @@ document.addEventListener('DOMContentLoaded', function() {
         fullscreenBtn.addEventListener('click', function() {
             if (window.ImmersiveEngine) {
                 window.ImmersiveEngine.toggle();
-            } else {
-                // Fallback if engine not loaded
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen();
-                } else {
-                    document.exitFullscreen();
-                }
             }
         });
 

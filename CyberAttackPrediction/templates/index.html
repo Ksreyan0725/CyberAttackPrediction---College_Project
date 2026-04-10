@@ -4,6 +4,17 @@
 
 {% block extra_css %}
 <style>
+    /* Fail-safe: Light/Dark friendly hero overlay to avoid full-black screens */
+    .hero-overlay {
+        background: var(--hero-overlay, linear-gradient(transparent, rgba(0,0,0,0.6)));
+    }
+    [data-theme="light"] .hero-overlay {
+        --hero-overlay: linear-gradient(transparent, rgba(255,255,255,0.65));
+    }
+    [data-theme="dark"] .hero-overlay {
+        --hero-overlay: linear-gradient(transparent, rgba(0,0,0,0.65));
+    }
+
     /* High-End Professional Text Styling */
     .hero-gradient-professional {
         background: linear-gradient(135deg, var(--text-main) 0%, var(--primary-color) 60%, var(--info-color) 100%);
@@ -228,7 +239,7 @@
                          alt="Cyber Security Visualization" 
                          onload="this.classList.add('img-fade-loaded'); this.closest('.skeleton-loader-bg').classList.add('loaded')"
                          style="object-fit: contain; height: 300px; padding: 10px;">
-                    <div class="position-absolute bottom-0 start-0 w-100 p-3" style="background: linear-gradient(transparent, rgba(0,0,0,0.8));">
+                    <div class="position-absolute bottom-0 start-0 w-100 p-3 hero-overlay">
                         <h5 class="text-white mb-0 h5 fw-bold">Digital Asset Protection</h5>
                         <p class="text-light opacity-90 mb-0 small fw-medium">Advanced threat detection & AI mitigation</p>
                     </div>
@@ -276,5 +287,7 @@
     window.addEventListener('load', function() {
         document.body.classList.add('loaded');
     });
+
+    // Shield handling is centralized in base.html
 </script>
 {% endblock %}
