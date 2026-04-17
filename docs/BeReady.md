@@ -25,8 +25,8 @@ or panel evaluation.
 Upon completing self-study of this project, the student will be able to:
 
 - Identify and explain all 4 NSL-KDD attack families and specific attack mechanics
-  (Neptune, Smurf, Satan) with reference to the `Dataset/kdd_train.csv` features.
-- Trace the full ML pipeline in `train_model.py` from raw CSV to a saved `.pkl` model,
+  (Neptune, Smurf, Satan) with reference to the dataset features.
+- Trace the full ML pipeline in `train_model.py` from raw data to a saved `.pkl` model,
   explaining every preprocessing step and design decision.
 - Justify the use of Random Forest and StackingClassifier and compare their accuracy,
   training time, and architecture.
@@ -43,7 +43,7 @@ Upon completing self-study of this project, the student will be able to:
 
 ## UNIT I: THE PROBLEM SPACE — NETWORKS AND CYBER ATTACKS
 
-**Hours:** 3 | **Files to Open:** `Dataset/kdd_train.csv`, `PROJECT_GUIDE.md`
+**Hours:** 3 | **Files to Open:** `PROJECT_GUIDE.md`
 
 ### Unit I — Core Topics
 
@@ -77,7 +77,7 @@ Upon completing self-study of this project, the student will be able to:
 ### Unit II — Core Topics
 
 - The complete preprocessing steps executed in `train_model.py`:
-  - Load CSV with `pd.read_csv()` (limited to 20,000 rows for performance)
+  - Load data with `pd.read_csv()` (limited to 20,000 rows for performance)
   - Fill missing values using `df.fillna(0)`
   - Label-encode categorical columns (`protocol_type`, `service`, `flag`)
   - Save original label names: `labels_list = np.unique(dataset['labels'])`
@@ -170,7 +170,7 @@ Upon completing self-study of this project, the student will be able to:
 - How credentials are kept secure: `.env` file + `load_dotenv()` + `os.getenv()`.
 - Why the model is loaded once at startup (`load_ml_model()`) and not per request.
 - The full prediction flow in `PredictAction()`:
-  - Read uploaded CSV into Pandas DataFrame
+  - Read uploaded data into Pandas DataFrame
   - Rename and encode columns using the same `LabelEncoder` logic
   - Apply saved `StandardScaler.transform()`
   - Call `model.predict()` to get integer predictions
@@ -253,7 +253,7 @@ Upon completing self-study of this project, the student will be able to:
 
 ### Unit II — ML Pipeline
 
-- [ ] I can trace the 7 preprocessing steps from raw CSV to `StandardScaler`.
+- [ ] I can trace the 7 preprocessing steps from raw data to `StandardScaler`.
 - [ ] I can explain why Recall matters more than Precision in this context.
 - [ ] I know what's inside `trained_rf_model.pkl` and why it's a dictionary.
 
@@ -265,7 +265,7 @@ Upon completing self-study of this project, the student will be able to:
 
 ### Unit IV — Web Application
 
-- [ ] I can trace a CSV upload from browser click to prediction on screen.
+- [ ] I can trace a data upload from browser click to prediction on screen.
 - [ ] I can explain how session management protects routes.
 - [ ] I know why training runs in a background thread.
 
@@ -339,18 +339,6 @@ Upon completing self-study of this project, the student will be able to:
 - Focus on: `shap.summary_plot()` with `feature_names` passed explicitly
 - Focus on: Performance comparison table between Proposed and Extension models
 - Covers: Unit III topics — stacking, MLP, KNN, SHAP interpretation
-
----
-
-### `Dataset/kdd_train.csv`
-
-**Purpose:** The training data — NSL-KDD network traffic records.
-
-- Open it and observe: 41 feature columns + 1 label column
-- Identify: which columns are categorical (`protocol_type`, `service`, `flag`)
-- Identify: which features belong to Basic, Content, and Traffic categories
-- Notice: label values (`normal`, `neptune`, `satan`, `smurf`, `guess_passwd`, etc.)
-- Covers: Unit I topics — dataset structure, feature taxonomy, attack labels
 
 ---
 

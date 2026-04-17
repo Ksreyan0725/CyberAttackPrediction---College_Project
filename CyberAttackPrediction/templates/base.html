@@ -27,21 +27,7 @@
     <!-- Global Security: CSRF Protection & Multi-tab Watchdog -->
     <meta name="csrf-token" content="{{ session['csrf_token'] }}">
 
-    <!-- Invisible Scroll Restoration: Synchronous Pre-Paint Engine (2026 Premium) -->
-    <script>
-        (function () {
-            if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
-            const key = window.location.pathname + '-window-scroll';
-            const saved = localStorage.getItem(key);
-            const pos = saved ? parseInt(saved, 10) : 0;
 
-            if (pos > 60) {
-                // Apply 'Cloak' to prevent top-of-page render jump
-                document.documentElement.style.visibility = 'hidden';
-                window.isRestoringScroll = true;
-            }
-        })();
-    </script>
 
     <!-- Smart Theme & Storage Management -->
     <script>
@@ -60,181 +46,7 @@
         })();
     </script>
 
-    <!-- Immersive Engine: Fullscreen Persistence & Aesthetic Restoration -->
-    <script>
-        window.ImmersiveEngine = {
-            state: {
-                isFullscreen: !!document.fullscreenElement,
-                persistenceEnabled: localStorage.getItem('cybershield_fs_mode') === 'true'
-            },
-            
-            init() {
-                document.addEventListener('fullscreenchange', () => {
-                    this.state.isFullscreen = !!document.fullscreenElement;
-                    if (!this.state.isFullscreen) {
-                        localStorage.setItem('cybershield_fs_mode', 'false');
-                        this.state.persistenceEnabled = false;
-                    }
-                    this.updateUI();
-                });
 
-                // Auto-restore check
-                if (this.state.persistenceEnabled && !this.state.isFullscreen) {
-                    this.showRestoreShield();
-                }
-            },
-
-            toggle() {
-                if (!document.fullscreenEnabled) {
-                    try { showToast("Fullscreen is unavailable in this context.", "warning"); } catch (_) {}
-                    try { this.showRestoreShield(); } catch (_) {}
-                    return;
-                }
-                try {
-                    if (!document.fullscreenElement) {
-                        const p = document.documentElement.requestFullscreen();
-                        if (p && typeof p.then === 'function') {
-                            p.then(() => {
-                                localStorage.setItem('cybershield_fs_mode', 'true');
-                                this.state.persistenceEnabled = true;
-                                const s = document.getElementById('fs-restore-shield'); if (s) s.remove();
-                                if (typeof hideAllTooltips === 'function') hideAllTooltips();
-                                if (typeof hideAllToasts === 'function') hideAllToasts();
-                                this.updateUI();
-                            }).catch(() => {
-                                setTimeout(() => {
-                                    if (!document.fullscreenElement) {
-                                        try { showToast("Fullscreen was blocked by the browser. Click anywhere to restore.", "warning"); } catch (_) {}
-                                        try { this.showRestoreShield(); } catch (_) {}
-                                    }
-                                }, 100);
-                            });
-                        }
-                    } else {
-                        const p = document.exitFullscreen ? document.exitFullscreen() : null;
-                        if (p && typeof p.then === 'function') {
-                            p.then(() => {
-                                localStorage.setItem('cybershield_fs_mode', 'false');
-                                this.state.persistenceEnabled = false;
-                                this.updateUI();
-                            }).catch(() => {});
-                        } else {
-                            localStorage.setItem('cybershield_fs_mode', 'false');
-                            this.state.persistenceEnabled = false;
-                            this.updateUI();
-                        }
-                    }
-                } catch (_) {
-                    setTimeout(() => {
-                        if (!document.fullscreenElement) {
-                            try { showToast("Fullscreen was blocked by the browser. Click anywhere to restore.", "warning"); } catch (_) {}
-                            try { this.showRestoreShield(); } catch (_) {}
-                        }
-                    }, 100);
-                }
-            },
-
-            showRestoreShield() {
-                if (document.getElementById('fs-restore-shield')) return;
-                
-                const shield = document.createElement('div');
-                shield.id = 'fs-restore-shield';
-                shield.innerHTML = `
-                    <div class="shield-content animate__animated animate__fadeIn">
-                        <div class="shield-icon"><i class="fas fa-expand-arrows-alt"></i></div>
-                        <div class="shield-text">Restore Immersive Mode</div>
-                        <div class="shield-subtext">Click anywhere or use the button below</div>
-                        <div class="mt-3">
-                            <button id="fs-restore-button" class="btn btn-glass-glow rounded-pill px-4 fw-bold">
-                                <i class="fas fa-expand me-2"></i>Enter Fullscreen
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                shield.onclick = async () => {
-                    try {
-                        await document.documentElement.requestFullscreen();
-                        shield.classList.add('animate__animated', 'animate__fadeOut');
-                        setTimeout(() => shield.remove(), 500);
-                    } catch (e) {
-                        shield.remove();
-                    }
-                };
-                const btn = shield.querySelector('#fs-restore-button');
-                if (btn) {
-                    btn.onclick = async (e) => {
-                        e.stopPropagation();
-                        try {
-                            await document.documentElement.requestFullscreen();
-                            shield.classList.add('animate__animated', 'animate__fadeOut');
-                            setTimeout(() => shield.remove(), 500);
-                        } catch (_) {
-                            shield.remove();
-                        }
-                    };
-                }
-                
-                document.body.appendChild(shield);
-                setTimeout(() => {
-                    if (!document.fullscreenElement && shield.parentElement) {
-                        shield.classList.add('animate__animated', 'animate__fadeOut');
-                        setTimeout(() => shield.remove(), 400);
-                    }
-                }, 4000);
-            },
-
-            updateUI() {
-                const floatingToggle = document.getElementById('floatingFsToggle');
-                if (floatingToggle) {
-                    floatingToggle.innerHTML = this.state.isFullscreen ? '<i class="fas fa-compress"></i>' : '<i class="fas fa-expand"></i>';
-                }
-                // Dispatch event for local buttons (like in UserScreen)
-                window.dispatchEvent(new CustomEvent('immersive-state-change', { detail: { isFullscreen: this.state.isFullscreen } }));
-            }
-        };
-
-        function hideAllTooltips() {
-            try {
-                document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => {
-                    const inst = window.bootstrap && window.bootstrap.Tooltip && window.bootstrap.Tooltip.getInstance ? window.bootstrap.Tooltip.getInstance(el) : null;
-                    if (inst) inst.hide();
-                });
-                document.querySelectorAll('.tooltip.show').forEach(t => t.classList.remove('show'));
-            } catch (e) {}
-        }
-        function hideAllToasts() {
-            try {
-                document.querySelectorAll('.premium-toast').forEach(t => t.remove());
-            } catch (e) {}
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            window.ImmersiveEngine.init();
-            if (localStorage.getItem('cybershield_fs_mode') !== 'true') {
-                const s = document.getElementById('fs-restore-shield');
-                if (s) s.remove();
-            }
-            document.addEventListener('keydown', (e) => {
-                if (e.isTrusted && e.altKey && e.key === 'Enter' && !e.repeat) {
-                    e.preventDefault();
-                    window.ImmersiveEngine.toggle();
-                }
-            });
-            ['floatingFsToggle','toggleFullscreen'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) btn.addEventListener('click', hideAllTooltips);
-            });
-            document.querySelectorAll('.btn-fullscreen').forEach(el => el.addEventListener('click', hideAllTooltips));
-        });
-        document.addEventListener('fullscreenchange', hideAllTooltips);
-        window.addEventListener('pageshow', () => {
-            if (!document.fullscreenElement && localStorage.getItem('cybershield_fs_mode') !== 'true') {
-                const s = document.getElementById('fs-restore-shield');
-                if (s) s.remove();
-            }
-        });
-    </script>
     <script>(function () { let wasOffline = false, checkInProgress = false; async function checkPulse() { if (checkInProgress) return; checkInProgress = true; const statusPill = document.getElementById('globalSystemStatus'), statusText = statusPill?.querySelector('.status-text'), trainingPill = document.getElementById('trainingStatus'), trainingText = trainingPill?.querySelector('.status-text') || document.getElementById('statusText'), trainingDot = trainingPill?.querySelector('.status-dot'); try { const response = await fetch('/api/heartbeat', { method: 'GET', cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } }); if (response.ok) { const data = await response.json(), isBusy = data.status === 'busy'; if (statusPill) { statusPill.className = 'system-status-pill status-' + (isBusy ? 'busy' : 'ready') + ' me-2'; if (statusText) statusText.textContent = isBusy ? 'System Busy' : 'System Ready' } if (trainingPill) { const startBtn = document.getElementById('startTrainingBtn'); if (!startBtn || !startBtn.disabled) { if (isBusy) { trainingPill.className = 'status-badge status-running d-flex align-items-center'; if (trainingText) trainingText.textContent = 'System Processing...'; if (trainingDot) trainingDot.className = 'status-dot dot-busy' } else if (!trainingPill.classList.contains('status-success')) { trainingPill.className = 'status-badge status-idle d-flex align-items-center'; if (trainingText) trainingText.textContent = 'System Ready'; if (trainingDot) trainingDot.className = 'status-dot dot-ready' } } } if (wasOffline) setTimeout(() => { if (typeof reloadWithScroll === 'function') reloadWithScroll(); else window.location.reload() }, 500); wasOffline = false } } catch (err) { wasOffline = true; if (statusPill) { statusPill.className = 'system-status-pill status-offline me-2'; if (statusText) statusText.textContent = 'Server Offline' } if (trainingPill) { trainingPill.className = 'status-badge bg-danger bg-opacity-10 text-danger d-flex align-items-center'; if (trainingText) trainingText.textContent = 'Server Offline' } } finally { checkInProgress = false } } setInterval(checkPulse, 3000); document.addEventListener('DOMContentLoaded', checkPulse) })();</script>
 
     <script>let lastToastInfo = { message: '', time: 0 }; function showToast(message, type = 'info', details = null) { const container = document.getElementById('toastContainer'); if (!container) return; const currentTime = Date.now(); if (message === lastToastInfo.message && (currentTime - lastToastInfo.time < 3000)) return; lastToastInfo = { message, time: currentTime }; const toast = document.createElement('div'); toast.className = `premium-toast toast-${type}`; if (details) toast.classList.add('cursor-pointer'); let icon = 'info-circle'; if (type === 'success') icon = 'check-circle'; if (type === 'error' || type === 'danger') icon = 'exclamation-circle'; if (type === 'warning') icon = 'exclamation-triangle'; const subtext = details ? '<div class="xx-small opacity-75 mt-1 mt-n1"><i class="fas fa-search-plus me-1"></i>Click to view details</div>' : ''; toast.innerHTML = `<div class="toast-icon text-white"><i class="fas fa-${icon}"></i></div><div class="toast-body"><div class="small fw-bold dynamic-text">${message}</div>${subtext}</div><button type="button" class="btn-close ms-2 small" style="font-size:0.6rem;filter:var(--close-filter,none);" onclick="event.stopPropagation();this.parentElement.remove()"></button>`; if (details) toast.onclick = () => showDetailModal(type.toUpperCase() + ' DETAILS', `<div class="p-3 rounded-3 border-glass font-monospace text-break" style="background:var(--bg-card-soft);">${details}</div>`); container.appendChild(toast); toast.offsetHeight; toast.classList.add('show'); setTimeout(() => { if (toast.parentElement) { toast.classList.add('hide'); setTimeout(() => toast.remove(), 500) } }, 5000) } document.addEventListener('DOMContentLoaded', () => { document.querySelectorAll('.flash-message-data').forEach(el => { showToast(el.dataset.message, el.dataset.category); el.remove() }) }); (function () { const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'), setupAjax = () => { if (window.jQuery && csrfToken) $.ajaxSetup({ headers: { 'X-CSRF-Token': csrfToken } }); else setTimeout(setupAjax, 100) }; setupAjax(); window.addEventListener('storage', e => { if (e.key === 'cybershield_logout') window.location.href = '/UserLogin?reason=sync_logout' }); document.addEventListener('click', e => { if (e.target.closest('a[href*="/Logout"]')) localStorage.setItem('cybershield_logout', Date.now()) }) })();</script>
@@ -387,21 +199,7 @@
             opacity: 1;
         }
 
-        /* FS Restore Shield Overlay */
-        #fs-restore-shield {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--fs-shield-bg, rgba(0, 0, 0, 0.75));
-            backdrop-filter: blur(20px);
-            z-index: 100000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
+
 
         .shield-content {
             text-align: center;
@@ -491,8 +289,27 @@
             padding: 0
         }
 
+        /* Premium Cyber-Scrollbar */
         ::-webkit-scrollbar {
-            display: none
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(var(--primary-rgb), 0.15);
+            border-radius: 20px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+            transition: all 0.3s;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-color);
+            border-width: 1px;
         }
 
         body {
@@ -1871,6 +1688,12 @@
             opacity: 0;
             transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
             white-space: nowrap;
+            letter-spacing: 0.5px;
+        }
+
+        .fs-restore-prompt i {
+            font-size: 1.1rem;
+            filter: drop-shadow(0 0 5px var(--accent-primary));
         }
 
         .fs-restore-prompt.active {
@@ -1897,6 +1720,15 @@
 
         .fs-restore-click-shield.active {
             display: block;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         @keyframes float-y {
@@ -2613,11 +2445,27 @@
         }
 
         // Initialize all Bootstrap tooltips globally (Wait for Library)
-        document.addEventListener('DOMContentLoaded', () => {
+        // Initialize all Bootstrap tooltips globally with dynamic container support
+        const initTooltips = () => {
+            // Clean up existing tooltips to prevent duplicates
+            document.querySelectorAll('.tooltip').forEach(el => el.remove());
+            
+            const container = document.fullscreenElement || document.body;
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl)
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                // Initialize with the current fullscreen element as container so they aren't hidden
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    container: container,
+                    trigger: 'hover' // Explicitly set trigger to avoid 'click' persistence
+                });
             });
+        };
+
+        document.addEventListener('DOMContentLoaded', initTooltips);
+        
+        // Re-sync tooltips whenever the immersive state changes
+        window.addEventListener('immersive-state-change', () => {
+            setTimeout(initTooltips, 100);
         });
 
     </script>
@@ -2677,44 +2525,71 @@
         }
     </script>    <script>
         /**
-         * WebApp Immersive Engine (v2.1)
+         * WebApp Immersive Engine (v2.1 - Master)
          * Manages Fullscreen state across navigations and optimizes UI for expanded viewports.
          */
         window.ImmersiveEngine = {
             config: {
                 storageKey: 'cybershield_fs_mode',
-                restoreDelay: 800
+                restoreDelay: 300
             },
 
-            elements: {
-                btn: document.getElementById('fullscreen-floating-toggle'),
-                banner: document.getElementById('fs-fallback-banner'),
-                prompt: document.getElementById('fs-restore-prompt'),
-                shield: document.getElementById('fs-restore-shield')
-            },
+            elements: {},
 
             init() {
+                this.elements = {
+                    btn: document.getElementById('fullscreen-floating-toggle'),
+                    banner: document.getElementById('fs-fallback-banner'),
+                    prompt: document.getElementById('fs-restore-prompt'),
+                    shield: document.getElementById('fs-restore-shield') || document.querySelector('.fs-restore-click-shield')
+                };
+
                 if (!this.elements.btn) return;
+                
                 this.bindEvents();
                 this.checkRestore();
-                console.log('ImmersiveEngine: Ready');
+                console.log('%c[CyberShield] %cImmersive Engine Ready', 'color: #00ffa3; font-weight: bold;', 'color: inherit;');
             },
 
             bindEvents() {
-                this.elements.btn.addEventListener('click', (e) => {
+                this.elements.btn.onclick = (e) => {
                     e.preventDefault();
+                    // Fix: Hide tooltip on click to prevent 'ghosting' or disappearing in the wrong layer during transition
+                    const tt = bootstrap.Tooltip.getInstance(this.elements.btn);
+                    if (tt) tt.hide();
                     this.toggle();
-                });
+                };
 
+                // Navigation Watchdog: If we click a link, preserve the FS state
+                document.addEventListener('click', (e) => {
+                    const link = e.target.closest('a');
+                    if (link && link.href && !link.href.startsWith('#') && !link.href.startsWith('javascript:')) {
+                        if (this.getFullscreenElement()) {
+                            localStorage.setItem(this.config.storageKey, 'active');
+                        }
+                    }
+                }, true);
+
+                const keyHandler = (e) => {
+                    if (e.key.toLowerCase() === 'f' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                        this.toggle();
+                    }
+                    if (e.key === 'Escape') this.hideRestoreUI(true);
+                };
+
+                document.addEventListener('keydown', keyHandler);
+
+                const fsHandler = () => this.syncUI();
                 ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange', 'MSFullscreenChange'].forEach(evt => {
-                    document.addEventListener(evt, () => this.syncUI());
+                    document.addEventListener(evt, fsHandler);
                 });
 
-                // Global First-Click Restore Catch
-                this.elements.shield?.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    this.restore();
-                });
+                if (this.elements.shield) {
+                    this.elements.shield.onclick = (e) => {
+                        e.preventDefault();
+                        this.restore();
+                    };
+                }
             },
 
             getFullscreenElement() {
@@ -2725,8 +2600,12 @@
                 const isFs = !!this.getFullscreenElement();
                 const icon = this.elements.btn.querySelector('i');
                 
-                // Track preference for persistence
-                localStorage.setItem(this.config.storageKey, isFs ? 'active' : 'inactive');
+                // Only set active if we are actually in FS. 
+                // Don't set inactive here, let the navigation/escape logic handle that.
+                if (isFs) {
+                    localStorage.setItem(this.config.storageKey, 'active');
+                    this.hideRestoreUI();
+                }
 
                 if (icon) {
                     this.elements.btn.classList.add('spin-transition');
@@ -2736,41 +2615,33 @@
 
                 if (isFs && this.elements.banner) this.elements.banner.classList.remove('reveal');
                 
-                // Synchronize CyberMaster with new viewport geometry
-                if (window.CyberMaster) {
-                    window.CyberMaster.updateDimensions();
-                    window.CyberMaster.requestTick();
-                }
-
-                // Hide restoration UI if it was active
-                this.hideRestoreUI();
+                window.dispatchEvent(new CustomEvent('immersive-state-change', { detail: { isFullscreen: isFs } }));
             },
 
             toggle(targetElement = document.documentElement) {
-                const el = targetElement;
                 const isNowFs = !!this.getFullscreenElement();
-
                 if (!isNowFs) {
-                    const p = (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen)?.call(el);
-                    if (p && p.catch) {
-                        p.catch(err => {
+                    const req = (targetElement.requestFullscreen || targetElement.webkitRequestFullscreen || targetElement.mozRequestFullScreen || targetElement.msRequestFullscreen);
+                    if (req) {
+                        req.call(targetElement).catch(err => {
                             console.warn('FS Blocked:', err);
-                            showToast("Fullscreen restricted by browser policy.", "warning");
+                            if (window.showToast) showToast("Fullscreen restricted by browser policy.", "warning");
                             this.elements.banner?.classList.add('reveal');
                         });
                     }
                 } else {
                     const exit = (document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen);
-                    if (exit) exit.call(document);
+                    if (exit) {
+                        exit.call(document);
+                        localStorage.setItem(this.config.storageKey, 'inactive');
+                    }
                 }
             },
 
             checkRestore() {
                 const savedState = localStorage.getItem(this.config.storageKey);
-                const isAlreadyFs = !!this.getFullscreenElement();
-
-                if (savedState === 'active' && !isAlreadyFs) {
-                    setTimeout(() => this.showRestoreUI(), this.config.restoreDelay);
+                if (savedState === 'active' && !this.getFullscreenElement()) {
+                    this.showRestoreUI();
                 }
             },
 
@@ -2779,19 +2650,25 @@
                 if (this.elements.shield) this.elements.shield.classList.add('active');
             },
 
-            hideRestoreUI() {
+            hideRestoreUI(clearState = false) {
                 if (this.elements.prompt) this.elements.prompt.classList.remove('active');
                 if (this.elements.shield) this.elements.shield.classList.remove('active');
+                if (clearState) localStorage.setItem(this.config.storageKey, 'inactive');
             },
 
             restore() {
+                // Hide all tooltips before restoration to prevent 'floating ghosts'
+                document.querySelectorAll('.tooltip').forEach(el => el.remove());
                 this.toggle();
-                // Ensure UI cleans up even if browser blocks toggle
                 setTimeout(() => this.hideRestoreUI(), 400);
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => ImmersiveEngine.init());
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => ImmersiveEngine.init());
+        } else {
+            ImmersiveEngine.init();
+        }
 
         // --- UI Navigation State Feedback ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -2900,7 +2777,6 @@
                 ut(n, true);
             });
         })();
-
         // Global Heartbeat
         (function () {
             const interval = 2000, token = document.querySelector('meta[name="csrf-token"]')?.content;
@@ -2917,6 +2793,18 @@
             setInterval(sendPulse, interval);
         })();
     </script>
-    {% block fab_zone %}{% endblock %}
+    
     {% block extra_js %}{% endblock %}
-</html>
+    
+    <!-- Progressive Web App: Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='sw.js') }}")
+                    .then(registration => console.log('%c[CyberShield] %cServiceWorker Registered.', 'color: #10b981; font-weight: bold;', 'color: inherit;'))
+                    .catch(err => console.log('%c[CyberShield] %cServiceWorker Failed: ', 'color: #ef4444; font-weight: bold;', 'color: inherit;', err));
+            });
+        }
+    </script>
+</body>
+</html>l>

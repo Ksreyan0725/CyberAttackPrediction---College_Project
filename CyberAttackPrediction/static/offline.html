@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connection Lost - CyberShield</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Outfit:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --info-color: #00d2ff;
+            --text-main: #e0e0e0;
+            --text-muted: #94a3b8;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --bg-card-soft: rgba(255, 255, 255, 0.04);
+            --primary-light: rgba(0, 123, 255, 0.15);
+        }
+
+        body {
+            background: radial-gradient(circle at top right, #0a191f, #000000);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-vh: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .outfit-font { font-family: 'Outfit', sans-serif; }
+        .border-glass { border: 1px solid var(--glass-border); }
+        
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .btn-glass-themed {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-glass-themed:hover {
+            background: var(--primary-light);
+            color: var(--info-color);
+            border-color: var(--info-color);
+            transform: translateY(-2px);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container p-4">
+        <div class="card border-glass shadow-lg">
+            <div class="card-body p-5 text-center">
+                <div class="mb-4 d-inline-block">
+                    <div class="position-relative">
+                        <i class="fas fa-wifi text-danger display-1 animate-pulse" style="filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.4));"></i>
+                        <i class="fas fa-slash position-absolute top-50 start-50 translate-middle text-info opacity-50" style="font-size: 3rem;"></i>
+                    </div>
+                </div>
+
+                <h1 class="display-3 fw-bold mb-2 outfit-font shadow-sm">OFFLINE</h1>
+                <h3 class="text-info mb-4">SYSTEM BREACH: CONNECTION LOST</h3>
+                
+                <p class="mb-4 px-lg-5" style="color: var(--text-muted);">
+                    The CyberShield server is currently unreachable. This happens if the backend process has stopped or your network is disconnected.
+                </p>
+
+                <div class="p-3 rounded-4 mb-4 border-glass" style="background: var(--bg-card-soft);">
+                    <div id="recoveryStatus" class="d-flex align-items-center justify-content-center small fw-medium">
+                        <div class="spinner-grow spinner-grow-sm me-2 text-info" role="status"></div>
+                        <span class="text-info opacity-75">MONITORING SERVER INTEGRITY...</span>
+                    </div>
+                </div>
+
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a href="/" class="btn btn-outline-info px-4 py-2 rounded-pill shadow-sm">
+                        <i class="fas fa-sync me-2"></i>Retry Connection
+                    </a>
+                    <button onclick="window.location.reload()" class="btn btn-glass-themed">
+                        <i class="fas fa-redo me-2"></i>Refresh Page
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const statusEl = document.getElementById('recoveryStatus');
+            let retryCount = 0;
+
+            async function checkServer() {
+                try {
+                    const response = await fetch('/api/heartbeat');
+                    if (response.ok) {
+                        statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i><span class="text-success fw-bold">SERVER RESTORED! RECONNECTING...</span>';
+                        setTimeout(() => {
+                            window.location.href = '/';
+                        }, 1200);
+                        return;
+                    }
+                } catch (e) {
+                    retryCount++;
+                    if (retryCount % 5 === 0) console.log("Retrying CyberShield bridge...");
+                }
+                setTimeout(checkServer, 3000);
+            }
+            setTimeout(checkServer, 1000);
+        })();
+    </script>
+</body>
+</html>

@@ -18,8 +18,9 @@ if defined VIRTUAL_ENV (
 :: Secure Workspace Shift
 pushd "%~dp0CyberAttackPrediction"
 
-:: Launch Jupyter in Chrome Incognito for a clean presentation
-jupyter notebook --browser="chrome --incognito %%s"
+:: Launch Jupyter in Chrome Incognito with Robust Shell Execution
+:: Using 'cmd /c start' allows Windows to find Chrome via Registry even if not in PATH.
+jupyter notebook --browser="cmd /c start chrome --incognito %%s"
 
 :: Restoration: Restore directory after closing Jupyter
 popd

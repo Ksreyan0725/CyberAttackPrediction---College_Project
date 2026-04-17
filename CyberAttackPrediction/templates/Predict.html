@@ -243,7 +243,6 @@
     </div>
     {% endif %}
 
-    <div class="row g-4 justify-content-center">
     <div class="row justify-content-center w-100 m-0">
     <div class="col-lg-6">
         <div class="card glass-card shadow-2xl border-0 reveal-premium">
@@ -269,7 +268,7 @@
                                     <h5 class="fw-bold dynamic-text text-center">Drop your dataset here</h5>
                                     <p class="xx-small dynamic-muted opacity-50 text-center">or click to browse your computer</p>
                                     <div class="text-center mt-2">
-                                        <span class="badge bg-dark-subtle text-info px-2 py-1 border border-info border-opacity-25 xx-small">NSL-KDD CSV ONLY</span>
+                                        <span class="badge px-2 py-1 xx-small" style="background: var(--bg-card-soft); color: var(--info-color); border: 1px solid rgba(var(--info-rgb), 0.3);">NSL-KDD CSV ONLY</span>
                                     </div>
                                 </div>
                                 <div id="file-details-container" style="display: none;" class="animate__animated animate__pulse">
@@ -309,7 +308,7 @@
                 <div class="card-footer p-3 border-0" style="background: var(--footer-accent);">
                     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 text-muted">
                         <div class="x-small d-flex align-items-center gap-2">
-                            <i class="fas fa-info-circle text-info" data-bs-toggle="tooltip" data-bs-placement="top" title="NSL-KDD is a standard dataset used to benchmark intrusion detection systems. It includes features like duration, protocol_type, service, etc."></i>
+                            <i class="fas fa-info-circle" style="color: var(--info-color);" data-bs-toggle="tooltip" data-bs-placement="top" title="NSL-KDD is a standard dataset used to benchmark intrusion detection systems. It includes features like duration, protocol_type, service, etc."></i>
                             <span class="dynamic-text opacity-75">Dataset should follow the <strong>NSL-KDD</strong> format.</span>
                         </div>
                         <a href="{{ url_for('static', filename='Dataset/kdd_test.csv') }}" class="btn btn-xs btn-outline-info px-2 py-1 rounded-pill x-small">

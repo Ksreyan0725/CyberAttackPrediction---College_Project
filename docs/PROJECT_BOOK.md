@@ -21,29 +21,36 @@ The project is organized into a modular structure to separate data analysis (Jup
 - **`/` (Root)**:
   - `Main.py`: The heart of the application. Handles Flask routing, session logic, and real-time inference.
   - `train_model.py`: Utility script to re-train the Random Forest model and generate the high-performance `.joblib` artifact.
-  - `validate_pipeline.py`: Sanity check script for data processing and model compatibility.
-  - `PROJECT_BOOK.md`: Technical documentation and project guide (The file you are reading).
+
   - `users.json`: Persistent user database (Salted/Hashed).
-  - `saved_creds.json`: Encrypted local session cache for "Quick Access".
   - `requirements.txt`: Python dependency manifest.
   - `.env`: Environment configuration (API keys, Secret keys).
+  
+- **`/docs`**:
+  - `PROJECT_BOOK.md`: Technical documentation and project guide (The file you are reading).
+  - `PROJECT_GUIDE.md`: Comprehensive reference with viva Q&A and technical deep-dives.
+  - `TECHNICAL_WORKFLOW.md`: Detailed system logic and architecture map.
+  - `BeReady.md`: Student handbook and self-study guide.
+
 - **`/model`**:
-  - `trained_rf_model.joblib`: High-performance serialized model artifact (includes Scaler and Encoders, optimized for memory).
+  - `trained_rf_model.pkl`: Serialized model artifact (includes Scaler and Encoders).
   - `*.hdf5`: Binary weight files for deep learning components.
+
 - **`/templates`**:
-  - `base.html`: Global layout with **CyberMaster Unified Controller** (Liquid-Glass UI, Focus-Lock, and Reveal systems). Managed by a high-performance JS/CSS engine for 60FPS visuals.
-  - `AccountSettings.html`: The **CyberShield Command Center**. A high-security administrator dashboard with live system monitoring and user registry management.
-  - `Legal.html`: The **Unified Legal Hub**. Consolidates Terms, Privacy, and Security Contact into a tabbed, high-performance interface.
-  - `index.html`, `Predict.html`, `Train.html`, `UserLogin.html`: Page-specific specialized templates.
+  - `base.html`: Global layout with **CyberMaster Unified Controller** (Liquid-Glass UI).
+  - `AccountSettings.html`: Admin dashboard for user management.
+  - `index.html`, `Predict.html`, `Train.html`: Specialized screens for each step.
 
 - **`/static`**:
-  - `images/`: High-resolution brand assets (`favicon.svg`, `five_pillars_HD.png`, `roadmap_HD.png`, `tra_HD.png`).
+  - `images/`: High-resolution brand assets.
   - `Dataset/`: Legacy data mirrors and documentation.
+
 - **`/Dataset`**:
-  - `kdd_train.csv`, `kdd_test.csv`: NSL-KDD source data.
-  - `DatasetLink.txt`: Remote mirror links for large datasets.
+  - `kdd_train.csv`: Primary training data.
+  - `DatasetLink.txt`: Remote mirror links.
+
 - **`/scripts`**:
-  - **Internal Maintenance Tooling**: A repository of 40+ surgical scripts used for notebook indexing, SHAP debugging, visual alignment, and environment silencing.
+  - **Internal Maintenance Tooling**: Scripts for indexing, debugging, and environment management.
 
 ---
 

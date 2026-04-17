@@ -1,5 +1,38 @@
-# CyberShield AI: Advanced Cyber Attack Prediction System (2026 Stable)
-# Tech Stack: Flask 3.1.3, Pandas 3.0.2, Scikit-Learn 1.8.0, Python 3.13
+# ==============================================================================
+# FILE: Main.py
+# PROJECT: CyberShield AI — Cyber Attack Prediction System (2026 Stable)
+# TECH STACK: Python 3.13 | Flask 3.1.3 | Pandas 3.0.2 | Scikit-Learn 1.8.0
+# ==============================================================================
+#
+# WHAT THIS FILE IS:
+#   This is the "brain and spine" of the entire web application.
+#   It does three main jobs:
+#     1. RUNS THE WEBSITE — handles every page (Home, Login, Predict, Train, etc.)
+#     2. HANDLES SECURITY — manages user accounts, login sessions, and CSRF protection
+#     3. RUNS THE AI — loads the trained model and uses it to classify network attacks
+#
+# HOW IT WORKS (Simple Version):
+#   When a user visits the website in their browser, Flask (a web server library)
+#   receives the request, runs the matching Python function, and sends back an
+#   HTML page. Think of it like a waiter — it takes the order (request), goes to
+#   the kitchen (processes data), and brings back the food (webpage).
+#
+# KEY SECTIONS INSIDE THIS FILE:
+#   • IMPORTS        — loads all the tools/libraries this script needs
+#   • SECURITY SETUP — CSRF protection and response headers to keep users safe
+#   • MODEL LOADER   — loads the pre-trained AI from disk at startup (so it's fast)
+#   • USER SYSTEM    — signup, login, logout, password management, admin controls
+#   • PREDICT        — takes a user's uploaded CSV, runs the AI, returns results
+#   • TRAIN          — triggers the training script and reloads the new model
+#   • EXPLORER       — lets logged-in users browse and read project files in-browser
+#   • ERROR HANDLERS — friendly 404 page and catch-all error responses
+#   • STARTUP        — runs the web server and auto-opens the browser when ready
+#
+# HOW TO RUN:
+#   Just use the launcher (launcher.py → Option 1), or run:
+#     python Main.py
+#   The site will start at http://127.0.0.1:2026/
+#================================================================================
 import pandas as pd
 import numpy as np
 import joblib
@@ -19,8 +52,9 @@ import subprocess
 import sys
 
 #=================flask code starts here
-from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, flash, send_from_directory, jsonify, render_template_string
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
 from train_model import run_training
 import markdown2
@@ -52,6 +86,12 @@ app.secret_key = os.getenv('FLASK_SECRET_KEY', secrets.token_hex(32) if not os.g
 # PROPRIETARY ADMIN SECURITY CONFIG (Hardcoded Bypass with Hashing)
 ADMIN_ID = "admin"
 ADMIN_HASH = "scrypt:32768:8:1$Cw2lrwbxEaJWsMvM$7d647e7e6e63deab9540306b28ceb1ea622ce0632d2d1b4e10807b507efe42355fab976a9acf2b5c0bc8e4a07ed75c2ba5f8e19330c7e3aac45ee82ceab4ceda"
+
+ALLOWED_EXTENSIONS = {'csv'}
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Global variables to store loaded models/scalers
 rf_model = None
@@ -152,7 +192,8 @@ def index():
     if 'last_result' in session and 'last_page_type' in session:
         return render_template('UserScreen.html', 
                                msg=session['last_result'], 
-                               page_type=session['last_page_type'])
+                               page_type=session['last_page_type'],
+                               feature_columns=session.get('last_feature_columns'))
     return render_template('index.html')
 
 @app.route('/HowItWorks')
@@ -192,6 +233,7 @@ def clear_session():
     session.pop('last_result', None)
     session.pop('train_result', None)
     session.pop('last_page_type', None)
+    session.pop('last_feature_columns', None)
     
     # Also log the user out as requested for a total state reset
     session.pop('user', None)
@@ -207,6 +249,7 @@ def ClearResults():
         
     session.pop('last_result', None)
     session.pop('last_page_type', None)
+    session.pop('last_feature_columns', None)
     
     return jsonify({"status": "success", "message": "Analysis results wiped successfully."})
 
@@ -539,9 +582,14 @@ def PredictAction():
             flash("No file was selected. Please try again.", "error")
             return redirect(url_for('predictView'))
             
-        # For simplicity, we'll save it temporarily as testData.csv
-        file.save("Dataset/uploaded_test.csv")
-        testData_df = pd.read_csv("Dataset/uploaded_test.csv")
+        if not allowed_file(file.filename):
+            flash("Invalid file type. Only CSV datasets are permitted.", "error")
+            return redirect(url_for('predictView'))
+            
+        filename = secure_filename(file.filename)
+        upload_path = os.path.join("Dataset", "uploaded_" + filename)
+        file.save(upload_path)
+        testData_df = pd.read_csv(upload_path)
         
         # Keep a copy of raw data for display
         raw_data = testData_df.values
@@ -565,11 +613,12 @@ def PredictAction():
         preds = rf_model.predict(scaled_test)
         
         # Generate styled HTML results with improved contrast
-        output = '<table class="table table-hover table-bordered table-striped align-middle mb-0">'
-        output += '<thead><tr class="glass-bg border-glass">'
-        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-database me-2 text-info"></i>Data Sample</th>'
-        output += '<th class="dynamic-text fw-bold py-3 text-center"><i class="fas fa-shield-alt me-2 text-primary"></i>Detection Status</th>'
-        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-magic me-2 text-warning"></i>GenAI Explanation</th></tr></thead><tbody>'
+        # Generate styled HTML results with premium aesthetics
+        output = '<table class="table table-hover align-middle mb-0">'
+        output += '<thead><tr class="glass-bg">'
+        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-database me-2" style="color: var(--info-color);"></i>DATA SAMPLE</th>'
+        output += '<th class="dynamic-text fw-bold py-3 text-center"><i class="fas fa-shield-alt me-2" style="color: var(--primary-color);"></i>DETECTION STATUS</th>'
+        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-magic me-2" style="color: var(--warning-color);"></i>GENAI EXPLANATION</th></tr></thead><tbody>'
         
         for i in range(len(preds)):
             attack_type = labels[preds[i]]
@@ -579,8 +628,12 @@ def PredictAction():
             genai_insight = get_genai_insight(attack_type)
             
             output += "<tr>"
-            # Row Data (Left)
-            output += f'<td><div class="text-truncate" style="max-width: 380px;" title="{row_data_str}"><code class="dynamic-text fw-medium">{row_data_str}</code></div></td>'
+            # Row Data (Left) - Enhanced with "Full View" capability
+            # Convert numpy array to list for JSON serialization in data attribute
+            safe_row_data = json.dumps(raw_data[i].tolist())
+            output += f'<td><div class="data-sample-wrapper" onclick="inspectSample(this)" data-sample=\'{safe_row_data}\' style="cursor: pointer; position: relative; transition: all 0.3s ease; border: 1px solid var(--glass-border); padding: 8px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.03);">'
+            output += f'<div class="text-truncate" style="max-width: 380px; font-family: monospace;"><code class="dynamic-text fw-medium" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0;">{row_data_str}</code></div>'
+            output += f'<div class="xx-small text-primary mt-1 opacity-75 hover-reveal"><i class="fas fa-search-plus me-1"></i>Click for deep analysis</div></div></td>'
             
             # Status Badge (Middle)
             is_normal = "normal" in attack_type.lower().strip()
@@ -599,7 +652,11 @@ def PredictAction():
         session['last_result'] = output
         session['last_page_type'] = 'result'
         
-        return render_template('UserScreen.html', msg=output, page_type='result')
+        # Convert feature columns to list if it exists for JSON serialization
+        f_cols = feature_columns.tolist() if hasattr(feature_columns, 'tolist') else feature_columns
+        session['last_feature_columns'] = f_cols
+        
+        return render_template('UserScreen.html', msg=output, page_type='result', feature_columns=f_cols)
         
     except Exception as e:
         print(f"Error during prediction: {e}")
@@ -707,11 +764,18 @@ def explorer():
     # Neural Discovery Tree
     project_tree = get_project_tree()
 
-    # Simple security check to prevent directory traversal
-    if '..' in doc_path or doc_path.startswith('/'):
-        return render_template('documentation.html', error="Invalid path", project_tree=project_tree)
+    # Hardened security check to prevent directory traversal
+    try:
+        # Resolve the absolute path of the requested document
+        requested_abs = os.path.abspath(os.path.join(base_dir, doc_path))
+        # Ensure the resolved path is within the base project directory
+        if not requested_abs.startswith(os.path.abspath(base_dir)):
+            return render_template('documentation.html', error="Security Alert: Access Denied to Outbound Directory", project_tree=project_tree)
         
-    full_path = os.path.join(base_dir, doc_path)
+        full_path = requested_abs
+    except Exception:
+        return render_template('documentation.html', error="Invalid path sequence", project_tree=project_tree)
+
     if not os.path.exists(full_path):
         return render_template('documentation.html', error=f"Resource not found: {doc_path}", project_tree=project_tree)
         

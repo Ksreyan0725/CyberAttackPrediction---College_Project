@@ -36,7 +36,7 @@ try:
     console = Console()
     HAS_RICH = True
 except ImportError:
-    HAS_RICH = False
+    HAS_RICH = False   
 
 # --- BLOCK 0.6: TELEMETRY DETECTION ---
 try:
@@ -74,15 +74,6 @@ IS_ADMIN = False # Calculated and cached at startup
 
 # --- BLOCK 1.2: PATH CACHE (PRE-COMPUTED TO SAVE CPU) ---
 root_dir = os.path.dirname(os.path.abspath(__file__))
-
-# 💡 TEST MODE: Support running against sandbox without copying the script
-if "--sandbox" in sys.argv:
-    sandbox_path = os.path.join(root_dir, "tactical_sandbox")
-    if os.path.exists(sandbox_path):
-        root_dir = sandbox_path
-        print(f"\033[93m[!] TACTICAL SANDBOX REDIRECT: {root_dir}\033[0m")
-    else:
-        print(f"\033[91m[-] Sandbox redirect failed: Folder not found.\033[0m")
 
 PATHS = {
     "root": root_dir,
@@ -167,7 +158,13 @@ def save_settings(settings):
         log_system_event(f"Failed to save settings: {e}", level="ERROR")
 
 # --- BLOCK 3: UTILITY HELPERS (THE BACKGROUND ENGINE) ---
-
+def clear_keyboard_buffer():
+    while msvcrt.kbhit():
+        try:
+            msvcrt.getch()
+        except:
+            pass
+    time.sleep(0.05) 
 # --- BLOCK 2: ASYNC CONNECTIVITY SHIELD ---
 _INTERNET_STATUS = True # Shared variable for background thread
 
@@ -1042,7 +1039,7 @@ def boot_loader():
         time.sleep(0.8)
     
     # Final buffer purge to ensure input is fresh for the main menu
-    while msvcrt.kbhit(): msvcrt.getch()
+    clear_keyboard_buffer()
 
 def main():
     """
@@ -1064,7 +1061,7 @@ def main():
     boot_loader()
 
     # Clean up any leftover input
-    while msvcrt.kbhit(): msvcrt.getch()
+    clear_keyboard_buffer()
 
     # Pillar 5: Global Crash Guard
     # Variables for Dual-Speed refresh
@@ -1078,10 +1075,10 @@ def main():
         try:
             # 💡 INTERACTIVE SENTINEL ENGINE (v3.7 - Immersive Fix)
             # Clear keyboard buffer to start fresh
-            while msvcrt.kbhit(): msvcrt.getch() 
+            clear_keyboard_buffer() 
             
             # Use screen=True for the "Cockpit" feel and to prevent ghosting artifacts
-            with Live(render_premium_menu(cached_health, current_input), console=console, refresh_per_second=10, screen=True, auto_refresh=True) as live:
+            with Live(render_premium_menu(cached_health, current_input), console=console, refresh_per_second=10, screen=False, auto_refresh=True) as live:
                 # Ensure we have fresh health data for the first render
                 if not cached_health:
                     cached_health = get_project_health()
@@ -1096,6 +1093,7 @@ def main():
 
                     # 2. FAST INPUT CAPTURE
                     has_input_change = False
+                    key = None  # 🔥 FIX: reset key every loop
                     while msvcrt.kbhit():
                         try:
                             raw = msvcrt.getch()
@@ -1103,7 +1101,7 @@ def main():
                             # Filter system artifacts (Escape sequences, function keys)
                             if raw == b'\x1b' or raw == b'\x00' or raw == b'\xe0':
                                 time.sleep(0.01) # Small delay to see if more bytes arrive
-                                while msvcrt.kbhit(): msvcrt.getch() 
+                                clear_keyboard_buffer() 
                                 continue
                             
                             key = raw.decode('utf-8', errors='ignore')
@@ -1127,7 +1125,7 @@ def main():
                         live.update(render_premium_menu(cached_health, current_input))
 
                     # Exit inner loop if Enter was pressed
-                    if 'key' in locals() and key in ['\r', '\n']:
+                    if key in ['\r', '\n']:
                         break
                     
                     # Small sleep to prevent 100% CPU usage while waiting for input
@@ -1352,7 +1350,8 @@ def main():
                 try:
                     # Use absolute path to python for reliability
                     python_exe = sys.executable
-                    os.execl(python_exe, python_exe, os.path.abspath(__file__), *sys.argv[1:])
+                    subprocess.Popen([sys.executable, os.path.abspath(__file__)])
+                    sys.exit()
                 except Exception as restart_err:
                     print(f"[-] Restart failed: {restart_err}")
                     input("Press ENTER to return to menu...")
@@ -1392,7 +1391,7 @@ def main():
             # Give the terminal half a second to settle focus and buffer switches
             time.sleep(0.5)
             # Drain any leftover characters from command inputs (like Git commit msgs)
-            while msvcrt.kbhit(): msvcrt.getch()
+            clear_keyboard_buffer()
 
         except KeyboardInterrupt:
             # Pillar 1: Professional Safe Exit on Ctrl+C
@@ -1422,6 +1421,8 @@ def main():
             # gc.collect(): MEMORY FIX - Clears internal Python 'junk' before restarting.
             gc.collect() 
             input(f"\n{YELLOW}[RECOVERED] Press ENTER to restart the menu engine...{RESET}")
+
+
 
 # This special condition makes sure main() only runs if you double-click THIS file.
 # If another script tries to 'import' this file, it won't start the menu automatically.

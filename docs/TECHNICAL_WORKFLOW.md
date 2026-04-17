@@ -164,8 +164,7 @@ Results are rendered as a high-contrast table. The **GenAI Insight Engine** maps
 | :--- | :--- |
 | `train_model.py` | Standalone ML pipeline — load, clean, encode, scale, train, evaluate, save |
 | `Dataset/kdd_train.csv` | Default NSL-KDD training data; labeled network traffic (~14 MB) |
-| `Dataset/CIC-IDS2017.csv` | IDS-based alternative training dataset |
-| `Dataset/X-IIoTID dataset.csv` | Large IoT-specific dataset (~355 MB) for extended scenarios |
+| `Dataset/custom_train.csv` | User-uploaded data saved for future training sessions |
 | `model/trained_rf_model.pkl` | **Output of training** — serialized bundle of classifier + scaler + encoder |
 
 > `train_model.py` has a single entry point `run_training(dataset_path)` and works both as a standalone CLI script (`python train_model.py`) and as a module called by Flask. This keeps ML logic independently testable.
@@ -213,7 +212,7 @@ The file `model/trained_rf_model.pkl` is the **sole bridge** between the two pha
 | Notebook | Phase | Purpose |
 | :--- | :---: | :--- |
 | `ProposeCyberAttack.ipynb` | Phase 1 | Traditional ML — Logistic Regression, Decision Tree, Random Forest on NSL-KDD. EDA, confusion matrices, SHAP explainability. |
-| `ExtensionCyberAttack.ipynb` | Phase 2 | Deep Learning — LSTM & MLP via Keras, multi-dataset experiments (CIC-IDS2017, X-IIoTID), GenAI-style explanations. Produces `*.hdf5` weight files. |
+| `ExtensionCyberAttack.ipynb` | Phase 2 | Deep Learning — LSTM & MLP research, multi-dataset experiments, and GenAI-style explanations. |
 
 The notebooks were the **R&D sandbox** — algorithm selection, preprocessing design, and hyperparameter tuning all happened here before the logic was ported to the production Flask app. They are **not called at runtime**; they are standalone academic deliverables.
 
@@ -248,6 +247,31 @@ graph TD
     style Model fill:#0f3460,stroke:#f8b400,stroke-width:2px,color:#fff
     style Dataset fill:#0f3460,stroke:#4ecca3,stroke-width:2px,color:#fff
 ```
+
+---
+
+## 🌐 Web Technicalities & Security Architecture
+
+The system is built on a **High-Security Web Architecture** designed for high-availability ML demos.
+
+### 🛡️ Layered Security Stack
+
+- **CSRF Protection**: Every state-changing request (`POST`, `PUT`, `DELETE`) is protected by a session-bound cryptographic token. This prevents Cross-Site Request Forgery attacks.
+- **Password Hashing**: We never store plain-text passwords. The system uses `werkzeug.security` with **PBKDF2-HMAC-SHA256** hashing.
+- **Proprietary Admin Bypass**: A scrypt-hashed admin account provides a secure "master key" for system recovery and specialized testing.
+- **Session Focus**: Flask sessions are cryptographically signed with a 64-character hex secret key, preventing cookie tampering.
+
+### ⚡ Performance Optimizations
+
+- **Model In-Memory Cache**: The AI brain is loaded into RAM at startup via `load_ml_model()`. This allows 1ms inference response times.
+- **Async Threading**: Training large datasets is offloaded to a background `threading.Thread`. This prevents the "UI Freeze" common in basic Python apps.
+- **Cache-Control Headers**: The server explicitly sends security and caching headers (e.g., `Strict-Transport-Security`, `X-Content-Type-Options`) to harden browser-side execution.
+
+### 🔄 Real-Time State Management
+
+- **Heartbeat Filter**: A custom logging filter suppresses repetitive server health pings, keeping the terminal clean for critical security alerts.
+- **AJAX Polling**: The training UI uses asynchronous JavaScript to poll `/TrainStatus`, providing real-time progress bars without page reloads.
+- **Auto-Browser Launch**: A delayed `threading.Timer` automatically opens the browser at `127.0.0.1:5000` once the server socket is confirmed active.
 
 ## 📐 Logic Flow Diagram (Raw ASCII)
 

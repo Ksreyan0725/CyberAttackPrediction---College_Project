@@ -18,9 +18,7 @@ The project now features a hybrid architecture:
 -----------------------------
 The system evaluates models across four major cybersecurity datasets:
    * NSL-KDD (kdd_train.csv): Primary dataset for the web app.
-   * CIC-IDS-2017: Modern benign and common attack traffic.
-   * CIC-DDoS-2019: Focused on DDoS attack patterns.
-   * X-IIoTID: Specific to Industrial Internet of Things (IIoT) intrusion.
+* Custom Captures: User-provided CSV files for testing and inference.
 
 Preprocessing Steps:
    - Label Encoding: Converts categorical data to numeric.

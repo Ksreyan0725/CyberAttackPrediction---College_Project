@@ -156,8 +156,6 @@ A software application that monitors a network or systems for malicious activity
 ### The Datasets (The Textbooks)
 
 - **NSL-KDD**: Our primary dataset. It's a clean version of the classic KDD cup data.
-- **CIC-IDS-2017**: Contains modern traffic like DDoS and Web Attacks.
-- **X-IIoTID**: Focused on "Smart Factory" and IoT device security.
 
 ---
 
