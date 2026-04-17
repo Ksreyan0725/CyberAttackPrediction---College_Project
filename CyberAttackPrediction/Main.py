@@ -186,14 +186,9 @@ def index():
     if request.args.get('reset') == 'true':
         session.pop('last_result', None)
         session.pop('last_page_type', None)
-        return redirect(url_for('index'))
 
-    # If there is a last result in session, restore it automatically for soft navigation
-    if 'last_result' in session and 'last_page_type' in session:
-        return render_template('UserScreen.html', 
-                               msg=session['last_result'], 
-                               page_type=session['last_page_type'],
-                               feature_columns=session.get('last_feature_columns'))
+    # Home page always shows the landing page.
+    # Previous results are only restored on the /Predict page, not here.
     return render_template('index.html')
 
 @app.route('/HowItWorks')
@@ -1078,4 +1073,9 @@ if __name__ == '__main__':
             browser_timer = Timer(6.5, open_browser)
             browser_timer.start()
     
-    app.run(debug=True, port=2026)
+    # use_reloader=False prevents Werkzeug from spawning a second child process.
+    # Without this, the reloader restarts the server on every file save, which:
+    #   1. Resets PULSE_DETECTED to False in the new process → fires a second browser window
+    #   2. Causes WinError 10038 (invalid socket) on Python 3.13 / Windows
+    # The launcher handles process management, so the reloader is not needed here.
+    app.run(debug=True, port=2026, use_reloader=False)

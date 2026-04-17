@@ -54,32 +54,14 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 ---
 
-## 💎 Premium Key Features
+## 💎 Key Features
 
-- **🚀 Dual-Docs Experience**
-  - Seamless navigation between a **High-Level Interactive Overview** and a **Surgical Repository Explorer**.
-- **🛡️ CSRF Cyber-Hardening**
-  - Global `X-CSRF-Token` protection and secure header enforcement across all endpoints.
-- **⚡ CyberMaster Unified Controller**
-  - A centralized JS/CSS engine managing 60FPS reveal animations, focus-locking, and state-aware theme synchronization.
-- **🤫 Silent Pulse Monitoring**
-  - Backend heartbeat noise is filtered out for a professional, clinical terminal output.
-- **💎 Liquid Glass Design System**
-  - A state-of-the-art UI featuring 80px Gaussian blur, **Staggered Sequential Animations (0.1s - 0.6s)**, and the cinematic **Blur Reveal** (1.2s blur-to-unblur transition).
-- **🧠 Stacking Ensemble AI**
-  - Uses a multi-model architecture (Random Forest, KNN, MLP) for **98%+ Accuracy**.
-- **⚡ Joblib High-Performance Serialization**
-  - Transitioned from standard pickle to **Joblib** for 3.5x faster model loading and memory-efficient array handling.
-- **🔍 XAI (Explainable AI)**
-  - Visualizes *why* a specific network packet was flagged using **SHAP (Shapley Additive Explanations)**.
-- **🤖 GenAI Mitigation Insights**
-  - Converts technical classification results into plain-English advice for security administrators.
-- **🔄 Synchronized System Reset**
-  - Total data-wipe capability: Clears both LocalStorage and Server Sessions for a 100% fresh environment.
-- **⚡ GPU Transition Hardening**
-  - Smooth, 60fps entry animations with 6px Gaussian blur and hardware-accelerated compositor layers.
-- **📂 Automated Rescue System**
-  - Integrated 404 Intelligent Recovery engine for seamless server-sync restoration.
+- **🧠 Stacking Ensemble AI** — Multi-model architecture (Random Forest, KNN, MLP) achieving **98%+ accuracy**.
+- **🤖 GenAI Mitigation Insights** — Converts classification results into plain-English advice for security administrators.
+- **🔍 Explainable AI (SHAP)** — Visualizes *why* a network packet was flagged using Shapley Additive Explanations.
+- **🛡️ CSRF Cyber-Hardening** — Global token protection and secure header enforcement across all endpoints.
+- **💎 Liquid Glass UI** — Glassmorphism design with 80px Gaussian blur and smooth staggered animations.
+- **📂 In-Browser Repository Explorer** — Logged-in users can browse and read all project files directly in the app.
 
 ---
 
@@ -122,40 +104,38 @@ This project includes all necessary software. Follow these **3 simple steps** to
 4. **Run the Application**:
    Launch via `Start_WebApp_Venv.bat` or `python CyberAttackPrediction/Main.py`.
 
-## 🏗️ Detailed Project Structure (Clickable)
+## 🏗️ Project Structure
 
-*Explore the project files directly!*
+- 📁 [**CyberAttackPrediction/**](CyberAttackPrediction/) — Main project folder
+  - 📁 [static/](CyberAttackPrediction/static/) — Styles, JS & images
+  - 📁 [templates/](CyberAttackPrediction/templates/) — HTML pages
+  - 📁 [model/](CyberAttackPrediction/model/) — Saved AI model files
+  - 📁 [Dataset/](CyberAttackPrediction/Dataset/) — All CSV training & test data
+  - 📁 [scripts/](CyberAttackPrediction/scripts/) — Internal maintenance utilities
+  - 🐍 **[Main.py](CyberAttackPrediction/Main.py)** — Flask backend (heart of the project)
+  - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) — AI trainer script
+  - 📔 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) — Research notebook (Phase 2)
+  - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) — Research notebook (Phase 1)
+  - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) — Python dependencies
+  - 📄 [users.json](CyberAttackPrediction/users.json) — User registry
 
-- 📁 [**CyberAttackPrediction**](CyberAttackPrediction/) (Main Project Folder)
-  - 📁 [static](CyberAttackPrediction/static/) (Styles & Images)
-  - 📁 [templates](CyberAttackPrediction/templates/) (The Webpages)
-  - 📁 [model](CyberAttackPrediction/model/) (The AI's Brain Files)
-  - 📁 [Dataset](CyberAttackPrediction/Dataset/) (The Textbooks/Data)
-  - 🐍 [**Main.py**](CyberAttackPrediction/Main.py) (Heart of the Project)
-  - 🐍 [train_model.py](CyberAttackPrediction/train_model.py) (AI Trainer script)
-  - 📔 [ExtensionCyberAttack.ipynb](CyberAttackPrediction/ExtensionCyberAttack.ipynb) (Research: NSL-KDD + CICIDS)
-  - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) (Initial Model Proposals)
-  - 📁 [**scripts**](CyberAttackPrediction/scripts/) (Internal Maintenance Utilities)
-  
-- 📁 [**docs/**](docs/) (Unified Documentation Hub)
-  - 📖 [**PROJECT_BOOK.md**](docs/PROJECT_BOOK.md) (The Definitive Technical Guide)
-  - 📘 [**PROJECT_GUIDE.md**](docs/PROJECT_GUIDE.md) (Comprehensive Reference & Viva Prep)
-  - 📜 [**TECHNICAL_WORKFLOW.md**](docs/TECHNICAL_WORKFLOW.md) (System Logic & Architecture)
-  - 📗 [**BeReady.md**](docs/BeReady.md) (Student Study Handbook)
+- 📁 [**docs/**](docs/) — Unified documentation hub
+  - 📖 [PROJECT_BOOK.md](docs/PROJECT_BOOK.md) — Definitive technical guide
+  - 📘 [PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) — Comprehensive reference & viva prep
+  - 📜 [TECHNICAL_WORKFLOW.md](docs/TECHNICAL_WORKFLOW.md) — System logic & architecture
+  - 📗 [BeReady.md](docs/BeReady.md) — Student study handbook
+  - 📋 [GUIDE_BOOK.md](docs/GUIDE_BOOK.md) — Quick-start & run instructions
+  - 🔍 [DATASET_AUDIT.md](docs/DATASET_AUDIT.md) — Dataset folder structure explained
 
-- 📄 [users.json](CyberAttackPrediction/users.json) (Secure User Registry)
-- 📄 [.env](CyberAttackPrediction/.env) (Environment Config)
-- 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) (Dependency list)
+- 📁 [Software/](Software/) — Installers & venv helpers
+- 📁 [backups/](backups/) — Original zips & legacy files
+- 📁 [Project%20materials/](Project%20materials/) — Graphics & reference images
 
-- 📁 [**Software**](Software/) (Installers & Venv Helpers)
-- 📁 [**backups**](backups/) (Original zips & legacy files)
-- 📁 [**Project materials**](Project%20materials/) (Graphics & Reference images)
-
-- 🐍 [**launcher.py**](launcher.py) (Unified Command Center)
-- ⚙️ [**Start_WebApp_Venv.bat**](Start_WebApp_Venv.bat) (Venv-Persistent Web Launcher)
-- ⚙️ [**Start_Jupyter_Venv.bat**](Start_Jupyter_Venv.bat) (Venv-Persistent Jupyter Launcher)
-- 📜 [install_deps.ps1](install_deps.ps1) (Automated dependency installation script)
-- 📝 [to do list.txt](to%20do%20list.txt) (Project task tracking - Archive)
+- 🐍 [launcher.py](launcher.py) — Unified command center
+- ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) — Web app launcher
+- ⚙️ [Start_Jupyter_Venv.bat](Start_Jupyter_Venv.bat) — Jupyter launcher
+- 📜 [install_deps.ps1](install_deps.ps1) — Automated dependency installer
+- 📝 [to%20do%20list.txt](to%20do%20list.txt) — Task tracking archive
 
 <p align="center">
   Built with ❤️ for Academic Excellence — 2026

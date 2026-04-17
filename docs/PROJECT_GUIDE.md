@@ -49,6 +49,8 @@
 - 📁 [CyberAttackPrediction](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction) (Main Project Folder)
   - 📁 [static](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static) (Styles & Images)
     - 📄 [default.css](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/default.css) (Colors and Layout)
+    - 📄 [sw.js](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/sw.js) (Service Worker for Offline Mode)
+    - 📄 [offline.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/offline.html) (Emergency Offline Landing Page)
   - 📁 [templates](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates) (The Webpages)
     - 📄 [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html) (The Master Layout)
     - 📄 [index.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/index.html) (Home Page)
@@ -60,6 +62,7 @@
   - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
   - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
   - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
+  - 📄 [Start_Jupyter_Venv.bat](file:///c:/Users/sreya/OneDrive/Desktop/Project/Start_Jupyter_Venv.bat) (One-click Research Lab Launch)
 
 ---
 
@@ -140,6 +143,12 @@ The internet is like a massive highway. Millions of pieces of information travel
 - **Old Machine Learning**: Like a doctor who only says "You have a fever." (Just identifies the problem).
 - **Generative AI (Our Project)**: Like a doctor who says "You have a fever, here is the medicine, and here is how to stay healthy next time." (Explains the problem and gives a solution).
 
+### 📶 Offline-First Resilience (PWA)
+
+Our system is built to survive in hostile network environments.
+- **Service Worker**: A script that runs in the background. If your internet dies, it intercepts the request and serves a beautiful "System Offline" page.
+- **Pulse Detection**: The system constantly checks for a "Heartbeat." If the connection is lost, it automatically logs the user out and renders the offline interface to prevent data tampering.
+
 ---
 
 ## CORE CONCEPTS & TERMINOLOGY
@@ -207,10 +216,26 @@ We take three different AI models (MLP, KNN, Random Forest) and let them all gue
   - `python CyberAttackPrediction\Main.py`: Starts the website.
 - **Role**: It's the "Start Button" for the whole system.
 
-#### 3. `.gitignore` (Configuration)
+#### 3. `Start_Jupyter_Venv.bat` (Automation)
+
+- **Role**: The "Laboratory Launcher."
+- **Detailed Logic**: This activates the environment and immediately launches Jupyter Lab. It allows the research team to interact with the notebooks without manually typing terminal commands.
+
+#### 4. `.gitignore` (Configuration)
 
 - **Role**: The "Filter."
 - **Details**: When using Git (GitHub), we don't want to upload 1GB of data or our passwords. This file tells Git to ignore the datasets, passwords, and the bulky Python folder.
+
+---
+
+### 📁 `static/` DIRECTORY: The Visuals & Resilience
+
+#### 1. `sw.js` (Service Worker)
+- **Role**: The Network Interceptor.
+- **Logic**: It caches critical pages (like `offline.html`). When the browser detects it's offline, the Service Worker "steps in" and serves the cached page instead of showing a "No Internet" dinosaur.
+
+#### 2. `offline.html` (The Emergency Deck)
+- **Role**: A beautiful, branded landing page that explains the network status and provides an "Automatic Reconnect" timer.
 
 ---
 
@@ -934,6 +959,11 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
 
 - **Never store plaintext passwords**: Use environment variables and consider hashing (`bcrypt`) for production.
 - **Validate all file uploads**: Check file extension, size limit, and column schema before processing uploaded CSVs.
+- **Hardened Security Headers**:
+  - **`X-Frame-Options: SAMEORIGIN`**: Prevents "Clickjacking" (hacker overlaying our site on theirs).
+  - **`X-Content-Type-Options: nosniff`**: Prevents the browser from "guessing" file types (security risk).
+  - **`Cache-Control: no-store`**: Ensures that sensitive prediction data is never stored in the browser's temporary files.
+- **CSRF Protection**: Every single form submission (POST) requires a unique, one-time "Security Token" (CSRF Token). Even if a hacker tricks a user into clicking a link, they cannot submit the form without this secret token.
 - **Use HTTPS in production**: Flask's built-in server is for development only. Use Gunicorn + Nginx with an SSL certificate for real deployments.
 - **Log predictions responsibly**: Network traffic data can be sensitive personal information. Log only metadata (attack type, timestamp) rather than raw packet data.
 - **Audit AI decisions**: Always have a human review AI-flagged attacks before taking automated blocking actions.

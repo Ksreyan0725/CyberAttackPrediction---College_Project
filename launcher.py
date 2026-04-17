@@ -417,7 +417,10 @@ def show_help(query=None):
         ("14/exit/stop/quit", "Close the Launcher"),
         ("15/global/cs/register", "Enable Global 'cs' Command"),
         ("16/reset", "Reset Browser Preferences"),
-        ("17/bro/cyber/alias", "Enable ALL Global Aliases (cs, bro, cyber)")
+        ("17/bro/cyber/alias", "Enable ALL Global Aliases (cs, bro, cyber)"),
+        ("18/speed/network/test", "Run Network Speed Test"),
+        ("19/help/guide", "Open Comprehensive Help Guide"),
+        ("20/log/logs/audit", "View Audit Logs (Notepad)")
     ]
     
     found = False
@@ -931,6 +934,7 @@ def render_premium_menu(health_data=None, current_input=""):
             "[bold yellow]9. [/] Git Pull\n"
             "[bold yellow]10.[/] Git Sync\n"
             "[bold yellow]11.[/] Edit Ignore\n"
+            "[bold cyan]12.[/] Diagnostic\n"
             "[bold cyan]13.[/] RESTART\n"
             "[bold red]14. EXIT HUB[/]"
         )
@@ -951,11 +955,7 @@ def render_premium_menu(health_data=None, current_input=""):
     # 4. ASSEMBLE ALL COMPONENTS
     components = [header_panel]
     
-    # Pillar 2: Dual-UI Strategy. Only show telemetry (Stats) in Admin Mode.
-    if IS_ADMIN:
-        components.append(telemetry_panel)
-    # health_banner is now integrated into telemetry_panel for all modes
-    
+    components.append(telemetry_panel)
     components.append(main_display)
     components.append(prompt_panel) # Always show the prompt embedded
     components.append(Text(f"Tip: Type 'help' for details | Session Log: {LOG_FILE}", style="white"))
@@ -983,17 +983,15 @@ def boot_loader():
     from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
     
     # 1. THE LOGO REVEAL
-    logo = f"""
-    [bold red]
-     ██████╗██╗   ██╗██████╗ ███████╗██████╗ ███████╗██╗  ██╗██╗███████╗██╗     ██████╗ 
-    ██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║  ██║██║██╔════╝██║     ██╔══██╗
-    ██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝███████╗███████║██║█████╗  ██║     ██║  ██║
-    ██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗╚════██║██╔══██║██║██╔══╝  ██║     ██║  ██║
-    ╚██████╗   ██║   ██████╔╝███████╗██║  ██║███████║██║  ██║██║███████╗███████╗██████╔╝
-     ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝ 
-    [/]
-    [dim cyan]      SYSTEM INITIALIZATION | COMMAND CENTER {CONFIG['VERSION']} | 2026 PRODUCTION [/]
-    """
+    logo = f"""[bold red]
+ ██████╗██╗   ██╗██████╗ ███████╗██████╗ ███████╗██╗  ██╗██╗███████╗██╗     ██████╗ 
+██╔════╝╚██╗ ██╔╝██╔══██╗██╔════╝██╔══██╗██╔════╝██║  ██║██║██╔════╝██║     ██╔══██╗
+██║      ╚████╔╝ ██████╔╝█████╗  ██████╔╝███████╗███████║██║█████╗  ██║     ██║  ██║
+██║       ╚██╔╝  ██╔══██╗██╔══╝  ██╔══██╗╚════██║██╔══██║██║██╔══╝  ██║     ██║  ██║
+╚██████╗   ██║   ██████╔╝███████╗██║  ██║███████║██║  ██║██║███████╗███████╗██████╔╝
+ ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝ 
+[/]
+[dim cyan]      SYSTEM INITIALIZATION | COMMAND CENTER {CONFIG['VERSION']} | 2026 PRODUCTION [/]"""
     console.print(Align.center(logo))
     
     if turbo_mode:
@@ -1331,7 +1329,7 @@ def main():
                     print("[-] No changes made.")
                 input("\nPress ENTER to return to menu...")
 
-            elif choice in ['12', 'audit', ' diagnostic']:
+            elif choice in ['12', 'audit', 'diagnostic']:
                 check_system_paths()
 
             elif choice in ['13', 'restart', 'reload']:

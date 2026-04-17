@@ -27,12 +27,13 @@
             background: radial-gradient(circle at top right, #0a191f, #000000);
             color: var(--text-main);
             font-family: 'Inter', sans-serif;
-            min-vh: 100vh;
             margin: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
         }
 
         .outfit-font { font-family: 'Outfit', sans-serif; }
@@ -78,38 +79,36 @@
     </style>
 </head>
 <body>
-    <div class="container p-4">
-        <div class="card border-glass shadow-lg">
-            <div class="card-body p-5 text-center">
-                <div class="mb-4 d-inline-block">
-                    <div class="position-relative">
-                        <i class="fas fa-wifi text-danger display-1 animate-pulse" style="filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.4));"></i>
-                        <i class="fas fa-slash position-absolute top-50 start-50 translate-middle text-info opacity-50" style="font-size: 3rem;"></i>
-                    </div>
+    <div class="card border-glass shadow-lg mx-auto">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4 d-inline-block">
+                <div class="position-relative">
+                    <i class="fas fa-wifi text-danger display-1 animate-pulse" style="filter: drop-shadow(0 0 15px rgba(255, 71, 87, 0.4));"></i>
+                    <i class="fas fa-slash position-absolute top-50 start-50 translate-middle text-info opacity-50" style="font-size: 3rem;"></i>
                 </div>
+            </div>
 
-                <h1 class="display-3 fw-bold mb-2 outfit-font shadow-sm">OFFLINE</h1>
-                <h3 class="text-info mb-4">SYSTEM BREACH: CONNECTION LOST</h3>
-                
-                <p class="mb-4 px-lg-5" style="color: var(--text-muted);">
-                    The CyberShield server is currently unreachable. This happens if the backend process has stopped or your network is disconnected.
-                </p>
+            <h1 class="display-3 fw-bold mb-2 outfit-font shadow-sm">OFFLINE</h1>
+            <h3 class="text-info mb-4">SYSTEM BREACH: CONNECTION LOST</h3>
+            
+            <p class="mb-4 px-lg-5" style="color: var(--text-muted);">
+                The CyberShield server is currently unreachable. This happens if the backend process has stopped or your network is disconnected.
+            </p>
 
-                <div class="p-3 rounded-4 mb-4 border-glass" style="background: var(--bg-card-soft);">
-                    <div id="recoveryStatus" class="d-flex align-items-center justify-content-center small fw-medium">
-                        <div class="spinner-grow spinner-grow-sm me-2 text-info" role="status"></div>
-                        <span class="text-info opacity-75">MONITORING SERVER INTEGRITY...</span>
-                    </div>
+            <div class="p-3 rounded-4 mb-4 border-glass" style="background: var(--bg-card-soft);">
+                <div id="recoveryStatus" class="d-flex align-items-center justify-content-center small fw-medium">
+                    <div class="spinner-grow spinner-grow-sm me-2 text-info" role="status"></div>
+                    <span class="text-info opacity-75">MONITORING SERVER INTEGRITY...</span>
                 </div>
+            </div>
 
-                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
-                    <a href="/" class="btn btn-outline-info px-4 py-2 rounded-pill shadow-sm">
-                        <i class="fas fa-sync me-2"></i>Retry Connection
-                    </a>
-                    <button onclick="window.location.reload()" class="btn btn-glass-themed">
-                        <i class="fas fa-redo me-2"></i>Refresh Page
-                    </button>
-                </div>
+            <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                <a href="/" class="btn btn-outline-info px-4 py-2 rounded-pill shadow-sm">
+                    <i class="fas fa-sync me-2"></i>Retry Connection
+                </a>
+                <button onclick="window.location.reload()" class="btn btn-glass-themed">
+                    <i class="fas fa-redo me-2"></i>Refresh Page
+                </button>
             </div>
         </div>
     </div>
@@ -123,10 +122,11 @@
                 try {
                     const response = await fetch('/api/heartbeat');
                     if (response.ok) {
-                        statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i><span class="text-success fw-bold">SERVER RESTORED! RECONNECTING...</span>';
+                        statusEl.innerHTML = '<i class="fas fa-check-circle text-success me-2"></i><span class="text-success fw-bold">SERVER RESTORED! RESETTING SESSION...</span>';
                         setTimeout(() => {
-                            window.location.href = '/';
-                        }, 1200);
+                            // Automatically logout to reset session state as requested
+                            window.location.href = '/Logout';
+                        }, 1500);
                         return;
                     }
                 } catch (e) {

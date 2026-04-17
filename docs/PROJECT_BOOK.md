@@ -43,7 +43,6 @@ The project is organized into a modular structure to separate data analysis (Jup
 
 - **`/static`**:
   - `images/`: High-resolution brand assets.
-  - `Dataset/`: Legacy data mirrors and documentation.
 
 - **`/Dataset`**:
   - `kdd_train.csv`: Primary training data.
@@ -103,6 +102,8 @@ We utilize four major datasets to ensure the models are robust across different 
 - **CICIDS 2017**: Modern network traffic containing up-to-date attack signatures.
 - **CICDDoS 2019**: Specialized dataset for Distributed Denial of Service (DDoS) attacks.
 - **X-IIoTID**: Focuses on Industrial Internet of Things (IIoT) security.
+
+> **Note on usage scope:** All four datasets are loaded and compared in the research notebooks (`ProposeCyberAttack.ipynb`, `ExtensionCyberAttack.ipynb`) to benchmark multiple ML algorithms across different network environments. The **Flask web application** uses **NSL-KDD (`kdd_train.csv`) as its default training dataset** — users can also upload their own CSV via the Train page to retrain the model on any compatible dataset.
 
 ---
 

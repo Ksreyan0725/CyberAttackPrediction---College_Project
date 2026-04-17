@@ -111,50 +111,77 @@ The system delivers a complete end-to-end pipeline:
 
 ---
 
-## 🔄 System Workflow
+## 🔄 The Resilient Engine Life-Cycle
 
-```text
-User Login  →  Training Dashboard  →  Model Training  →  Prediction Dashboard  →  Results
+CyberShield AI operates on a state-aware execution loop that maintains data integrity and session stability even in hostile network conditions.
+
+### 1 · Secure Training Lifecycle
+Training is handled as an **Asynchronous Process** to prevent UI blocking. The frontend monitors the backend "Heartbeat" to provide real-time status updates without manual page refreshes.
+
+```mermaid
+sequenceDiagram
+    participant U as User (Browser)
+    participant S as Main.py (Flask)
+    participant T as train_model.py (ML)
+    participant D as trained_rf_model.pkl
+    
+    Note over U: User Clicks "Start Training"
+    U->>S: POST /TrainAction (Dataset + CSRF)
+    S->>S: Validate CSRF Token
+    S->>T: Trigger run_training() [Async Thread]
+    S-->>U: Return JSON (Status: busy)
+    
+    loop Heartbeat Loop (every 3s)
+        U->>S: GET /api/heartbeat
+        S-->>U: { status: "busy", health: "online" }
+        Note over U: UI shows "System Processing..."
+    end
+    
+    T->>T: Load, Clean, Scale, Train
+    T->>D: Serialize Model Bundle
+    T-->>S: Thread Signal (Done)
+    
+    U->>S: GET /api/heartbeat
+    S-->>U: { status: "ready", health: "online" }
+    S->>S: load_ml_model() (Reload Memory)
+    Note over U: UI shows "System Ready"
 ```
 
-### 1 · Authentication
+### 2 · Secure Inference Lifecycle (Predict)
+Prediction utilizes the **In-Memory Model Cache** for sub-millisecond classification. Every request is hardened by security middlewares before reaching the AI core.
 
-Users log in at `/UserLogin`. Credentials are validated against `users.json` using `werkzeug` password hashing. A hardcoded **Admin** account provides elevated system access. On success, a Flask session and a **CSRF token** are created.
-
-### 2 · Training Dashboard
-
-The user selects a dataset — the built-in **NSL-KDD** baseline (`kdd_train.csv`) or a **custom CSV upload** — and clicks **Start Training**, triggering an AJAX `POST` to `/TrainAction`.
-
-### 3 · Model Training Pipeline
-
-`Main.py` delegates to `run_training()` in `train_model.py`, which executes these stages in order:
-
-```text
-Load CSV  →  Detect Label Column  →  Encode Categories  →  Sanitize NaN/Inf
-  →  Scale Features  →  Split 80/20  →  Fit RandomForest  →  Evaluate  →  Save .pkl
+```mermaid
+sequenceDiagram
+    participant U as User (Browser)
+    participant S as Main.py (Flask)
+    participant M as In-Memory Cache (RAM)
+    
+    Note over U: User Uploads CSV
+    U->>S: POST /PredictAction (File + CSRF)
+    S->>S: Handle Security Headers (no-store)
+    S->>S: Preprocess (Align & Scale)
+    S->>M: rf_model.predict(X_scaled)
+    M-->>S: Predicted Class (e.g., "neptune")
+    S->>S: Map to GenAI Insight Engine
+    S-->>U: Render UserScreen.html
+    
+    Note right of S: Result stored in secured session
 ```
 
-### 4 · Model Loaded into Memory
+---
 
-On app startup, `load_ml_model()` checks for `model/trained_rf_model.pkl` and loads the classifier, scaler, label encoder, and feature list into global memory — ensuring instant inference without per-request disk reads.
+### Phase-by-Phase Technical Breakdown
 
-### 5 · Prediction Dashboard
+#### A · Authentication & Heartbeat
+- **Entry**: `/UserLogin` validates credentials via `werkzeug` scrypt.
+- **Pulse Start**: On successful login, the `base.html` initializes a `setInterval` that pings `/api/heartbeat` every 3000ms.
+- **Session Focus**: CSRF tokens are stored in the server-side session, ensuring that all prediction uploads originate from the authenticated user.
 
-Users navigate to `/Predict` (redirected away if no model exists), upload a capture file, and click **Run Analysis** to `POST` to `/PredictAction`.
-
-### 6 · Prediction Pipeline
-
-The uploaded CSV goes through the **exact same preprocessing** as training:
-
-- Feature columns are aligned to the saved list (missing → `0`, extra → dropped)
-- Categorical data is encoded using the **saved** encoder (transform only, never re-fitted)
-- Numeric features are scaled using the **saved** scaler (transform only, never re-fitted)
-
-Processed data goes to `rf_model.predict()` and results are stored in the Flask session.
-
-### 7 · Results & GenAI Insight Engine
-
-Results are rendered as a high-contrast table. The **GenAI Insight Engine** maps each predicted attack class (e.g., `neptune`, `smurf`) to a human-readable explanation — describing behaviour, impact, and mitigation — making output interpretable for non-technical examiners.
+#### B · Post-Processing & GenAI Mapping
+Unlike traditional ML apps that just return a number, CyberShield runs a **Contextual Mapping Layer**:
+1. **Raw Prediction**: Returns a numeric code.
+2. **Label Translation**: Converts code to attack name (e.g., `back`, `teardrop`).
+3. **Insight Generation**: Pulls pre-written technical summaries explaining the "How, Why, and What to do" for each specific threat detected.
 
 ---
 
@@ -216,6 +243,12 @@ The file `model/trained_rf_model.pkl` is the **sole bridge** between the two pha
 
 The notebooks were the **R&D sandbox** — algorithm selection, preprocessing design, and hyperparameter tuning all happened here before the logic was ported to the production Flask app. They are **not called at runtime**; they are standalone academic deliverables.
 
+### 📚 Notebook Comment Architecture (Viva-Ready)
+Each cell in the notebooks follows a **Dual-Language** structure to assist during the Viva:
+- **`[TECH]` Comments**: Direct technical breakdown (e.g., hyperparameter choices, scaling math).
+- **`[NON-TECH]` Comments**: High-level business/security impact.
+- **`[ANALOGY]` Sections**: Simple, relatable examples to use when explaining complex math to non-technical evaluators.
+
 ---
 
 ## 📊 High-Resolution System Architecture
@@ -269,9 +302,13 @@ The system is built on a **High-Security Web Architecture** designed for high-av
 
 ### 🔄 Real-Time State Management
 
-- **Heartbeat Filter**: A custom logging filter suppresses repetitive server health pings, keeping the terminal clean for critical security alerts.
-- **AJAX Polling**: The training UI uses asynchronous JavaScript to poll `/TrainStatus`, providing real-time progress bars without page reloads.
 - **Auto-Browser Launch**: A delayed `threading.Timer` automatically opens the browser at `127.0.0.1:5000` once the server socket is confirmed active.
+
+### 📶 The Offline Reliability Loop
+The app utilizes a **State-Persistence Loop** via a PWA Service Worker (`sw.js`):
+1. **Pulse Verification**: The frontend emits a heartbeat every 30s to the `/Pulse` endpoint.
+2. **Network Interception**: If the `/Pulse` fails, the `sw.js` intercepts the `FETCH` signal and checks the local cache.
+3. **Emergency Handover**: If the system is offline, the Service Worker serves `offline.html`, which triggers an **Automatic Secure Logout** to prevent session hi-jacking while the network is insecure.
 
 ## 📐 Logic Flow Diagram (Raw ASCII)
 
@@ -322,13 +359,12 @@ The system is built on a **High-Security Web Architecture** designed for high-av
 
 ## 🔐 Security Architecture
 
-| Layer | Implementation |
-| :--- | :--- |
 | **Authentication** | `werkzeug` scrypt hashing; hardcoded admin hash |
 | **Session Security** | Server-side Flask sessions; secret key from `.env` |
 | **CSRF Protection** | `security_pre_check()` validates `X-CSRF-Token` on all `POST`/`PUT`/`DELETE` |
 | **Input Validation** | `train_model.py` enforces column contracts, rejects empty files, sanitizes `NaN`/`Inf` |
-| **Response Hardening** | `X-Content-Type-Options`, `X-Frame-Options`, `Cache-Control` on every response |
+| **Response Hardening** | `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Cache-Control: no-store` |
+| **Integrity Checks** | **ETag generation** via file hashing ensures that large assets (models/CSS) aren't tampered with during transit. |
 
 ---
 
