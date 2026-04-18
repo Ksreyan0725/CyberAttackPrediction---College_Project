@@ -1,4 +1,11 @@
-# CyberShield AI: Technical Hardening & Versioning Log
+<!-- markdownlint-disable MD033 -->
+<h1 align="center">
+  <img src="../CyberAttackPrediction/static/images/logo_with_bg.svg" alt="CyberShield Logo" width="32" vertical-align="middle"> CyberShield AI: Technical Hardening & Versioning Log
+</h1>
+
+<p align="center">
+  <img src="../CyberAttackPrediction/static/images/banner.png" alt="CyberShield Architecture Banner" width="800">
+</p>
 
 This document tracks the technical evolution of the CyberShield AI project, from legacy modernization to high-performance security hardening.
 
@@ -59,6 +66,4 @@ python launcher.py
 
 *Choose **Mode 1** for the Web Dashboard or **Mode 2** for Jupyter research. The (.venv) will persist automatically.*
 
----
-
-Built for Technical Excellence & Academic Integrity — 2026 🛡️
+Built for Technical Excellence & Academic Integrity — 2026 ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg)

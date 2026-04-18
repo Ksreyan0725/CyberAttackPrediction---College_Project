@@ -1,4 +1,4 @@
-# Comprehensive Guide: Cyber Attack Prediction Analysis 🛡️
+# ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) Comprehensive Guide: Cyber Attack Prediction Analysis
 
 **Status**: 🟢 **Hardened 2026 Technology Stack** (Flask 3.1.3, Pandas 3.0.2, Scikit-Learn 1.8.0, Python 3.13)
 

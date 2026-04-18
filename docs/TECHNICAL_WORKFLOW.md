@@ -1,28 +1,37 @@
-# 🛡️ CyberShield AI — Technical Workflow
+<!-- markdownlint-disable MD033 -->
+<h1 align="center">
+  <img src="../CyberAttackPrediction/static/images/logo_with_bg.svg" alt="CyberShield Logo" width="32" vertical-align="middle"> CyberShield AI — Technical Workflow
+</h1>
 
-![CyberShield Architecture Banner](static/images/banner.png)
+<p align="center">
+  <img src="../CyberAttackPrediction/static/images/banner.png" alt="Architecture Banner" width="800">
+</p>
 
-[![Python](https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white)](https://python.org)
-[![Flask](https://img.shields.io/badge/Flask-3.x-7C3AED?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
-[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org)
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-Deep%20Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org)
-[![Keras](https://img.shields.io/badge/Keras-Neural%20Nets-D00000?style=flat-square&logo=keras&logoColor=white)](https://keras.io)
-[![Pandas](https://img.shields.io/badge/Pandas-Data-8B5CF6?style=flat-square&logo=pandas&logoColor=white)](https://pandas.pydata.org)
-[![NumPy](https://img.shields.io/badge/NumPy-Arrays-4DABCF?style=flat-square&logo=numpy&logoColor=white)](https://numpy.org)
-[![Matplotlib](https://img.shields.io/badge/Matplotlib-Plotting-11557C?style=flat-square&logoColor=white)](https://matplotlib.org)
-[![Seaborn](https://img.shields.io/badge/Seaborn-Visualization-4C72B0?style=flat-square&logoColor=white)](https://seaborn.pydata.org)
-[![SHAP](https://img.shields.io/badge/SHAP-Explainability-FF4B4B?style=flat-square&logoColor=white)](https://shap.readthedocs.io)
-[![SciPy](https://img.shields.io/badge/SciPy-Scientific-8CAAE6?style=flat-square&logo=scipy&logoColor=white)](https://scipy.org)
-[![Joblib](https://img.shields.io/badge/Joblib-Persistence-6D28D9?style=flat-square&logoColor=white)](https://joblib.readthedocs.io)
-[![Werkzeug](https://img.shields.io/badge/Werkzeug-Security-059669?style=flat-square&logoColor=white)](https://werkzeug.palletsprojects.com)
-[![Jupyter](https://img.shields.io/badge/Jupyter-Notebooks-F37626?style=flat-square&logo=jupyter&logoColor=white)](https://jupyter.org)
-[![Markdown2](https://img.shields.io/badge/Markdown2-Rendering-0EA5E9?style=flat-square&logoColor=white)](https://github.com/trentm/python-markdown2)
-[![Pygments](https://img.shields.io/badge/Pygments-Highlighting-E11D48?style=flat-square&logoColor=white)](https://pygments.org)
-[![nbconvert](https://img.shields.io/badge/nbconvert-Export-F59E0B?style=flat-square&logo=jupyter&logoColor=white)](https://nbconvert.readthedocs.io)
-[![nbformat](https://img.shields.io/badge/nbformat-Notebook%20IO-10B981?style=flat-square&logo=jupyter&logoColor=white)](https://nbformat.readthedocs.io)
-[![python-dotenv](https://img.shields.io/badge/python--dotenv-Config-84CC16?style=flat-square&logoColor=white)](https://pypi.org/project/python-dotenv)
-[![rich](https://img.shields.io/badge/rich-Terminal%20UI-6366F1?style=flat-square&logoColor=white)](https://rich.readthedocs.io)
-[![ipywidgets](https://img.shields.io/badge/ipywidgets-Interactive-DB2777?style=flat-square&logo=jupyter&logoColor=white)](https://ipywidgets.readthedocs.io)
+<p align="center">
+  <a href="https://python.org"><img src="https://img.shields.io/badge/Python-3.13-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python Badge"></a>
+  <a href="https://flask.palletsprojects.com"><img src="https://img.shields.io/badge/Flask-3.x-7C3AED?style=flat-square&logo=flask&logoColor=white" alt="Flask Badge"></a>
+  <a href="https://scikit-learn.org"><img src="https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=flat-square&logo=scikitlearn&logoColor=white" alt="Scikit-learn Badge"></a>
+  <a href="https://tensorflow.org"><img src="https://img.shields.io/badge/TensorFlow-Deep%20Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white" alt="TensorFlow Badge"></a>
+  <a href="https://keras.io"><img src="https://img.shields.io/badge/Keras-Neural%20Nets-D00000?style=flat-square&logo=keras&logoColor=white" alt="Keras Badge"></a>
+  <a href="https://pandas.pydata.org"><img src="https://img.shields.io/badge/Pandas-Data-8B5CF6?style=flat-square&logo=pandas&logoColor=white" alt="Pandas Badge"></a>
+  <a href="https://numpy.org"><img src="https://img.shields.io/badge/NumPy-Arrays-4DABCF?style=flat-square&logo=numpy&logoColor=white" alt="NumPy Badge"></a>
+  <a href="https://matplotlib.org"><img src="https://img.shields.io/badge/Matplotlib-Plotting-11557C?style=flat-square&logoColor=white" alt="Matplotlib Badge"></a>
+  <a href="https://seaborn.pydata.org"><img src="https://img.shields.io/badge/Seaborn-Visualization-4C72B0?style=flat-square&logoColor=white" alt="Seaborn Badge"></a>
+  <a href="https://shap.readthedocs.io"><img src="https://img.shields.io/badge/SHAP-Explainability-FF4B4B?style=flat-square&logoColor=white" alt="SHAP Badge"></a>
+  <a href="https://scipy.org"><img src="https://img.shields.io/badge/SciPy-Scientific-8CAAE6?style=flat-square&logo=scipy&logoColor=white" alt="SciPy Badge"></a>
+  <a href="https://joblib.readthedocs.io"><img src="https://img.shields.io/badge/Joblib-Persistence-6D28D9?style=flat-square&logoColor=white" alt="Joblib Badge"></a>
+  <a href="https://werkzeug.palletsprojects.com"><img src="https://img.shields.io/badge/Werkzeug-Security-059669?style=flat-square&logoColor=white" alt="Werkzeug Badge"></a>
+  <a href="https://jupyter.org"><img src="https://img.shields.io/badge/Jupyter-Notebooks-F37626?style=flat-square&logo=jupyter&logoColor=white" alt="Jupyter Badge"></a>
+  <a href="https://github.com/trentm/python-markdown2"><img src="https://img.shields.io/badge/Markdown2-Rendering-0EA5E9?style=flat-square&logoColor=white" alt="Markdown2 Badge"></a>
+  <a href="https://pygments.org"><img src="https://img.shields.io/badge/Pygments-Highlighting-E11D48?style=flat-square&logoColor=white" alt="Pygments Badge"></a>
+  <a href="https://nbconvert.readthedocs.io"><img src="https://img.shields.io/badge/nbconvert-Export-F59E0B?style=flat-square&logo=jupyter&logoColor=white" alt="nbconvert Badge"></a>
+  <a href="https://nbformat.readthedocs.io"><img src="https://img.shields.io/badge/nbformat-Notebook%20IO-10B981?style=flat-square&logo=jupyter&logoColor=white" alt="nbformat Badge"></a>
+  <a href="https://pypi.org/project/python-dotenv"><img src="https://img.shields.io/badge/python--dotenv-Config-84CC16?style=flat-square&logoColor=white" alt="python-dotenv Badge"></a>
+  <a href="https://gunicorn.org"><img src="https://img.shields.io/badge/Gunicorn-Deployment-4338CA?style=flat-square&logo=gunicorn&logoColor=white" alt="Gunicorn Badge"></a>
+  <a href="https://pypi.org/project/six"><img src="https://img.shields.io/badge/Six-Compatibility-6366F1?style=flat-square&logoColor=white" alt="Six Badge"></a>
+  <a href="https://rich.readthedocs.io"><img src="https://img.shields.io/badge/rich-Terminal%20UI-6366F1?style=flat-square&logoColor=white" alt="Rich Badge"></a>
+  <a href="https://ipywidgets.readthedocs.io"><img src="https://img.shields.io/badge/ipywidgets-Interactive-DB2777?style=flat-square&logo=jupyter&logoColor=white" alt="ipywidgets Badge"></a>
+</p>
 
 ---
 
@@ -294,7 +303,7 @@ graph TD
 
 The system is built on a **High-Security Web Architecture** designed for high-availability ML demos.
 
-### 🛡️ Layered Security Stack
+### ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) Layered Security Stack
 
 - **CSRF Protection**: Every state-changing request (`POST`, `PUT`, `DELETE`) is protected by a session-bound cryptographic token. This prevents Cross-Site Request Forgery attacks.
 - **Password Hashing**: We never store plain-text passwords. The system uses `werkzeug.security` with **PBKDF2-HMAC-SHA256** hashing.
@@ -319,7 +328,7 @@ The app utilizes a **State-Persistence Loop** via a PWA Service Worker (`sw.js`)
 2. **Network Interception**: If the `/Pulse` fails, the `sw.js` intercepts the `FETCH` signal and checks the local cache.
 3. **Emergency Handover**: If the system is offline, the Service Worker serves `offline.html`, which triggers an **Automatic Secure Logout** to prevent session hi-jacking while the network is insecure.
 
-### 🛡️ Adaptive Security Layers (ASL)
+### ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) Adaptive Security Layers (ASL)
 
 The **Stable-2026** update introduces the Adaptive Security Layer, which moves beyond simple password hashing to protect the system's internal core:
 

@@ -1,4 +1,4 @@
-# 🎓 FINAL YEAR PROJECT: CYBER ATTACK PREDICTION SYSTEM
+# ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) 🎓 FINAL YEAR PROJECT: CYBER ATTACK PREDICTION SYSTEM
 
 ## Academic Year 2023-2026 | 6th Semester Project
 
@@ -573,7 +573,7 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
 - **Q: What is `n_jobs=-1` doing in `RandomForestClassifier`?**
   - *A*: It tells scikit-learn to use all available CPU cores in parallel for training. This dramatically speeds up fitting time on multi-core machines.
 
-### 🛡️ Category D: Cybersecurity Concepts
+### ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) Category D: Cybersecurity Concepts
 
 - **Q: What is the NSL-KDD dataset and why is it better than KDD'99?**
   - *A*: NSL-KDD removes redundant records from KDD'99 so that each row is unique. This ensures the model doesn't "learn" by simply counting duplicates.
@@ -737,7 +737,7 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
 - **Q: What is the academic contribution of this project?**
   - *A*: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP) and a simulated GenAI layer.
 
-### 🛡️ Category L: Advanced Security (Stable-2026)
+### ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) Category L: Advanced Security (Stable-2026)
 
 - **Q: What is the "Neural Firewall" in your project?**
   - *A*: It is a security logic that prevents "Directory Traversal." It ensures that a user can only view files inside the project folder and cannot use `../` to access sensitive system files on the host computer.

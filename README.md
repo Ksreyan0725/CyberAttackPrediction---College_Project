@@ -1,22 +1,19 @@
-# 🛡️ Cyber Attack Prediction: From Traditional ML to Generative AI
-
-<!-- markdownlint-disable MD033 MD041 -->
-<p align="center">
-  <img src="CyberAttackPrediction/static/images/favicon.svg" alt="CyberShield AI Logo" width="160" height="160">
-</p>
-
-<h1 align="center">CyberShield AI</h1>
+<!-- markdownlint-disable MD033 -->
+<h1 align="center">
+  <img src="CyberAttackPrediction/static/images/logo_with_bg.svg" alt="CyberShield Logo" width="32" vertical-align="middle"> Cyber Attack Prediction: From Traditional ML to Generative AI
+</h1>
 
 <p align="center">
-  <strong>Predicting network intrusions with precision. Explaining security with intelligence.</strong>
+  <img src="CyberAttackPrediction/static/images/favicon.svg" alt="CyberShield Favicon" width="128">
 </p>
 
+<h2 align="center">CyberShield AI</h2>
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.13.2-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/Flask-v3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
-  <img src="https://img.shields.io/badge/Scikit--Learn-v1.8.0-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
-  <img src="https://img.shields.io/badge/Status-Stable--2026--Hardened-success?style=for-the-badge" alt="Status">
+  **Predicting network intrusions with precision. Explaining security with intelligence.**
 </p>
+
+![Python](https://img.shields.io/badge/Python-3.13.2-3776AB?style=for-the-badge&logo=python&logoColor=white) ![Flask](https://img.shields.io/badge/Flask-v3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white) ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-v1.8.0-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white) ![Status](https://img.shields.io/badge/Status-Stable--2026--Hardened-success?style=for-the-badge)
 
 ## 🏛️ Academic Institutional Details
 
@@ -59,7 +56,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 - **🧠 Stacking Ensemble AI** — Multi-model architecture (Random Forest, KNN, MLP) achieving **98%+ accuracy**.
 - **🤖 GenAI Mitigation Insights** — Converts classification results into plain-English advice for security administrators.
-- **🛡️ Stable-2026 Hardening** — Integrated **Neural Firewall** (path traversal protection) and **Cryptographic Identity** (HMAC session tokens).
+- **![CyberShield Logo](CyberAttackPrediction/static/images/logo_with_bg.svg) Stable-2026 Hardening** — Integrated **Neural Firewall** (path traversal protection) and **Cryptographic Identity** (HMAC session tokens).
 - **🔍 Explainable AI (SHAP)** — Visualizes *why* a network packet was flagged using Shapley Additive Explanations.
 - **📂 In-Browser Repository Explorer** — Logged-in users can browse and read all project files directly in the app, protected by root-level sandboxing.
 
@@ -67,15 +64,11 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 ## 📊 Project Foundations
 
-<p align="center">
-  <img src="CyberAttackPrediction/static/images/roadmap_HD.png" alt="Project Roadmap" width="85%">
-  <br><i>The systematic development lifecycle from data ingestion to Generative AI integration.</i>
-</p>
+![Project Roadmap](CyberAttackPrediction/static/images/roadmap_HD.png)
+*The systematic development lifecycle from data ingestion to Generative AI integration.*
 
-<p align="center">
-  <img src="CyberAttackPrediction/static/images/five_pillars_HD.png" alt="Five Pillars" width="85%">
-  <br><i>Aligning with cybersecurity frameworks for comprehensive monitoring and defense.</i>
-</p>
+![Five Pillars](CyberAttackPrediction/static/images/five_pillars_HD.png)
+*Aligning with cybersecurity frameworks for comprehensive monitoring and defense.*
 
 ---
 
@@ -83,40 +76,41 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 1. **Clone the repository**:
 
-   ```bash
-   git clone https://github.com/Ksreyan0725/CyberAttackPrediction---College_Project.git
-   cd CyberAttackPrediction---College_Project
-   ```
+```bash
+git clone https://github.com/Ksreyan0725/CyberAttackPrediction---College_Project.git
+cd CyberAttackPrediction---College_Project
+```
 
-2. **Setup Virtual Environment**:
+1. **Setup Virtual Environment**:
 
-   ```bash
-   python -m venv .venv
-   .\.venv\Scripts\activate
-   ```
+```bash
+python -m venv .venv
+.\.venv\Scripts\activate
+```
 
-3. **Install Dependencies**:
+1. **Install Dependencies**:
 
-   ```bash
-   pip install -r CyberAttackPrediction/requirements.txt
-   ```
+```bash
+pip install -r CyberAttackPrediction/requirements.txt
+```
 
-4. **Configure Environment**:
+1. **Configure Environment**:
    Create a `.env` file in the root based on the following template:
 
-   ```env
-   FLASK_SECRET_KEY=your_secure_hex_key
-   ADMIN_USER=admin
-   ADMIN_PASS=admin
-   ADMIN_HASH=pbkdf2:sha256:600000$...
-   ```
+```env
+FLASK_SECRET_KEY=your_secure_hex_key
+ADMIN_USER=admin
+ADMIN_PASS=admin
+ADMIN_HASH=pbkdf2:sha256:600000$...
+```
 
-5. **Run the Application**:
+1. **Run the Application**:
    Launch via `Start_WebApp_Venv.bat` or `python CyberAttackPrediction/Main.py`.
 
 ## 🏗️ Project Structure
 
 - 📁 [**CyberAttackPrediction/**](CyberAttackPrediction/) — Main project folder
+
   - 📁 [static/](CyberAttackPrediction/static/) — Styles, JS & images
   - 📁 [templates/](CyberAttackPrediction/templates/) — HTML pages
   - 📁 [model/](CyberAttackPrediction/model/) — Saved AI model files
@@ -129,25 +123,21 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) — Python dependencies
   - 📄 [users.json](CyberAttackPrediction/users.json) — User registry
   - 🔐 [.env](.env) — Sensitive configuration & secrets
-
 - 📁 [**docs/**](docs/) — Unified documentation hub
+
   - 📖 [PROJECT_BOOK.md](docs/PROJECT_BOOK.md) — Definitive technical guide
   - 📘 [PROJECT_GUIDE.md](docs/PROJECT_GUIDE.md) — Comprehensive reference & viva prep
   - 📜 [TECHNICAL_WORKFLOW.md](docs/TECHNICAL_WORKFLOW.md) — System logic & architecture
   - 📗 [BeReady.md](docs/BeReady.md) — Student study handbook
   - 📋 [GUIDE_BOOK.md](docs/GUIDE_BOOK.md) — Quick-start & run instructions
   - 🔍 [DATASET_AUDIT.md](docs/DATASET_AUDIT.md) — Dataset folder structure explained
-
 - 📁 [Software/](Software/) — Installers & venv helpers
 - 📁 [backups/](backups/) — Original zips & legacy files
 - 📁 [Project%20materials/](Project%20materials/) — Graphics & reference images
-
 - 🐍 [launcher.py](launcher.py) — Unified command center
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) — Web app launcher
 - ⚙️ [Start_Jupyter_Venv.bat](Start_Jupyter_Venv.bat) — Jupyter launcher
 - 📜 [install_deps.ps1](install_deps.ps1) — Automated dependency installer
 - 📝 [to%20do%20list.txt](to%20do%20list.txt) — Task tracking archive
 
-<p align="center">
-  Built with ❤️ for Academic Excellence — 2026
-</p>
+Built with ❤️ for Academic Excellence — 2026
