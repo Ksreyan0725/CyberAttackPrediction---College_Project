@@ -138,6 +138,5 @@ ADMIN_HASH=pbkdf2:sha256:600000$...
 - ⚙️ [Start_WebApp_Venv.bat](Start_WebApp_Venv.bat) — Web app launcher
 - ⚙️ [Start_Jupyter_Venv.bat](Start_Jupyter_Venv.bat) — Jupyter launcher
 - 📜 [install_deps.ps1](install_deps.ps1) — Automated dependency installer
-- 📝 [to%20do%20list.txt](to%20do%20list.txt) — Task tracking archive
 
 Built with ❤️ for Academic Excellence — 2026

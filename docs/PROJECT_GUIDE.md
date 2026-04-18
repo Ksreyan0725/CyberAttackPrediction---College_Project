@@ -1,3 +1,4 @@
+
 # ![CyberShield Logo](../CyberAttackPrediction/static/images/logo_with_bg.svg) 🎓 FINAL YEAR PROJECT: CYBER ATTACK PREDICTION SYSTEM
 
 ## Academic Year 2023-2026 | 6th Semester Project
@@ -35,36 +36,10 @@
 
 *If the teacher asks "What did YOU do?", here are your answers:*
 
-- **Ankita Pati**: "I worked on the **Data Collection and Research**. I studied the NSL-KDD dataset and identified the 41 clues (features) that help catch hackers."
-- **Kumar Sreyan Pattanayak**: "I worked on the **Backend Logic and AI Integration**. I wrote the Python code that loads the Random Forest model and creates the GenAI insights."
-- **Subhashree Pathy**: "I worked on the **Frontend UI Design**. I used Bootstrap 5 to make the website look professional, modern, and easy for users to navigate."
-- **Tanmaya Ranjan Jena**: "I worked on **Testing and Documentation**. I tested the system with different CSV files to ensure the predictions were correct and helped prepare this guide."
-
----
-
-## 🏗️ PROJECT STRUCTURE (CLICKABLE FILE MAP)
-
-*Click on any file or folder to open it directly!*
-
-- 📁 [CyberAttackPrediction](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction) (Main Project Folder)
-  - 📁 [static](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static) (Styles & Images)
-    - 📄 [default.css](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/default.css) (Colors and Layout)
-    - 📄 [sw.js](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/sw.js) (Service Worker for Offline Mode)
-    - 📄 [offline.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/static/offline.html) (Emergency Offline Landing Page)
-  - 📁 [templates](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates) (The Webpages)
-    - 📄 [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html) (The Master Layout)
-    - 📄 [index.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/index.html) (Home Page)
-    - 📄 [Predict.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/Predict.html) (The Upload Page)
-    - 📄 [UserLogin.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserLogin.html) (Login Page)
-    - 📄 [UserScreen.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserScreen.html) (Results Page)
-  - 📁 [model](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/model) (The AI's Brain Files)
-  - 📁 [Dataset](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Dataset) (The Textbooks/Data)
-  - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
-  - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
-  - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
-  - 📄 [users.json](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/users.json) (User database with PBKDF2 hashes)
-  - 🔐 [.env](file:///c:/Users/sreya/OneDrive/Desktop/Project/.env) (Confidential configuration & secrets)
-  - 📄 [Start_Jupyter_Venv.bat](file:///c:/Users/sreya/OneDrive/Desktop/Project/Start_Jupyter_Venv.bat) (One-click Research Lab Launch)
+- **Ankita Pati**: "I worked on the **Data Research and Problem Scope**. I studied the NSL-KDD dataset and identified the 41 behavior clues (features) that help the project distinguish between a normal user and a hacker."
+- **Subhashree Pathy**: "I focused on the **User Interface and Visual Delivery**. I designed the real-time Dashboard to ensure that clear security insights are always visible to the network administrator."
+- **Kumar Sreyan Pattanayak**: "I was responsible for the **Core AI Brain and Backend Engine**. I built the Random Forest classification logic and the Generative AI Insight Engine that explains attacks in plain English."
+- **Tanmaya Ranjan Jena**: "I handled the **System Testing and Performance Verification**. I benchmarked the final accuracy and helped document the results to ensure the project is stable and ready for real-world use."
 
 ---
 

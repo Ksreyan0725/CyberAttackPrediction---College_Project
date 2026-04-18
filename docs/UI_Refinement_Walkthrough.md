@@ -10,9 +10,9 @@
 - **Enhanced Password Security**: Added a professional "eye" toggle to the password field for better visibility management.
 - **Input UX Refinement**: Fixed a common "white-to-dark" flash issue where inputs would turn white when clicked or autofilled in dark mode. They now remain consistently sleek and dark.
 - **Smart Theme Engine**: Implemented head-level theme detection to prevent "dark flash." The site now perfectly syncs with your Windows/System theme in real-time.
-- **UI Polishing**: 
-    - **Premium Gradients**: Added high-end linear gradients to all buttons.
-    - **Themed Checkboxes**: Refined the "Remember Me" checkbox styling to ensure it looks integrated and elegant in dark mode.
+- **UI Polishing**:
+  - **Premium Gradients**: Added high-end linear gradients to all buttons.
+  - **Themed Checkboxes**: Refined the "Remember Me" checkbox styling to ensure it looks integrated and elegant in dark mode.
 - **Global Typing Utility**: Moved typing animation logic to [base.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html). This creates a reusable [initTypingEffect](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/base.html#545-565) function that can be used across the entire site for streamlined animated headers/summaries.
 - **Simplified Login Info Panel**: Refined the left side of the login screen to be cleaner. It now features a central "CyberShield AI" brand heading and a concise, animated summary focusing on the "Remember Me" feature.
 
@@ -20,15 +20,18 @@
 - **Speed Login**: Seamless one-click login for returning users using persistent `saved_creds.json` storage.
 
 ### 2. Predict Results (Dashboard) Enhancements
+
 - **Full-Visibility Table**: Removed internal scrollbars from the results table for natural page scrolling and better data scannability.
 - **Desktop Full-Screen Mode**: Immersive viewing mode for detailed data analysis.
 - **Compact Dashboard**: centered layout integrating hero info, table, and AI insights into a single professional card.
 
 ### 3. Real-time Feedback & Notifications
+
 - **Progress Animation**: Dynamic percentage-based animation during deep analysis.
 - **Top-Centered Toasts**: Modern pill-shaped notifications that slide down from the top center.
 
 ### 4. Code & Architecture Optimization
+
 - **[Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py)**: Added JSON persistence, session management, and informational routes.
 - **[UserLogin.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/UserLogin.html)**: Refactored with split layout and conditional Speed Login states.
 - **[HowItWorks.html](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/templates/HowItWorks.html)**: [NEW] Professional explanation of the project's technical pipeline.

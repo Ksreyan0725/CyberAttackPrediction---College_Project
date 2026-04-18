@@ -1,7 +1,7 @@
 """  
 ================================================================================
 PROJECT: CyberShield AI - Bulletproof Command Center (2026)
-VERSION: 2.7.1 (Production Hardened - Multi-Alias Engine)
+VERSION: 2.8.0 (Production Hardened - Multi-Alias Engine)
 AUTHOR: Ksreyan0725 / Managed by Antigravity AI
 PURPOSE: A resilient, zero-failure launcher for the Cyber Attack Prediction project.
 FEATURES: Dual-Speed Refresh, Admin Integrity Check, and NLU Command Routing.
@@ -22,6 +22,7 @@ import logging     # NEW: Professional logging to track errors in a file.
 import msvcrt      # WINDOWS ONLY: Non-blocking input detection.
 import ctypes      # WINDOWS ONLY: Attribute management (Hidden files, Admin checks).
 import threading   # NEW: Path for non-blocking background tasks (Internet check).
+import traceback   # NEW: For detailed crash diagnostics
 from datetime import datetime # Adds timestamps to logs.
 
 # --- BLOCK 0.5: PREMIUM UI DETECTION ---
@@ -33,7 +34,10 @@ try:
     from rich.align import Align
     from rich.live import Live
     from rich.layout import Layout
-    console = Console()
+    import io
+    # Force UTF-8 output — bypasses CP1252 legacy Windows encoding in VS Code / cmd terminals
+    _utf8_stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace', line_buffering=True)
+    console = Console(file=_utf8_stdout, highlight=False)
     HAS_RICH = True
 except ImportError:
     HAS_RICH = False   
@@ -102,6 +106,14 @@ CYAN    = "\033[96m"
 WHITE   = "\033[97m"
 RESET   = "\033[0m"
 BOLD    = "\033[1m"
+BOLD_RED = BOLD + RED
+BOLD_GREEN = BOLD + GREEN
+BOLD_YELLOW = BOLD + YELLOW
+BOLD_BLUE = BOLD + BLUE
+BOLD_MAGENTA = BOLD + MAGENTA
+BOLD_CYAN = BOLD + CYAN
+BOLD_WHITE = BOLD + WHITE
+DIM_WHITE = "\033[2m\033[37m"
 LOG_FILE = PATHS["log"]
 SETTINGS_FILE = PATHS["settings"]
 
@@ -164,7 +176,7 @@ def clear_keyboard_buffer():
             msvcrt.getch()
         except:
             pass
-    time.sleep(0.05) 
+    # No sleep here — keeps input snappy after command execution
 # --- BLOCK 2: ASYNC CONNECTIVITY SHIELD ---
 _INTERNET_STATUS = True # Shared variable for background thread
 
@@ -210,8 +222,9 @@ def is_package_installed(package_name):
     """
     PURPOSE: Checks if a specific library (like 'pandas') is already functioning in your Python.
     """
-    # We clean the package name (e.g. 'pandas==3.0.2' -> 'pandas')
-    clean_name = package_name.split('==')[0].split('>=')[0].strip()
+    import re
+    # Strip all common version specifiers: ==, >=, <=, !=, ~=, >
+    clean_name = re.split(r'[><=!~]', package_name)[0].strip()
     return importlib.util.find_spec(clean_name) is not None
 
 # --- BLOCK 3: THE LAUNCHER FUNCTIONS (THE ACTIONS) ---
@@ -291,11 +304,12 @@ def harden_environment():
         from rich.table import Table
         from rich.text import Text
         
-        console = Console()
+        # Use a local alias to avoid shadowing the global 'console' object
+        hc = Console()
         
         # Header Display
         header_text = Text("🛡️ CyberShield AI: THE BULLETPROOF HARDENING ENGINE (2026)", style="bold cyan")
-        console.print(Panel(header_text, border_style="bright_blue", expand=False))
+        hc.print(Panel(header_text, border_style="bright_blue", expand=False))
         
         # Diagnostic Table
         table = Table(title="[SYSTEM DIAGNOSTIC]", show_header=True, header_style="bold magenta")
@@ -304,7 +318,7 @@ def harden_environment():
         table.add_row("Python Core", f"{sys.version.split()[0]} (Verified)")
         table.add_row("Environment", f"VIRTUAL ({VENV_NAME})" if IS_VIRTUAL else "GLOBAL (Manual)")
         table.add_row("Network", "ONLINE (Stable)" if check_internet() else "OFFLINE (Limited)")
-        console.print(table)
+        hc.print(table)
         
         # --- THE REAL INSTALLATION ENGINE ---
         requirements = get_requirements()
@@ -330,7 +344,8 @@ def harden_environment():
             total_task = progress.add_task("[cyan]Overall Progress", total=len(requirements))
             
             for pkg in requirements:
-                pkg_clear = pkg.split('==')[0] # Clean name for display
+                import re
+                pkg_clear = re.split(r'[><=!~]', pkg)[0].strip()  # Handles ==, >=, ~=, !=, etc.
                 progress.update(total_task, description=f"[magenta]Hardening: {pkg_clear}")
                 
                 success = False
@@ -378,8 +393,8 @@ def harden_environment():
                 
                 progress.advance(total_task)
 
-        console.print("\n✅ [bold green]ZERO-FAILURE HARDENING COMPLETE[/bold green] 🛡️")
-        console.print("--------------------------------------------------")
+        hc.print("\n✅ [bold green]ZERO-FAILURE HARDENING COMPLETE[/bold green] 🛡️")
+        hc.print("--------------------------------------------------")
         
     except Exception as e:
         # This is the 'Doctor's Emergency' block. If the main hardening engine fails (like a weird permission crash),
@@ -389,7 +404,7 @@ def harden_environment():
         # 'powershell -ExecutionPolicy Bypass': This tells Windows to allow running our setup script.
         subprocess.run(["powershell", "-ExecutionPolicy", "Bypass", "-File", "install_deps.ps1"])
     
-    input("\n[PROCESSS COMPLETE] Press ENTER to return to menu...")
+    input("\n[PROCESS COMPLETE] Press ENTER to return to menu...")
 
 def show_help(query=None):
     """
@@ -485,7 +500,9 @@ def get_system_stats():
     try:
         cpu = psutil.cpu_percent(interval=None)
         ram = psutil.virtual_memory().percent
-        disk = psutil.disk_usage('/').percent
+        # Use the root drive letter for Windows compatibility (avoids '/' Linux path)
+        drive = os.path.splitdrive(PATHS["root"])[0] + "\\"
+        disk = psutil.disk_usage(drive).percent
         return {"cpu": cpu, "ram": ram, "disk": disk}
     except Exception:
         return {"cpu": 0, "ram": 0, "disk": 0}
@@ -590,7 +607,7 @@ def open_repo_smart():
     mode = settings.get("browser_mode")
     
     if not mode:
-        print(f"\n{CYAN}[?] BROWSER PREFERENCE REQUIRED]{RESET}")
+        print(f"\n{CYAN}[?] BROWSER PREFERENCE REQUIRED{RESET}")
         print("1. Default System Browser (Standard)")
         print("2. Incognito/Private Mode (Chrome/Edge/Firefox)")
         choice = input(f"\n{YELLOW}Select Mode (The script will REMEMBER this): {RESET}").strip()
@@ -783,47 +800,7 @@ def run_speed_test():
 
     input("\nPress ENTER to return to menu...")
 
-def get_input_timeout(prompt, timeout=2.0):
-    """
-    PURPOSE: This is a Windows-specific trick to wait for a user's input
-    without pausing the whole script. If the user doesn't type anything within
-    the timeout, the script continues (allowing us to refresh the telemetry).
-    """
-    if HAS_RICH:
-        console.print(prompt, end="")
-    else:
-        print(prompt, end="", flush=True)
-        
-    start_time = time.time()
-    user_input = ""
-    
-    while (time.time() - start_time) < timeout:
-        if msvcrt.kbhit():
-            try:
-                raw = msvcrt.getch() # Use getch (no echo) for better control
-                # Handle Windows special keys (Arrow keys, F-keys)
-                if raw in [b'\xe0', b'\x00']:
-                    if msvcrt.kbhit(): msvcrt.getch() # Swallow the second byte
-                    continue
-                
-                char = raw.decode('utf-8', errors='ignore')
-                if not char: continue
-
-                if char in ['\r', '\n']: # Enter key
-                    print() # Move to next line
-                    return user_input.strip()
-                elif char == '\x08': # Backspace (standard byte for \b)
-                    if len(user_input) > 0:
-                        user_input = user_input[:-1]
-                        print("\b \b", end="", flush=True)
-                elif char.isprintable():
-                    user_input += char
-                    print(char, end="", flush=True)
-            except Exception:
-                pass 
-        time.sleep(0.01)
-    
-    return None # Indicates a timeout (refresh the screen)
+# NOTE: get_input_timeout() removed — superseded by the Live/msvcrt input engine in main().
 
 # --- BLOCK 3: THE MAIN BRAIN (THE INTERFACE) ---
 
@@ -842,7 +819,7 @@ def render_premium_menu(health_data=None, current_input=""):
     h = health_data if health_data else get_project_health()
     
     # 0. HEADER WITH LIVE CLOCK & ADMIN STATUS
-    now = datetime.now().strftime("%I:%M:%S %p")
+    now = datetime.now().strftime("%I:%M %p")
     admin_tag = "[bold green]ADMIN[/]" if IS_ADMIN else "[bold yellow]USER[/]"
     
     # 💡 REFINED HEADING: Unified Info Box as requested
@@ -856,7 +833,7 @@ def render_premium_menu(health_data=None, current_input=""):
     status_badge = f"{admin_tag} | [bold cyan]{now}[/]"
     
     header_grid.add_row(env_badge, center_title, status_badge)
-    header_panel = Panel(header_grid, border_style="cyan", padding=(0, 1))
+    header_panel = Panel(header_grid, border_style="cyan", padding=(0, 0))
 
     # 1. TOP BAR: SYSTEM STATUS (Real-time Telemetry)
     # 💡 Optimization: We merge integrity and Python runtime into this bar
@@ -870,77 +847,82 @@ def render_premium_menu(health_data=None, current_input=""):
         Text.from_markup(f"[bold cyan]Py: {sys.executable.split('\\')[-1]}[/]")
     )
     
-    telemetry_panel = Panel(Align.center(stats_text), border_style="bright_blue", padding=(0, 2))
+    telemetry_panel = Panel(Align.center(stats_text), border_style="bright_blue", padding=(0, 0))
     
-    # 💡 The 1.5 Health/Py badges are now integrated into the telemetry bar above.
-    health_banner = None
+    # 💡 The 1.5 Health/Py badges are now integrated into the     # 2. THE DASHBOARD GRID (Unified v3.8 Layout)
+    grid = Table.grid(expand=True)
+    grid.add_column(justify="left", ratio=2) # Main Menu Items
+    grid.add_column(justify="left", ratio=1) # Side Stats Panel
 
-    # 2. THE DASHBOARD GRID
+    # Left Column: Menu Items
     if IS_ADMIN:
-        # POWER-USER GRID (Rainbow Boxes)
-        grid = Table.grid(expand=True)
-        grid.add_column(justify="left", ratio=1)
-        grid.add_column(justify="left", ratio=1)
-
-        launch_panel = Panel(
-            "[bold green]1.[/] WebApp (Integrated)\n[bold green]2.[/] WebApp (External)\n[bold green]3.[/] Jupyter Notebook\n[bold green]4.[/] Jupyter (External)",
-            title="[bold green]🚀 ENGINE LAUNCH[/]", border_style="green", padding=(0, 2), expand=True
-        )
-        system_panel = Panel(
-            "[bold magenta]5.[/] Harden Environment\n[bold magenta]6.[/] GitHub Repo\n[bold magenta]7.[/] Switch to Venv\n[bold magenta]8.[/] Auto-Upgrade",
-            title="[bold magenta]🛠️ SYSTEM OPS[/]", border_style="magenta", padding=(0, 2), expand=True
-        )
-        git_panel = Panel(
-            "[bold yellow]9.[/] Git: Pull Code\n[bold yellow]10.[/] Git: Sync/Push\n[bold yellow]11.[/] Git: Edit Ignore",
-            title="[bold yellow]📦 VERSION CONTROL[/]", border_style="yellow", padding=(0, 2), expand=True
-        )
+        menu_columns = Table.grid(expand=True)
+        menu_columns.add_column(ratio=1)
+        menu_columns.add_column(ratio=1)
         
-        # 💡 MAINTENANCE: Multi-column to save vertical space in Admin Mode
+        launch_text = "[bold green]1.[/] WebApp (Int)   [bold green]2.[/] WebApp (Ext)\n[bold green]3.[/] Jupyter NB    [bold green]4.[/] Jupyter (Ext)"
+        system_text = "[bold magenta]5.[/] Harden Env    [bold magenta]6.[/] GitHub Repo\n[bold magenta]7.[/] Switch Venv   [bold magenta]8.[/] Auto-Upgrade"
+        git_text    = "[bold yellow]9.[/] Git Pull     [bold yellow]10.[/] Git Sync\n[bold yellow]11.[/] Edit Ignore"
+        
         maint_grid = Table.grid(expand=True)
         maint_grid.add_column(ratio=1)
         maint_grid.add_column(ratio=1)
+        maint_grid.add_row("[bold cyan]12.[/] Audit Sys", "[bold red]13.[/] Restart")
+        maint_grid.add_row("[bold red]14.[/] Exit Hub", "[bold yellow]15.[/] Add 'cs'")
+        maint_grid.add_row("[bold cyan]16.[/] Reset Browser", "[bold cyan]17.[/] Aliases")
+        maint_grid.add_row("[bold green]18.[/] Speed Test", "[bold white]19.[/] Help")
         
-        maint_grid.add_row("12. System Audit", "13. Force Restart")
-        maint_grid.add_row("[bold red]14. Exit Launcher[/]", "[bold yellow]15. Enable 'cs'[/]")
-        maint_grid.add_row("16. Reset Browser", "[bold cyan]17. Reg Aliases[/]")
-        maint_grid.add_row("[bold green]18. Speed Test[/]", "19. Help Guide")
-        maint_grid.add_row("20. Audit Logs", "")
-        
-        maint_panel = Panel(maint_grid, title="[bold blue]🛡️ MAINTENANCE[/]", border_style="blue", padding=(0, 2), expand=True)
-        
-        grid.add_row(launch_panel, system_panel)
-        grid.add_row(git_panel, maint_panel)
-        main_display = grid
+        menu_columns.add_row(
+            Panel(launch_text, title="[green]🚀 LAUNCH[/]", border_style="green"),
+            Panel(system_text, title="[magenta]🛠️ OPS[/]", border_style="magenta")
+        )
+        menu_columns.add_row(
+            Panel(git_text, title="[yellow]📦 GIT[/]", border_style="yellow"),
+            Panel(maint_grid, title="[blue]🛡️ MAINT[/]", border_style="blue")
+        )
+        left_col = menu_columns
     else:
-        # 💡 MINIMALIST RED PANEL (User Mode Only)
-        hub_grid = Table.grid(expand=True, padding=(0, 2))
-        hub_grid.add_column(ratio=1)
-        hub_grid.add_column(ratio=1)
-        hub_grid.add_column(ratio=1)
-        
-        col1 = (
-            "[bold green]1.[/] WebApp (Int)\n"
-            "[bold green]2.[/] WebApp (Ext)\n"
-            "[bold green]3.[/] Jupyter NB\n"
-            "[bold green]4.[/] Jupyter (Ext)"
-        )
-        col2 = (
-            "[bold magenta]5.[/] Harden Env\n"
-            "[bold magenta]6.[/] GitHub Repo\n"
-            "[bold magenta]7.[/] Switch Venv\n"
-            "[bold magenta]8.[/] Auto-Upgrade"
-        )
-        col3 = (
-            "[bold yellow]9. [/] Git Pull\n"
-            "[bold yellow]10.[/] Git Sync\n"
-            "[bold yellow]11.[/] Edit Ignore\n"
-            "[bold cyan]12.[/] Diagnostic\n"
-            "[bold cyan]13.[/] RESTART\n"
-            "[bold red]14. EXIT HUB[/]"
-        )
-        
-        hub_grid.add_row(col1, col2, col3)
-        main_display = Panel(hub_grid, title="[bold red]⚡ CYBER SENTINEL HUB[/]", border_style="red", padding=(0, 2))
+        # Minimal User Dashboard — 2-column grid to ensure no wrapping
+        user_opt_grid = Table.grid(expand=True)
+        user_opt_grid.add_column(ratio=1)
+        user_opt_grid.add_column(ratio=1)
+
+        user_opt_grid.add_row("[bold green] 1[/] WebApp (Int)",   "[bold green] 2[/] WebApp (Ext)")
+        user_opt_grid.add_row("[bold green] 3[/] Jupyter NB",     "[bold green] 4[/] Jupyter (Ext)")
+        user_opt_grid.add_row("[bold magenta] 5[/] Harden Env",    "[bold magenta] 6[/] GitHub Repo")
+        user_opt_grid.add_row("[bold magenta] 7[/] Switch Venv",   "[bold magenta] 8[/] Auto-Upgrade")
+        user_opt_grid.add_row("[bold yellow] 9[/] Git Pull",      "[bold yellow]10[/] Git Sync")
+        user_opt_grid.add_row("[bold yellow]11[/] Edit Ignore",   "[bold cyan]12[/] Diagnostic")
+        user_opt_grid.add_row("[bold red]13[/] Restart",       "[bold red]14[/] Exit Hub")
+
+        user_help_line = Text("  Type a number to run a command  |  'help' for details  |  '14' to exit", style="dim white")
+        left_col = Panel(user_opt_grid, title="[bold cyan]⚡ COMMANDS[/]", border_style="cyan", padding=(0, 2))
+
+
+
+
+    # Right Column: Live System Health Sidebar (wired to real runtime state)
+    net_status   = "[bold green]ONLINE[/]"  if check_internet() else "[bold red]OFFLINE[/]"
+    venv_status  = "[bold green]ACTIVE[/]"  if IS_VIRTUAL     else "[bold yellow]GLOBAL[/]"
+    rich_status  = "[bold green]READY[/]"   if HAS_RICH        else "[bold red]MISSING[/]"
+    psutil_status= "[bold green]READY[/]"   if HAS_PSUTIL      else "[bold red]MISSING[/]"
+    admin_status = "[bold green]ADMIN[/]"   if IS_ADMIN        else "[bold yellow]USER[/]"
+
+    status_table = Table(show_header=True, header_style="bold cyan", box=None, expand=True)
+    status_table.add_column("NODE", style="dim")
+    status_table.add_column("STATUS", justify="right")
+    
+    status_table.add_row("Network",    net_status)
+    status_table.add_row("Venv",       venv_status)
+    status_table.add_row("Rich TUI",   rich_status)
+    status_table.add_row("Telemetry",  psutil_status)
+    status_table.add_row("Privilege",  admin_status)
+    
+    sidebar_panel = Panel(status_table, title="[cyan]🛰️ STATUS[/]", border_style="cyan", padding=(0, 1))
+
+
+    grid.add_row(left_col, sidebar_panel)
+    main_display = grid
 
     # 3. PROMPT DISPLAY (Embedded Input)
     prompt_tag = "cmd_admin" if IS_ADMIN else "cmd_cyber"
@@ -954,12 +936,18 @@ def render_premium_menu(health_data=None, current_input=""):
 
     # 4. ASSEMBLE ALL COMPONENTS
     components = [header_panel]
-    
-    components.append(telemetry_panel)
+    if IS_ADMIN: components.append(telemetry_panel)
     components.append(main_display)
-    components.append(prompt_panel) # Always show the prompt embedded
-    components.append(Text(f"Tip: Type 'help' for details | Session Log: {LOG_FILE}", style="white"))
     
+    # Unified Footer: Combines help and tips to eliminate vertical gaps
+    footer = Text()
+    if not IS_ADMIN:
+        footer.append(user_help_line)
+        footer.append("\n")
+    footer.append(f"  Tip: Type 'help' for details  |  Session Log: {os.path.basename(LOG_FILE)}", style="dim white")
+    
+    components.append(footer)
+
     return Group(*components)
 
 def boot_loader():
@@ -992,7 +980,20 @@ def boot_loader():
  ╚═════╝   ╚═╝   ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝╚══════╝╚══════╝╚═════╝ 
 [/]
 [dim cyan]      SYSTEM INITIALIZATION | COMMAND CENTER {CONFIG['VERSION']} | 2026 PRODUCTION [/]"""
-    console.print(Align.center(logo))
+    try:
+        console.print(Align.center(logo))
+    except (UnicodeEncodeError, Exception):
+        # Full ASCII fallback — bypasses Rich render pipeline for legacy terminals
+        import re as _re
+        plain = _re.sub(r'\[.*?\]', '', logo)  # Strip all Rich markup tags
+        # Replace ALL Unicode box-drawing / block characters with ASCII equivalents
+        for old, new in [('█','#'),('╚','+'),('╝','+'),('╔','+'),('╗','+'),
+                         ('═','-'),('║','|'),('╠','+'),('╣','+'),('╦','+'),
+                         ('╩','+'),('╬','+'),('╭','+'),('╮','+'),('╰','+'),
+                         ('╯','+'),('─','-'),('│','|'),('✅','[OK]'),('⚠️','[!]')]:
+            plain = plain.replace(old, new)
+        sys.stdout.write(plain + '\n')
+        sys.stdout.flush()
     
     if turbo_mode:
         console.print(Align.center("[dim italic]Turbo Mode Active: Skipping Animation...[/]"))
@@ -1065,80 +1066,40 @@ def main():
     # Variables for Dual-Speed refresh
     cached_health = None
     last_health_check = 0
-    
-    # Start the Cockpit Engine
-    current_input = ""
-    
+
     while True:
         try:
-            # 💡 INTERACTIVE SENTINEL ENGINE (v3.7 - Immersive Fix)
-            # Clear keyboard buffer to start fresh
-            clear_keyboard_buffer() 
-            
-            # Use screen=True for the "Cockpit" feel and to prevent ghosting artifacts
-            with Live(render_premium_menu(cached_health, current_input), console=console, refresh_per_second=10, screen=False, auto_refresh=True) as live:
-                # Ensure we have fresh health data for the first render
-                if not cached_health:
-                    cached_health = get_project_health()
-                    live.update(render_premium_menu(cached_health, current_input))
-                
-                while True: 
-                    # 1. SLOW REFRESH (Health/Stats)
-                    if time.time() - last_health_check > CONFIG["REFRESH_RATE_SLOW"]:
-                        cached_health = get_project_health()
-                        last_health_check = time.time()
-                        live.update(render_premium_menu(cached_health, current_input))
+            # Refresh health on a slow timer
+            now = time.time()
+            if not cached_health or (now - last_health_check) > CONFIG["REFRESH_RATE_SLOW"]:
+                cached_health     = get_project_health()
+                last_health_check = now
 
-                    # 2. FAST INPUT CAPTURE
-                    has_input_change = False
-                    key = None  # 🔥 FIX: reset key every loop
-                    while msvcrt.kbhit():
-                        try:
-                            raw = msvcrt.getch()
-                            
-                            # Filter system artifacts (Escape sequences, function keys)
-                            if raw == b'\x1b' or raw == b'\x00' or raw == b'\xe0':
-                                time.sleep(0.01) # Small delay to see if more bytes arrive
-                                clear_keyboard_buffer() 
-                                continue
-                            
-                            key = raw.decode('utf-8', errors='ignore')
-                            
-                            if key in ['\r', '\n']: # Enter
-                                break # Exit the input-burst while loop
-                            elif key == '\x08': # Backspace
-                                if len(current_input) > 0:
-                                    current_input = current_input[:-1]
-                                    has_input_change = True
-                            elif key.isprintable() and ord(key) < 128:
-                                # Standard ASCII Only
-                                if len(current_input) < 40:
-                                    current_input += key
-                                    has_input_change = True
-                        except Exception:
-                            pass
-                    
-                    # Update UI if input changed
-                    if has_input_change:
-                        live.update(render_premium_menu(cached_health, current_input))
+            # ── RENDER: hard-clear (cursor home + clear screen + clear scrollback)
+            # \033[H  = move cursor to top-left
+            # \033[2J = erase visible screen
+            # \033[3J = clear scrollback buffer (prevents auto-scroll on long output)
+            sys.stdout.write('\033[H\033[2J\033[3J')
+            sys.stdout.flush()
+            console.print(render_premium_menu(cached_health, ""))
 
-                    # Exit inner loop if Enter was pressed
-                    if key in ['\r', '\n']:
-                        break
-                    
-                    # Small sleep to prevent 100% CPU usage while waiting for input
-                    time.sleep(0.02) 
+            # ── INPUT: standard input() — works in every terminal ─────────
+            prompt_tag = "cmd_admin" if IS_ADMIN else "cmd_cyber"
+            try:
+                # 💡 ANSI Cursor Hack: \033[5 q = Blinking Bar cursor
+                # (restores the premium 'active' feel in most modern terminals)
+                sys.stdout.write('\033[5 q')
+                sys.stdout.flush()
+                choice = input(f"  {prompt_tag} > ").strip().lower()
+                # Reset cursor to default (usually blinking block or bar) if needed, 
+                # but typically leaving it as bar is preferred for the theme.
+            except (EOFError, KeyboardInterrupt):
 
-            # Action Phase: Process captured choice
-            choice = current_input.strip().lower()
-            current_input = "" 
-            
+                choice = "14"   # treat as Exit
+
+
             if not choice:
-                continue 
-
-            # --- SUSPEND FOR COMMAND EXECUTION ---
-            # Screen=True automatically restores the buffer on exit from 'with' block
-            console.clear()
+                continue
 
             # --- BLOCK 4: THE SWITCHBOARD (CHOOSING THE ACTION) ---
             
@@ -1168,15 +1129,16 @@ def main():
                 'pull': '9', 'update': '9',
                 'push': '10', 'commit': '10', 'sync': '10',
                 'ignore': '11', 'gitignore': '11',
-                'audit': '12', 'path': '12',
-                'restart': '13', 'reload': '13',
+                'audit': '12', 'path': '12', 'version': '12',
+                'restart': '13', 'reload': '13', 'refresh': '13',
                 'stop': '14', 'exit': '14', 'bye': '14', 'quit': '14',
-                'global': '15', 'cs': '15', 'register': '15',
+                'global': '15', 'register': '15',
                 'reset': '16', 'clear_settings': '16',
-                'alias': '17', 'bro': '17', 'cyber': '17', 'register_all': '17',
-                'speed': '18', 'network': '18', 'test': '18', 'internet': '18',
-                'help': '19', 'guide': '19', 'h': '19', 
+                'alias': '17', 'register_all': '17',
+                'speed': '18', 'network': '18', 'speedtest': '18', 'internet': '18',
                 'log': '20', 'logs': '20', 'audit_logs': '20'
+                # NOTE: 'help', 'guide', 'h', 'cs', 'bro', 'cyber' intentionally excluded
+                # — they are handled by the help_patterns block above to avoid conflict.
             }
             
             # SENSE: Natural Language Intent Routing
@@ -1398,10 +1360,11 @@ def main():
             
         except Exception as e:
             # Pillar 5: Master Catch-All UI
-            # NEW: AI AUTO-DIAGNOSIS
+            log_system_event(f"MASTER ENGINE CRASH: {traceback.format_exc()}", level="CRITICAL")
+            
+            # AI AUTO-DIAGNOSIS
             error_msg = str(e).lower()
             advice = "Please check launcher_debug.log for technical details."
-            
             if "not found" in error_msg:
                 advice = "A required program (Git, Python, or a dependency) is missing. Try Option 5."
             elif "access is denied" in error_msg or "perm" in error_msg:
@@ -1409,16 +1372,25 @@ def main():
             elif "disk" in error_msg or "space" in error_msg:
                 advice = "Your computer's storage is full. Please clear some space."
 
-            log_system_event(f"MASTER ENGINE CRASH: {str(e)}", level="CRITICAL")
-            print("\n" + f"{RED}" + "="*45 + f"{RESET}")
+            print("\n" + f"{RED}" + "="*50 + f"{RESET}")
             print(f" {RED}[CRITICAL SYSTEM ERROR CAUGHT]{RESET} ")
-            print(f" Error: {e}") 
+            print(f" {BOLD_WHITE}Error Type: {type(e).__name__}{RESET}")
+            print(f" {BOLD_WHITE}Message:    {e}{RESET}")
             print(f" {YELLOW}[AI ADVICE]: {advice}{RESET}")
-            print(f"{RED}" + "="*45 + f"{RESET}")
+            print(f"{RED}" + "="*50 + f"{RESET}")
             
-            # gc.collect(): MEMORY FIX - Clears internal Python 'junk' before restarting.
+            print(f"\n{DIM_WHITE}[DEBUG TRACEBACK]{RESET}")
+            traceback.print_exc()
+            
             gc.collect() 
-            input(f"\n{YELLOW}[RECOVERED] Press ENTER to restart the menu engine...{RESET}")
+            print(f"\n{BOLD_CYAN}>>> Press ANY KEY to attempt auto-restart of the engine...{RESET}")
+            
+            # Robust any-key detection
+            while True:
+                if msvcrt.kbhit():
+                    msvcrt.getch()
+                    break
+                time.sleep(0.1)
 
 
 

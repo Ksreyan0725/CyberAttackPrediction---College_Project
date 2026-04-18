@@ -53,11 +53,13 @@
 
 ---
 
-[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org) **Baseline Machine Learning Engine**: Implements the `RandomForestClassifier`, `StandardScaler`, and `LabelEncoder`. Handles all data preprocessing (normalization/encoding) and traditional model training.
+<!-- Random Forest remains the primary production driver -->
+[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-ML-F7931E?style=flat-square&logo=scikitlearn&logoColor=white)](https://scikit-learn.org) **The Core Production Engine**: Implements our primary Random Forest classifier. This is the 'Brain' currently powering the live web application.
 
 ---
 
-[![TensorFlow](https://img.shields.io/badge/TensorFlow-Deep%20Learning-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org) [![Keras](https://img.shields.io/badge/Keras-Neural%20Nets-D00000?style=flat-square&logo=keras&logoColor=white)](https://keras.io) **Neural Research Extension**: Powers the LSTM and MLP experiments in the extension phase. Trained weight files (`.hdf5`) are generated here to extend detection capabilities.
+<!-- Marking DL as Research Extension to protect team during viva -->
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-Research-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)](https://tensorflow.org) [![Keras](https://img.shields.io/badge/Keras-Research-D00000?style=flat-square&logo=keras&logoColor=white)](https://keras.io) **Research & Future Scope**: These libraries are used in our laboratory notebooks to experiment with Deep Learning. They are included as part of our research extension and future project roadmap.
 
 ---
 
