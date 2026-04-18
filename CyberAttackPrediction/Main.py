@@ -83,9 +83,9 @@ app = Flask(__name__, static_url_path='')
 # Use a derived secret key for session integrity; fallback to a generated secret if environment is missing
 app.secret_key = os.getenv('FLASK_SECRET_KEY', secrets.token_hex(32) if not os.getenv('FLASK_SECRET_KEY') else os.getenv('FLASK_SECRET_KEY'))
 
-# PROPRIETARY ADMIN SECURITY CONFIG (Hardcoded Bypass with Hashing)
-ADMIN_ID = "admin"
-ADMIN_HASH = "scrypt:32768:8:1$Cw2lrwbxEaJWsMvM$7d647e7e6e63deab9540306b28ceb1ea622ce0632d2d1b4e10807b507efe42355fab976a9acf2b5c0bc8e4a07ed75c2ba5f8e19330c7e3aac45ee82ceab4ceda"
+# PROPRIETARY ADMIN SECURITY CONFIG (Loaded from Environment)
+ADMIN_ID = os.getenv('ADMIN_USER', 'admin')
+ADMIN_HASH = os.getenv('ADMIN_HASH', ADMIN_HASH if 'ADMIN_HASH' in locals() else "scrypt:32768:8:1$Cw2lrwbxEaJWsMvM$7d647e7e6e63deab9540306b28ceb1ea622ce0632d2d1b4e10807b507efe42355fab976a9acf2b5c0bc8e4a07ed75c2ba5f8e19330c7e3aac45ee82ceab4ceda")
 
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -153,15 +153,25 @@ def apply_optimization_headers(response):
     return response
 
 def load_ml_model():
-    """Loads the pre-trained model and preprocessing tools from disk."""
+    """Loads the pre-trained model and preprocessing tools from disk with integrity checks."""
     global rf_model, scaler, labels, label_encoder, feature_columns
     try:
-        # Base directory of the script
         base_dir = os.path.dirname(os.path.abspath(__file__))
         model_path = os.path.join(base_dir, "model", "trained_rf_model.pkl")
         
         if os.path.exists(model_path):
+            # Basic integrity check: File size must be reasonable
+            if os.path.getsize(model_path) < 1000: # Less than 1KB is likely corruption
+                 print(f"[Security Check] Model file {model_path} appears corrupted or too small.")
+                 return False
+
             model_data = joblib.load(model_path)
+            # Verify structure of the loaded object
+            required_keys = ['rf_model', 'scaler', 'labels', 'label_encoder', 'feature_columns']
+            if not all(k in model_data for k in required_keys):
+                print("[Security Check] Model data integrity compromised: Missing required components.")
+                return False
+
             rf_model = model_data['rf_model']
             scaler = model_data['scaler']
             labels = model_data['labels']
@@ -318,25 +328,28 @@ def VerifySavedLogin():
             with open(creds_file, 'r') as f:
                 creds = json.load(f)
             
-            # SECURE ADMIN BYPASS (Using Hashed Comparison)
-            if creds.get('user') == ADMIN_ID and check_password_hash(ADMIN_HASH, creds.get('pass')):
-                session['user'] = ADMIN_ID
-                session['is_ultimate'] = True
+            username = creds.get('user')
+            signature = creds.get('token')
+            
+            if not username or not signature:
+                return jsonify({"status": "error", "message": "Corrupted credentials payload"})
+
+            # Generate expected signature to verify identity without password storage
+            import hmac, hashlib
+            expected = hmac.new(app.secret_key.encode(), username.encode(), hashlib.sha256).hexdigest()
+            
+            if hmac.compare_digest(signature, expected):
+                # Identity verified via cryptographic signature
+                session['user'] = username
+                if username == ADMIN_ID:
+                    session['is_ultimate'] = True
                 session['remembered'] = True
                 return jsonify({"status": "success"})
-            
-            users = load_users()
-            user_data = users.get(creds.get('user'))
-            
-            # Verify saved hash if present, otherwise fallback to plain check (for migration)
-            if user_data and check_password_hash(user_data['password'], creds.get('pass')):
-                session['user'] = user_data['username']
-                session['remembered'] = True
-                return jsonify({"status": "success"})
+                
         except Exception as e:
-            print(f"Error reading creds: {e}")
+            print(f"[Security Layer] Credential Verification Error: {e}")
             
-    return jsonify({"status": "error", "message": "Saved credentials invalid or missing"})
+    return jsonify({"status": "error", "message": "Saved credentials invalid or signature mismatch"})
 
 @app.route('/ResetCredentials', methods=['POST'])
 def ResetCredentials():
@@ -372,9 +385,13 @@ def UserLoginAction():
         session['user'] = ADMIN_ID
         session['is_ultimate'] = True
         if remember:
+            # SECURE PERSISTENCE: Store a cryptographic signature, never the plain password
+            import hmac, hashlib
+            token = hmac.new(app.secret_key.encode(), ADMIN_ID.encode(), hashlib.sha256).hexdigest()
+            
             base_dir = os.path.dirname(os.path.abspath(__file__))
             with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
-                json.dump({"user": ADMIN_ID, "pass": password}, f)
+                json.dump({"user": ADMIN_ID, "token": token}, f)
             session['remembered'] = True
         return jsonify({"status": "success", "message": "Ultimate Admin access granted!", "redirect": url_for('train_view')})
 
@@ -389,9 +406,13 @@ def UserLoginAction():
         
         # Save credentials locally if "Remember Me" is checked
         if remember:
+            # SECURE PERSISTENCE: Store a cryptographic signature, never the plain password
+            import hmac, hashlib
+            token = hmac.new(app.secret_key.encode(), username.encode(), hashlib.sha256).hexdigest()
+            
             base_dir = os.path.dirname(os.path.abspath(__file__))
             with open(os.path.join(base_dir, "saved_creds.json"), 'w') as f:
-                json.dump({"user": username, "pass": password}, f)
+                json.dump({"user": username, "token": token}, f)
             session['remembered'] = True
         
         return jsonify({"status": "success", "message": f"Welcome, {username}!", "redirect": url_for('train_view')})
@@ -551,7 +572,13 @@ def AdminResetPassword():
 
 @app.route('/Logout')
 def Logout():
+    """Securely terminates the user session and clears all cached results."""
+    # Preserve only the pulse state if applicable
+    pulse_state = session.get('pulse_detected', False)
     session.clear()
+    session['pulse_detected'] = pulse_state
+    
+    flash("Neural session terminated: You have been safely logged out.", "info")
     return redirect(url_for('index'))
 
 @app.route('/PredictAction', methods=['POST'])
@@ -586,6 +613,16 @@ def PredictAction():
         file.save(upload_path)
         testData_df = pd.read_csv(upload_path)
         
+        # SCHEMA VALIDATION: Ensure uploaded dataset has the expected features
+        if feature_columns is not None:
+            missing_cols = [c for c in feature_columns if c not in testData_df.columns]
+            if missing_cols:
+                flash(f"Invalid Prediction Data: Missing features {missing_cols}", "error")
+                return redirect(url_for('predictView'))
+            
+            # Reorder columns to match the model's expected input order
+            testData_df = testData_df[feature_columns]
+
         # Keep a copy of raw data for display
         raw_data = testData_df.values
         
@@ -607,51 +644,22 @@ def PredictAction():
         # Prediction
         preds = rf_model.predict(scaled_test)
         
-        # Generate styled HTML results with improved contrast
-        # Generate styled HTML results with premium aesthetics
-        output = '<table class="table table-hover align-middle mb-0">'
-        output += '<thead><tr class="glass-bg">'
-        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-database me-2" style="color: var(--info-color);"></i>DATA SAMPLE</th>'
-        output += '<th class="dynamic-text fw-bold py-3 text-center"><i class="fas fa-shield-alt me-2" style="color: var(--primary-color);"></i>DETECTION STATUS</th>'
-        output += '<th class="dynamic-text fw-bold py-3"><i class="fas fa-magic me-2" style="color: var(--warning-color);"></i>GENAI EXPLANATION</th></tr></thead><tbody>'
+        # Prepare data for template rendering via macros
+        predictions = [labels[p] for p in preds]
         
-        for i in range(len(preds)):
-            attack_type = labels[preds[i]]
-            row_data_str = str(raw_data[i])
-            
-            # Simple simulation of GenAI Insights
-            genai_insight = get_genai_insight(attack_type)
-            
-            output += "<tr>"
-            # Row Data (Left) - Enhanced with "Full View" capability
-            # Convert numpy array to list for JSON serialization in data attribute
-            safe_row_data = json.dumps(raw_data[i].tolist())
-            output += f'<td><div class="data-sample-wrapper" onclick="inspectSample(this)" data-sample=\'{safe_row_data}\' style="cursor: pointer; position: relative; transition: all 0.3s ease; border: 1px solid var(--glass-border); padding: 8px; border-radius: 12px; background: rgba(var(--primary-rgb), 0.03);">'
-            output += f'<div class="text-truncate" style="max-width: 380px; font-family: monospace;"><code class="dynamic-text fw-medium" style="background: transparent !important; border: none !important; box-shadow: none !important; padding: 0;">{row_data_str}</code></div>'
-            output += f'<div class="xx-small text-primary mt-1 opacity-75 hover-reveal"><i class="fas fa-search-plus me-1"></i>Click for deep analysis</div></div></td>'
-            
-            # Status Badge (Middle)
-            is_normal = "normal" in attack_type.lower().strip()
-            if is_normal:
-                output += f'<td class="text-center"><span class="badge bg-success py-2 px-3 rounded-pill shadow-sm"><i class="fas fa-check-circle me-1"></i> {attack_type.upper()}</span></td>'
-            else:
-                output += f'<td class="text-center"><span class="badge bg-danger py-2 px-3 rounded-pill shadow-sm"><i class="fas fa-skull-crossbones me-1"></i> {attack_type.upper()}</span></td>'
-            
-            # GenAI Insight (Right)
-            output += f'<td><div class="dynamic-text small fw-medium text-wrap">{genai_insight}</div></td>'
-            output += "</tr>"
-            
-        output += "</tbody></table>"
-        
-        # Save to session for persistence across navigation
-        session['last_result'] = output
-        session['last_page_type'] = 'result'
+        # PERSISTENCE: Store results in session for session-level caching
+        session['last_predictions'] = predictions
+        session['last_raw_data'] = raw_data.tolist()
         
         # Convert feature columns to list if it exists for JSON serialization
         f_cols = feature_columns.tolist() if hasattr(feature_columns, 'tolist') else feature_columns
         session['last_feature_columns'] = f_cols
         
-        return render_template('UserScreen.html', msg=output, page_type='result', feature_columns=f_cols)
+        return render_template('UserScreen.html', 
+                             predictions=predictions, 
+                             raw_data=raw_data.tolist(), 
+                             page_type='result', 
+                             feature_columns=f_cols)
         
     except Exception as e:
         print(f"Error during prediction: {e}")
@@ -761,18 +769,24 @@ def explorer():
 
     # Hardened security check to prevent directory traversal
     try:
-        # Resolve the absolute path of the requested document
+        # Resolve the absolute path and ensure it stays within the restricted project tree
         requested_abs = os.path.abspath(os.path.join(base_dir, doc_path))
-        # Ensure the resolved path is within the base project directory
-        if not requested_abs.startswith(os.path.abspath(base_dir)):
-            return render_template('documentation.html', error="Security Alert: Access Denied to Outbound Directory", project_tree=project_tree)
+        project_root = os.path.abspath(base_dir)
         
+        if not requested_abs.startswith(project_root):
+            return render_template('documentation.html', error="Security Alert: Outbound traversal blocked.", project_tree=project_tree)
+        
+        # Explicit check for sensitive files even within project
+        forbidden_docs = {'users.json', '.env', 'saved_creds.json'}
+        if os.path.basename(requested_abs) in forbidden_docs:
+             return render_template('documentation.html', error="Access Restricted: Protected System Resource", project_tree=project_tree)
+
         full_path = requested_abs
     except Exception:
-        return render_template('documentation.html', error="Invalid path sequence", project_tree=project_tree)
+        return render_template('documentation.html', error="Invalid neural path sequence", project_tree=project_tree)
 
     if not os.path.exists(full_path):
-        return render_template('documentation.html', error=f"Resource not found: {doc_path}", project_tree=project_tree)
+        return render_template('documentation.html', error=f"System Insight Unavailable: {doc_path}", project_tree=project_tree)
         
     try:
         # FOLDER LISTING INTELLIGENCE
@@ -906,14 +920,18 @@ def explorer_save():
         return jsonify({"status": "error", "message": "Auth Required"}), 401
     
     data = request.json
-    rel_path = data.get('path')
-    new_content = data.get('content')
+    rel_path = data.get('path', '')
+    new_content = data.get('content', '')
     
-    if not rel_path or '..' in rel_path or rel_path.startswith('/'):
-        return jsonify({"status": "error", "message": "Invalid Path"}), 400
-        
+    # NEURAL FIREWALL: Absolute path enforcement
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    full_path = os.path.join(base_dir, rel_path)
+    project_root = os.path.abspath(base_dir)
+    requested_abs = os.path.abspath(os.path.join(base_dir, rel_path))
+    
+    if not requested_abs.startswith(project_root) or any(f in rel_path for f in ['users.json', '.env', 'saved_creds.json']):
+        return jsonify({"status": "error", "message": "Neural Integrity Violation: Access Denied"}), 403
+        
+    full_path = requested_abs
     
     try:
         ext = os.path.splitext(rel_path)[1].lower()
@@ -940,13 +958,19 @@ def explorer_run():
         return jsonify({"status": "error", "message": "Auth Required"}), 401
     
     # Restrict to admin/ultimate users for security
+    # Restrict to admin/ultimate users for security
     if not session.get('is_ultimate') and session.get('user') != ADMIN_ID:
          return jsonify({"status": "error", "message": "Neural Access Denied: Administrator Level Restricted"}), 403
 
     data = request.json
-    rel_path = data.get('path')
+    rel_path = data.get('path', '')
     
-    if not rel_path or not rel_path.endswith('.py') or '..' in rel_path:
+    # NEURAL FIREWALL: Prevent execution of the main server script or dangerous utilities via explorer
+    restricted_scripts = {'Main.py', 'app.py', 'server.py', '.env', 'users.json', 'saved_creds.json'}
+    if os.path.basename(rel_path) in restricted_scripts or '..' in rel_path:
+        return jsonify({"status": "error", "message": "Neural Integrity Violation: Execution restricted"}), 403
+
+    if not rel_path or not rel_path.endswith('.py'):
         return jsonify({"status": "error", "message": "Invalid Script Path: Only .py files allowed"}), 400
         
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -1044,6 +1068,11 @@ def TrainAction():
 def handle_404(e):
     """Premium 404 error handler for CyberShield."""
     return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def handle_500(e):
+    """Secure 500 error handler to prevent internal logic leakage."""
+    return render_template('404.html', message="System Integration Error: The request could not be processed safely."), 500
 
 # --- Legal & Contact Routes ---
 @app.route('/Contact')

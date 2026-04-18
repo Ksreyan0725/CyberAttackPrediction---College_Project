@@ -116,6 +116,7 @@ The system delivers a complete end-to-end pipeline:
 CyberShield AI operates on a state-aware execution loop that maintains data integrity and session stability even in hostile network conditions.
 
 ### 1 · Secure Training Lifecycle
+
 Training is handled as an **Asynchronous Process** to prevent UI blocking. The frontend monitors the backend "Heartbeat" to provide real-time status updates without manual page refreshes.
 
 ```mermaid
@@ -148,6 +149,7 @@ sequenceDiagram
 ```
 
 ### 2 · Secure Inference Lifecycle (Predict)
+
 Prediction utilizes the **In-Memory Model Cache** for sub-millisecond classification. Every request is hardened by security middlewares before reaching the AI core.
 
 ```mermaid
@@ -173,12 +175,15 @@ sequenceDiagram
 ### Phase-by-Phase Technical Breakdown
 
 #### A · Authentication & Heartbeat
+
 - **Entry**: `/UserLogin` validates credentials via `werkzeug` scrypt.
 - **Pulse Start**: On successful login, the `base.html` initializes a `setInterval` that pings `/api/heartbeat` every 3000ms.
 - **Session Focus**: CSRF tokens are stored in the server-side session, ensuring that all prediction uploads originate from the authenticated user.
 
 #### B · Post-Processing & GenAI Mapping
+
 Unlike traditional ML apps that just return a number, CyberShield runs a **Contextual Mapping Layer**:
+
 1. **Raw Prediction**: Returns a numeric code.
 2. **Label Translation**: Converts code to attack name (e.g., `back`, `teardrop`).
 3. **Insight Generation**: Pulls pre-written technical summaries explaining the "How, Why, and What to do" for each specific threat detected.
@@ -244,7 +249,9 @@ The file `model/trained_rf_model.pkl` is the **sole bridge** between the two pha
 The notebooks were the **R&D sandbox** — algorithm selection, preprocessing design, and hyperparameter tuning all happened here before the logic was ported to the production Flask app. They are **not called at runtime**; they are standalone academic deliverables.
 
 ### 📚 Notebook Comment Architecture (Viva-Ready)
+
 Each cell in the notebooks follows a **Dual-Language** structure to assist during the Viva:
+
 - **`[TECH]` Comments**: Direct technical breakdown (e.g., hyperparameter choices, scaling math).
 - **`[NON-TECH]` Comments**: High-level business/security impact.
 - **`[ANALOGY]` Sections**: Simple, relatable examples to use when explaining complex math to non-technical evaluators.
@@ -305,10 +312,28 @@ The system is built on a **High-Security Web Architecture** designed for high-av
 - **Auto-Browser Launch**: A delayed `threading.Timer` automatically opens the browser at `127.0.0.1:5000` once the server socket is confirmed active.
 
 ### 📶 The Offline Reliability Loop
+
 The app utilizes a **State-Persistence Loop** via a PWA Service Worker (`sw.js`):
+
 1. **Pulse Verification**: The frontend emits a heartbeat every 30s to the `/Pulse` endpoint.
 2. **Network Interception**: If the `/Pulse` fails, the `sw.js` intercepts the `FETCH` signal and checks the local cache.
 3. **Emergency Handover**: If the system is offline, the Service Worker serves `offline.html`, which triggers an **Automatic Secure Logout** to prevent session hi-jacking while the network is insecure.
+
+### 🛡️ Adaptive Security Layers (ASL)
+
+The **Stable-2026** update introduces the Adaptive Security Layer, which moves beyond simple password hashing to protect the system's internal core:
+
+- **Neural Firewall (Path-Traversal Guard)**:
+  - **Logic**: When a user accesses the "Project Explorer," the system calculates the `abspath` of the requested file and ensures it starts with the `PROJECT_ROOT`.
+  - **Defense**: If an attacker attempts to use `../../` to access system passwords or root folders (e.g., `/etc/shadow` on Linux or `C:\Windows`), the Firewall intercepts the request and forces a redirect to the safe root.
+- **Cryptographic Identity (HMAC Tokens)**:
+  - **Protocol**: Instead of storing plain-text login states, the system generates a **Unique Session Signature** using `HMAC-SHA256`.
+  - **Persistence**: When the "Remember Me" feature is used, only a short-lived signature is stored. Any alteration to this signature results in an immediate session invalidation.
+- **Decoupled View Logic (macros.html)**:
+  - **Refactoring**: All interactive UI elements (Badges, Buttons, Cards) have been moved to a central Jinja2 macro library.
+  - **Impact**: This reduces code surface area, ensuring that a vulnerability in one page doesn't compromise the entire UI template system.
+
+---
 
 ## 📐 Logic Flow Diagram (Raw ASCII)
 
@@ -316,15 +341,21 @@ The app utilizes a **State-Persistence Loop** via a PWA Service Worker (`sw.js`)
 ┌──────────────────────────────────────────────────────────────┐
 │                        USER BROWSER                          │
 │          Login → Train → Predict → Results UI                │
-└──────────────────────────────┬───────────────────────────────┘
-                               │ AJAX / Form POST (+ CSRF)
-                               ▼
+└───────────┬──────────────────────────────────────────────────┘
+            │ AJAX / Form POST (+ HMAC Sig)
+            ▼
 ┌──────────────────────────────────────────────────────────────┐
 │                    MAIN.PY (Flask Server)                    │
 │                                                              │
-│          /UserLoginAction   →   users.json                   │
-│          /TrainAction       →   train_model.py               │
-│          /PredictAction     →   .pkl + RF predict            │
+│  [ SECURITY LAYER ]                                          │
+│  ├ Neural Firewall  ──► Path Sanitization                    │
+│  ├ HMAC Interceptor ──► Session Validation                   │
+│  └ Jinja2 Macros    ──► Sanitize UI Output                   │
+│                                                              │
+│  [ ACTION HANDLERS ]                                         │
+│  ├ /UserLoginAction   →   users.json                         │
+│  ├ /TrainAction       →   train_model.py                     │
+│  └ /PredictAction     →   .pkl + RF predict                  │
 └──────────────┬───────────────────────────────┬───────────────┘
                │                               │
      ┌─────────▼──────────┐          ┌─────────▼──────────┐
@@ -359,12 +390,13 @@ The app utilizes a **State-Persistence Loop** via a PWA Service Worker (`sw.js`)
 
 ## 🔐 Security Architecture
 
-| **Authentication** | `werkzeug` scrypt hashing; hardcoded admin hash |
-| **Session Security** | Server-side Flask sessions; secret key from `.env` |
-| **CSRF Protection** | `security_pre_check()` validates `X-CSRF-Token` on all `POST`/`PUT`/`DELETE` |
-| **Input Validation** | `train_model.py` enforces column contracts, rejects empty files, sanitizes `NaN`/`Inf` |
-| **Response Hardening** | `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Cache-Control: no-store` |
-| **Integrity Checks** | **ETag generation** via file hashing ensures that large assets (models/CSS) aren't tampered with during transit. |
+| **Authentication** | `PBKDF2-HMAC-SHA256` hashing in `users.json` |
+| **Session Security** | HMAC-signed session tokens; secret key from `.env` |
+| **Neural Firewall** | Absolute-path boundary enforcement for file exploration |
+| **CSRF Protection** | `security_pre_check()` validates `X-CSRF-Token` |
+| **Input Validation** | Sanitizes `NaN`/`Inf`; enforces strict CSV schema |
+| **Response Hardening** | `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN` |
+| **Integrity Checks** | **ETag generation** via MD5 file hashing |
 
 ---
 
@@ -403,6 +435,16 @@ It is a rule-based NLG system. After `predict()` returns a class name, the engin
 **Q: Why re-train during the demo instead of using a pre-loaded model?**
 
 Live training demonstrates the real-time pipeline: the examiner sees log streaming, the accuracy metric computed on-the-fly, and an immediate prediction run afterwards — proving the system works end-to-end, not just as a static showcase.
+
+**Q: How does the system handle directory traversal attacks?**
+
+The system uses a **Neural Firewall** logic. Whenever a file path is requested, it is converted to an absolute path using `os.path.abspath()`. It then checks if this path starts with the project's root directory. If the path tries to "escape" the project folder (e.g., using `../`), the request is discarded, and the user is redirected to safety.
+
+---
+
+**Q: Why was the UI refactored into Jinja2 Macros?**
+
+Refactoring the UI into `macros.html` promotes **Don't Repeat Yourself (DRY)** principles and security via abstraction. By centralizing UI components like the "Attack Badge" or "Result Card," we ensure consistent data sanitization and styling across all 5+ pages, reducing the potential for injection vulnerabilities in the template layer.
 
 ---
 

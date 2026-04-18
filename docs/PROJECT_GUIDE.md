@@ -62,6 +62,8 @@
   - 🐍 [Main.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/Main.py) (The Heart of the Project)
   - 🐍 [train_model.py](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/train_model.py) (The AI Trainer script)
   - 📄 [requirements.txt](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/requirements.txt) (List of needed libraries)
+  - 📄 [users.json](file:///c:/Users/sreya/OneDrive/Desktop/Project/CyberAttackPrediction/users.json) (User database with PBKDF2 hashes)
+  - 🔐 [.env](file:///c:/Users/sreya/OneDrive/Desktop/Project/.env) (Confidential configuration & secrets)
   - 📄 [Start_Jupyter_Venv.bat](file:///c:/Users/sreya/OneDrive/Desktop/Project/Start_Jupyter_Venv.bat) (One-click Research Lab Launch)
 
 ---
@@ -146,6 +148,7 @@ The internet is like a massive highway. Millions of pieces of information travel
 ### 📶 Offline-First Resilience (PWA)
 
 Our system is built to survive in hostile network environments.
+
 - **Service Worker**: A script that runs in the background. If your internet dies, it intercepts the request and serves a beautiful "System Offline" page.
 - **Pulse Detection**: The system constantly checks for a "Heartbeat." If the connection is lost, it automatically logs the user out and renders the offline interface to prevent data tampering.
 
@@ -231,10 +234,12 @@ We take three different AI models (MLP, KNN, Random Forest) and let them all gue
 ### 📁 `static/` DIRECTORY: The Visuals & Resilience
 
 #### 1. `sw.js` (Service Worker)
+
 - **Role**: The Network Interceptor.
 - **Logic**: It caches critical pages (like `offline.html`). When the browser detects it's offline, the Service Worker "steps in" and serves the cached page instead of showing a "No Internet" dinosaur.
 
 #### 2. `offline.html` (The Emergency Deck)
+
 - **Role**: A beautiful, branded landing page that explains the network status and provides an "Automatic Reconnect" timer.
 
 ---
@@ -731,6 +736,19 @@ See the Algorithmic Comparison and XAI sections above for full details on how th
   - *A*: Use WebSockets in Flask (via Flask-SocketIO) to push predictions to the browser in real time instead of waiting for a full CSV upload.
 - **Q: What is the academic contribution of this project?**
   - *A*: It demonstrates a full ML pipeline — from raw network data to human-readable AI-generated mitigations — integrating Random Forest with Explainable AI (SHAP) and a simulated GenAI layer.
+
+### 🛡️ Category L: Advanced Security (Stable-2026)
+
+- **Q: What is the "Neural Firewall" in your project?**
+  - *A*: It is a security logic that prevents "Directory Traversal." It ensures that a user can only view files inside the project folder and cannot use `../` to access sensitive system files on the host computer.
+- **Q: How do you protect against "Session Hijacking"?**
+  - *A*: We use **HMAC-SHA256 Cryptographic Tokens**. Every login session is uniquely signed. If someone tries to steal and modify the session cookie, the signature won't match, and the system logs them out immediately.
+- **Q: Why do you have a `.env` file?**
+  - *A*: It's an industry-best practice for "Secret Management." It keeps sensitive info like the Flask Secret Key and Admin credentials out of the main code, so they don't get accidentally uploaded to GitHub.
+- **Q: What is the benefit of using "Jinja2 Macros" for the UI?**
+  - *A*: It makes the UI "Decoupled" and "Modular." By defining elements like the "Attack Badge" in a macro, we ensure that the logic for displaying data is safe and consistent across all pages.
+- **Q: What hashing algorithm is used for the database?**
+  - *A*: We use `PBKDF2-HMAC-SHA256`. It is much slower and harder for hackers to crack compared to traditional MD5 or SHA1, making it highly secure for student projects.
 
 ### CATEGORY L: JUPYTER & NOTEBOOK ENVIRONMENTS
 

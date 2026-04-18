@@ -60,7 +60,7 @@ Uses **SHAP** (SHapley Additive exPlanations) in the notebooks to visualize whic
 | --- | --- |
 | `Main.py` | The Flask backend server (optimized for model loading) |
 | `train_model.py` | Run this to train and save the ML model to disk |
-| `.env` | Secure storage for admin credentials and secret keys |
+| `.env` | **MANDATORY**: Secure storage for admin credentials and secret keys |
 | `templates/base.html` | Modern Jinja2 base template with Bootstrap 5 |
 | `model/trained_rf_model.pkl` | The persistent, pre-trained model file |
 | `requirements.txt` | All dependencies including `python-dotenv` |
@@ -79,13 +79,21 @@ Uses **SHAP** (SHapley Additive exPlanations) in the notebooks to visualize whic
 ### Step 1: Initial Setup *(First Time Only)*
 
 1. Open a terminal in the project root.
-2. Install dependencies:
+2. **Setup Secrets**: Create a `.env` file in the root directory. Copy the contents from `.env.example` or use the following:
+
+   ```env
+   FLASK_SECRET_KEY=generate_a_long_hex_key
+   ADMIN_USER=admin
+   ADMIN_PASS=admin
+   ```
+
+3. Install dependencies:
 
    ```bat
    .venv\Scripts\python.exe -m pip install -r CyberAttackPrediction\requirements.txt
    ```
 
-3. Train the model:
+4. Train the model:
 
    ```bat
    .venv\Scripts\python.exe CyberAttackPrediction\train_model.py
@@ -104,7 +112,7 @@ Uses **SHAP** (SHapley Additive exPlanations) in the notebooks to visualize whic
 1. Double-click **`Start_WebApp_Venv.bat`** in the main folder.
 2. Wait for `Running on http://127.0.0.1:2026/` in the terminal.
 3. Open <http://127.0.0.1:2026> in your browser.
-4. Login using the credentials in your `.env` file *(default: admin / admin)*.
+4. Login using the credentials defined in your `.env` file *(Default: admin / admin)*.
 5. Upload `testData.csv` to see real-time predictions and AI insights.
 
 ---

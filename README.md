@@ -15,7 +15,7 @@
   <img src="https://img.shields.io/badge/Python-3.13.2-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Flask-v3.1.3-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
   <img src="https://img.shields.io/badge/Scikit--Learn-v1.8.0-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
-  <img src="https://img.shields.io/badge/Status-Hardened--2026-success?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/Status-Stable--2026--Hardened-success?style=for-the-badge" alt="Status">
 </p>
 
 ## 🏛️ Academic Institutional Details
@@ -45,9 +45,10 @@
 This project includes all necessary software. Follow these **3 simple steps** to launch the application for your viva:
 
 1. **Install Python**: Open the [📁 Software/](Software/) folder and run **[🐍 python-3.13.12-amd64.exe](Software/python-3.13.12-amd64.exe)**.
-2. **Setup Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) or `install_deps.ps1` to automatically prepare the high-performance environment.
-3. **Unified Launch**: Run [🐍 launcher.py](launcher.py) to access the **Command Center**. Choose **Mode 1** for the Web Dashboard or **Mode 2** for Jupyter research.
-4. **Active Session Guard**: Start scripts now feature **Venv Persistence**, ensuring the `.venv` environment remains active and isolated for high-performance operation.
+2. **Configure Secrets**: Create a `.env` file in the root directory (use `.env.example` as a template) to secure your admin credentials and Flask session keys.
+3. **Setup Dependencies**: Run the [⚙️ Pack Install.bat](Software/Pack%20Install.bat) or `install_deps.ps1` to automatically prepare the high-performance environment.
+4. **Unified Launch**: Run [🐍 launcher.py](launcher.py) to access the **Command Center**. Choose **Mode 1** for the Web Dashboard or **Mode 2** for Jupyter research.
+5. **Active Session Guard**: Start scripts now feature **Venv Persistence**, ensuring the `.venv` environment remains active and isolated for high-performance operation.
 
 > [!TIP]
 > **Admin Dashboard Bypass**: Use Username `admin` and Password `admin` to immediately access the full features and Master Badge interface.
@@ -58,10 +59,9 @@ This project includes all necessary software. Follow these **3 simple steps** to
 
 - **🧠 Stacking Ensemble AI** — Multi-model architecture (Random Forest, KNN, MLP) achieving **98%+ accuracy**.
 - **🤖 GenAI Mitigation Insights** — Converts classification results into plain-English advice for security administrators.
+- **🛡️ Stable-2026 Hardening** — Integrated **Neural Firewall** (path traversal protection) and **Cryptographic Identity** (HMAC session tokens).
 - **🔍 Explainable AI (SHAP)** — Visualizes *why* a network packet was flagged using Shapley Additive Explanations.
-- **🛡️ CSRF Cyber-Hardening** — Global token protection and secure header enforcement across all endpoints.
-- **💎 Liquid Glass UI** — Glassmorphism design with 80px Gaussian blur and smooth staggered animations.
-- **📂 In-Browser Repository Explorer** — Logged-in users can browse and read all project files directly in the app.
+- **📂 In-Browser Repository Explorer** — Logged-in users can browse and read all project files directly in the app, protected by root-level sandboxing.
 
 ---
 
@@ -101,7 +101,17 @@ This project includes all necessary software. Follow these **3 simple steps** to
    pip install -r CyberAttackPrediction/requirements.txt
    ```
 
-4. **Run the Application**:
+4. **Configure Environment**:
+   Create a `.env` file in the root based on the following template:
+
+   ```env
+   FLASK_SECRET_KEY=your_secure_hex_key
+   ADMIN_USER=admin
+   ADMIN_PASS=admin
+   ADMIN_HASH=pbkdf2:sha256:600000$...
+   ```
+
+5. **Run the Application**:
    Launch via `Start_WebApp_Venv.bat` or `python CyberAttackPrediction/Main.py`.
 
 ## 🏗️ Project Structure
@@ -118,6 +128,7 @@ This project includes all necessary software. Follow these **3 simple steps** to
   - 📔 [ProposeCyberAttack.ipynb](CyberAttackPrediction/ProposeCyberAttack.ipynb) — Research notebook (Phase 1)
   - 📄 [requirements.txt](CyberAttackPrediction/requirements.txt) — Python dependencies
   - 📄 [users.json](CyberAttackPrediction/users.json) — User registry
+  - 🔐 [.env](.env) — Sensitive configuration & secrets
 
 - 📁 [**docs/**](docs/) — Unified documentation hub
   - 📖 [PROJECT_BOOK.md](docs/PROJECT_BOOK.md) — Definitive technical guide

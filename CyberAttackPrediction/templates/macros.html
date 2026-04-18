@@ -1,0 +1,68 @@
+{% macro render_prediction_table(predictions, raw_data) %}
+<table class="table table-striped table-hover align-middle border-glass-soft">
+    <thead>
+        <tr>
+            <th class="ps-4">Record ID</th>
+            <th>Network Traffic Pulse</th>
+            <th>Security Status</th>
+            <th>GenAI Insights</th>
+            <th class="text-center pe-4">Inspection</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pred in predictions %}
+        {% set row_idx = loop.index0 %}
+        {% set row_data = raw_data[row_idx]|list %}
+        <tr>
+            <td class="ps-4">
+                <span class="x-small fw-bold dynamic-muted">#{{ 1000 + loop.index }}</span>
+            </td>
+            <td>
+                <code class="dynamic-text">Vector-{{ 2026 + loop.index }}</code>
+            </td>
+            <td>
+                {% if pred == 'normal' or pred == 'normal.' %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill shadow-sm">
+                    <i class="fas fa-check-circle me-1"></i> Normal Activity
+                </span>
+                {% else %}
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-2 rounded-pill shadow-sm" style="box-shadow: 0 4px 12px rgba(var(--danger-rgb), 0.15);">
+                    <i class="fas fa-skull-crossbones me-1"></i> {{ pred|upper }} DETECTED
+                </span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="d-flex align-items-center gap-2">
+                    <div class="bg-primary-light p-1 rounded-circle flex-shrink-0" style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-robot text-primary" style="font-size: 10px;"></i>
+                    </div>
+                    <span class="xx-small dynamic-muted opacity-75">
+                        {% if pred == 'normal' or pred == 'normal.' %}
+                        Traffic patterns within standard heuristic baselines. No escalation required.
+                        {% elif 'dos' in pred or 'land' in pred or 'neptune' in pred or 'smurf' in pred or 'pod' in pred or 'back' in pred or 'teardrop' in pred %}
+                        Potentially a <strong>Denial of Service (DoS)</strong> attempt. System should restrict incoming packet frequency.
+                        {% elif 'r2l' in pred or 'warezmaster' in pred or 'warezclient' in pred or 'ftp_write' in pred or 'guess_passwd' in pred or 'imap' in pred or 'multihop' in pred or 'phf' in pred or 'spy' in pred %}
+                        Possible <strong>Remote-to-Local (R2L)</strong> attack. Verify account credentials and check for brute-force patterns.
+                        {% elif 'u2r' in pred or 'buffer_overflow' in pred or 'loadmodule' in pred or 'perl' in pred or 'rootkit' in pred %}
+                        Critical <strong>User-to-Root (U2R)</strong> escalation! Immediate account lockdown recommended.
+                        {% elif 'probe' in pred or 'satan' in pred or 'ipsweep' in pred or 'nmap' in pred or 'portsweep' in pred %}
+                        <strong>Probing/Scan</strong> activity detected. IP address may be mapping the network for future intrusion.
+                        {% else %}
+                        Suspicious heuristic anomalies detected. Logged for manual expert review.
+                        {% endif %}
+                    </span>
+                </div>
+            </td>
+            <td class="text-center pe-4">
+                <button class="btn btn-outline-info btn-sm rounded-pill p-0 d-inline-flex align-items-center justify-content-center hover-scale" 
+                        style="width: 32px; height: 32px;" 
+                        onclick="inspectSample(this)" 
+                        data-sample='{{ row_data|tojson }}'>
+                    <i class="fas fa-microscope" style="font-size: 12px;"></i>
+                </button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endmacro %}
